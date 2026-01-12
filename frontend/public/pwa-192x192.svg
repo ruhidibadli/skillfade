@@ -1,10 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
   <defs>
-    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" style="stop-color:#4A90E2;stop-opacity:1" />
       <stop offset="100%" style="stop-color:#6366F1;stop-opacity:1" />
     </linearGradient>
   </defs>
-  <rect width="192" height="192" rx="38" fill="url(#grad)"/>
-  <text x="96" y="130" font-family="Arial, sans-serif" font-size="96" font-weight="bold" fill="white" text-anchor="middle">SF</text>
+  <!-- Background -->
+  <rect width="192" height="192" rx="38" fill="url(#bg-grad)"/>
+  <!-- Three fading bars representing skill decay -->
+  <!-- Bar 1: Tall, full opacity (fresh skill) -->
+  <rect x="35" y="38" width="31" height="115" rx="8" fill="white" opacity="1"/>
+  <!-- Bar 2: Medium, reduced opacity (aging skill) -->
+  <rect x="81" y="67" width="31" height="86" rx="8" fill="white" opacity="0.7"/>
+  <!-- Bar 3: Short, faded (decayed skill) -->
+  <rect x="127" y="96" width="31" height="57" rx="8" fill="white" opacity="0.4"/>
 </svg>

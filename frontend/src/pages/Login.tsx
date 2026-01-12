@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Sparkles, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import LogoIcon from '../components/LogoIcon';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -36,7 +37,7 @@ const Login: React.FC = () => {
       <div className="absolute top-0 left-0 right-0 p-6">
         <Link to="/" className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-accent-400 to-secondary-400 flex items-center justify-center shadow-glow-accent">
-            <Sparkles className="w-5 h-5 text-surface-50" />
+            <LogoIcon className="w-5 h-5 text-surface-50" />
           </div>
           <span className="text-xl font-bold text-txt-primary">SkillFade</span>
           <span className="tag-accent text-[10px] uppercase tracking-wider">Beta</span>

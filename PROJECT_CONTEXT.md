@@ -579,6 +579,10 @@ ENVIRONMENT=development
 
 ## Development Workflow
 
+**Primary Development Environment:** Docker (recommended)
+
+Both frontend and backend run in Docker containers during development. This ensures consistent environments and avoids local dependency issues.
+
 ### Quick Start (Docker)
 ```bash
 # 1. Configure environment
@@ -595,9 +599,16 @@ docker-compose exec backend alembic upgrade head
 # Frontend: http://localhost:3000
 # Backend API: http://localhost:8000
 # API Docs: http://localhost:8000/docs
+
+# 5. View logs
+docker-compose logs -f frontend  # Frontend logs
+docker-compose logs -f backend   # Backend logs
+
+# 6. Rebuild after changes
+docker-compose up -d --build     # Rebuild containers
 ```
 
-### Manual Setup
+### Manual Setup (Alternative)
 
 **Backend:**
 ```bash

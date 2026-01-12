@@ -6,10 +6,10 @@ import {
   Layers,
   BarChart3,
   Settings,
-  LogOut,
-  Sparkles
+  LogOut
 } from 'lucide-react';
 import QuickLogWidget from './QuickLogWidget';
+import LogoIcon from './LogoIcon';
 
 const Layout: React.FC = () => {
   const { logout } = useAuth();
@@ -39,7 +39,7 @@ const Layout: React.FC = () => {
             {/* Logo */}
             <Link to="/dashboard" className="flex items-center gap-3 group">
               <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-accent-400 to-secondary-400 flex items-center justify-center shadow-glow-accent group-hover:shadow-glow-accent-lg transition-shadow">
-                <Sparkles className="w-5 h-5 text-surface-50" />
+                <LogoIcon className="w-5 h-5 text-surface-50" />
               </div>
               <span className="text-xl font-bold text-txt-primary">
                 SkillFade
