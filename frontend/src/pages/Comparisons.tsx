@@ -18,42 +18,42 @@ interface Comparison {
 
 const comparisons: Comparison[] = [
   {
-    competitor: "Anki",
-    tagline: "SkillFade vs Anki: Skill Tracking vs Spaced Repetition",
-    whatTheyDo: "Anki is a flashcard application using spaced repetition algorithms to help you memorize discrete facts. It excels at vocabulary, definitions, medical terminology, and factual recall. You create cards, review them, and Anki schedules reviews based on how well you remember each card.",
+    competitor: "Flashcard Apps",
+    tagline: "SkillFade vs Flashcard Apps: Skill Tracking vs Spaced Repetition",
+    whatTheyDo: "Flashcard applications use spaced repetition algorithms to help you memorize discrete facts. They excel at vocabulary, definitions, medical terminology, and factual recall. You create cards, review them, and the app schedules reviews based on how well you remember each card.",
     howWeDiffer: "SkillFade tracks broader skill competency over time, not individual facts. It measures when you last practiced a skill and whether you are balancing learning with application. There are no flashcards, no quizzes, and no scheduled reviews. Instead, SkillFade visualizes when you last practiced a skill and how that affects your retention through a freshness score (0-100%).",
-    useTogetherNote: "Use Anki to memorize syntax, concepts, and facts. Use SkillFade to track whether you are actually writing code and applying those concepts. They are complementary tools for different aspects of learning.",
+    useTogetherNote: "Use flashcard apps to memorize syntax, concepts, and facts. Use SkillFade to track whether you are actually writing code and applying those concepts. They are complementary tools for different aspects of learning.",
     bestFor: {
       them: "Memorizing discrete facts, vocabulary, definitions, medical terminology, flashcard-based learning",
       skillfade: "Tracking skill decay over time, balancing learning with practice, visualizing the forgetting curve for skills"
     }
   },
   {
-    competitor: "Notion",
-    tagline: "SkillFade vs Notion: Decay Tracking vs Note-Taking",
-    whatTheyDo: "Notion is a flexible workspace for notes, documents, databases, wikis, and project management. It stores and organizes information in a highly customizable way. Many learners use it to take notes, create learning dashboards, and organize resources.",
-    howWeDiffer: "Notion stores what you learn but does not track whether those skills are decaying over time. SkillFade specifically calculates freshness scores based on time since last practice and alerts you when skills need reinforcement. SkillFade adds the time dimension that note-taking apps lack - it shows you that knowledge decays without practice.",
-    useTogetherNote: "Use Notion to store notes and resources about what you are learning. Use SkillFade to track whether you are applying that knowledge and which skills are fading. Notion is for storage; SkillFade is for decay tracking.",
+    competitor: "Note-Taking Apps",
+    tagline: "SkillFade vs Note-Taking Apps: Decay Tracking vs Documentation",
+    whatTheyDo: "Note-taking applications are flexible workspaces for notes, documents, databases, wikis, and project management. They store and organize information in highly customizable ways. Many learners use them to take notes, create learning dashboards, and organize resources.",
+    howWeDiffer: "Note-taking apps store what you learn but do not track whether those skills are decaying over time. SkillFade specifically calculates freshness scores based on time since last practice and alerts you when skills need reinforcement. SkillFade adds the time dimension that note-taking apps lack - it shows you that knowledge decays without practice.",
+    useTogetherNote: "Use note-taking apps to store notes and resources about what you are learning. Use SkillFade to track whether you are applying that knowledge and which skills are fading. Note-taking is for storage; SkillFade is for decay tracking.",
     bestFor: {
       them: "Note-taking, documentation, knowledge bases, project management, team collaboration, flexible databases",
       skillfade: "Tracking skill freshness over time, visualizing learning decay, monitoring practice frequency"
     }
   },
   {
-    competitor: "Obsidian",
-    tagline: "SkillFade vs Obsidian: Decay Tracking vs Knowledge Graphs",
-    whatTheyDo: "Obsidian is a markdown-based knowledge management tool with linked notes and graph visualization. It helps you build a personal knowledge base where ideas connect to each other. The graph view shows relationships between your notes.",
-    howWeDiffer: "Obsidian shows connections between your notes but not whether your skills are fresh or decaying. SkillFade adds the time dimension - tracking when you last practiced and calculating decay. While Obsidian helps you understand relationships between concepts, SkillFade helps you understand which skills need reinforcement.",
-    useTogetherNote: "Use Obsidian for your knowledge graph and linked notes about concepts. Use SkillFade to track which skills need practice to prevent decay. Obsidian is about connections; SkillFade is about time-based decay.",
+    competitor: "Knowledge Graph Apps",
+    tagline: "SkillFade vs Knowledge Graph Apps: Decay Tracking vs Linked Notes",
+    whatTheyDo: "Knowledge graph applications are markdown-based knowledge management tools with linked notes and graph visualization. They help you build a personal knowledge base where ideas connect to each other. The graph view shows relationships between your notes.",
+    howWeDiffer: "Knowledge graph apps show connections between your notes but not whether your skills are fresh or decaying. SkillFade adds the time dimension - tracking when you last practiced and calculating decay. While knowledge graphs help you understand relationships between concepts, SkillFade helps you understand which skills need reinforcement.",
+    useTogetherNote: "Use knowledge graph apps for your linked notes about concepts. Use SkillFade to track which skills need practice to prevent decay. Knowledge graphs are about connections; SkillFade is about time-based decay.",
     bestFor: {
       them: "Building knowledge graphs, linking ideas, long-form writing, markdown notes, local-first storage",
       skillfade: "Time-based skill tracking, practice frequency monitoring, visualizing the forgetting curve"
     }
   },
   {
-    competitor: "Spaced Repetition Apps (SuperMemo, RemNote, Mochi)",
+    competitor: "Spaced Repetition Apps",
     tagline: "SkillFade vs Spaced Repetition Apps",
-    whatTheyDo: "Spaced repetition apps like SuperMemo, RemNote, and Mochi schedule reviews of flashcards to optimize memory retention based on the forgetting curve. They actively quiz you and adjust review intervals based on your performance.",
+    whatTheyDo: "Spaced repetition apps schedule reviews of flashcards to optimize memory retention based on the forgetting curve. They actively quiz you and adjust review intervals based on your performance.",
     howWeDiffer: "SkillFade does not create flashcards or schedule reviews. It tracks when you actually practice skills (through projects, exercises, work) and shows whether you are balancing learning with doing. It is passive tracking of real-world practice, not active quizzing of memorized facts. SkillFade respects your autonomy - it shows you the truth and lets you decide what to do.",
     useTogetherNote: "Use spaced repetition apps for facts you need to memorize verbatim. Use SkillFade to track whether you are applying skills in practice. Spaced repetition is for recall; SkillFade is for application.",
     bestFor: {
@@ -64,15 +64,15 @@ const comparisons: Comparison[] = [
 ];
 
 const featureComparison = [
-  { feature: "Tracks skill decay over time", skillfade: true, anki: false, notion: false, obsidian: false },
-  { feature: "Flashcard-based learning", skillfade: false, anki: true, notion: false, obsidian: false },
-  { feature: "Note-taking / documentation", skillfade: false, anki: false, notion: true, obsidian: true },
-  { feature: "Knowledge graphs / linked notes", skillfade: false, anki: false, notion: "partial", obsidian: true },
-  { feature: "Tracks learning vs practice balance", skillfade: true, anki: false, notion: false, obsidian: false },
-  { feature: "Freshness scores (0-100%)", skillfade: true, anki: false, notion: false, obsidian: false },
-  { feature: "No gamification (streaks, points)", skillfade: true, anki: false, notion: true, obsidian: true },
-  { feature: "Self-hosted option", skillfade: true, anki: true, notion: false, obsidian: true },
-  { feature: "Open source", skillfade: true, anki: true, notion: false, obsidian: false },
+  { feature: "Tracks skill decay over time", skillfade: true, flashcard: false, notetaking: false, knowledgegraph: false },
+  { feature: "Flashcard-based learning", skillfade: false, flashcard: true, notetaking: false, knowledgegraph: false },
+  { feature: "Note-taking / documentation", skillfade: false, flashcard: false, notetaking: true, knowledgegraph: true },
+  { feature: "Knowledge graphs / linked notes", skillfade: false, flashcard: false, notetaking: "partial", knowledgegraph: true },
+  { feature: "Tracks learning vs practice balance", skillfade: true, flashcard: false, notetaking: false, knowledgegraph: false },
+  { feature: "Freshness scores (0-100%)", skillfade: true, flashcard: false, notetaking: false, knowledgegraph: false },
+  { feature: "No gamification (streaks, points)", skillfade: true, flashcard: false, notetaking: true, knowledgegraph: true },
+  { feature: "Self-hosted option", skillfade: true, flashcard: true, notetaking: false, knowledgegraph: true },
+  { feature: "Open source", skillfade: true, flashcard: true, notetaking: false, knowledgegraph: false },
 ];
 
 const Comparisons: React.FC = () => {
@@ -85,8 +85,8 @@ const Comparisons: React.FC = () => {
   return (
     <div className="min-h-screen bg-mesh">
       <SEO
-        title="SkillFade vs Anki, Notion, Obsidian - Tool Comparisons"
-        description="Compare SkillFade to Anki, Notion, Obsidian, and spaced repetition apps. Learn how skill decay tracking differs from flashcards, note-taking, and knowledge graphs. Find the right tool for your learning needs."
+        title="SkillFade vs Other Learning Tools - Comparisons"
+        description="Compare SkillFade to flashcard apps, note-taking apps, knowledge graphs, and spaced repetition apps. Learn how skill decay tracking differs from other learning tools. Find the right tool for your learning needs."
         canonicalUrl="https://skillfade.app/comparisons"
       />
 
@@ -145,9 +145,9 @@ const Comparisons: React.FC = () => {
                     <tr className="border-b border-border-subtle bg-surface-100/50">
                       <th className="px-6 py-4 text-left text-sm font-semibold text-txt-primary">Feature</th>
                       <th className="px-6 py-4 text-center text-sm font-semibold text-accent-400">SkillFade</th>
-                      <th className="px-6 py-4 text-center text-sm font-semibold text-txt-secondary">Anki</th>
-                      <th className="px-6 py-4 text-center text-sm font-semibold text-txt-secondary">Notion</th>
-                      <th className="px-6 py-4 text-center text-sm font-semibold text-txt-secondary">Obsidian</th>
+                      <th className="px-6 py-4 text-center text-sm font-semibold text-txt-secondary">Flashcard Apps</th>
+                      <th className="px-6 py-4 text-center text-sm font-semibold text-txt-secondary">Note-Taking Apps</th>
+                      <th className="px-6 py-4 text-center text-sm font-semibold text-txt-secondary">Knowledge Graphs</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -155,9 +155,9 @@ const Comparisons: React.FC = () => {
                       <tr key={index} className="border-b border-border-subtle last:border-0 hover:bg-surface-100/30 transition-colors">
                         <td className="px-6 py-4 text-sm text-txt-secondary">{row.feature}</td>
                         <td className="px-6 py-4 text-center">{renderFeatureStatus(row.skillfade)}</td>
-                        <td className="px-6 py-4 text-center">{renderFeatureStatus(row.anki)}</td>
-                        <td className="px-6 py-4 text-center">{renderFeatureStatus(row.notion)}</td>
-                        <td className="px-6 py-4 text-center">{renderFeatureStatus(row.obsidian)}</td>
+                        <td className="px-6 py-4 text-center">{renderFeatureStatus(row.flashcard)}</td>
+                        <td className="px-6 py-4 text-center">{renderFeatureStatus(row.notetaking)}</td>
+                        <td className="px-6 py-4 text-center">{renderFeatureStatus(row.knowledgegraph)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -246,15 +246,15 @@ const Comparisons: React.FC = () => {
                 <ul className="space-y-3 text-txt-secondary">
                   <li className="flex gap-3">
                     <Check className="w-5 h-5 text-fresh-base flex-shrink-0 mt-0.5" />
-                    <span>Use <strong className="text-txt-primary">Anki</strong> for memorizing facts, <strong className="text-txt-primary">SkillFade</strong> for tracking skill decay</span>
+                    <span>Use <strong className="text-txt-primary">flashcard apps</strong> for memorizing facts, <strong className="text-txt-primary">SkillFade</strong> for tracking skill decay</span>
                   </li>
                   <li className="flex gap-3">
                     <Check className="w-5 h-5 text-fresh-base flex-shrink-0 mt-0.5" />
-                    <span>Use <strong className="text-txt-primary">Notion</strong> for notes and organization, <strong className="text-txt-primary">SkillFade</strong> for decay tracking</span>
+                    <span>Use <strong className="text-txt-primary">note-taking apps</strong> for notes and organization, <strong className="text-txt-primary">SkillFade</strong> for decay tracking</span>
                   </li>
                   <li className="flex gap-3">
                     <Check className="w-5 h-5 text-fresh-base flex-shrink-0 mt-0.5" />
-                    <span>Use <strong className="text-txt-primary">Obsidian</strong> for knowledge graphs, <strong className="text-txt-primary">SkillFade</strong> for time-based freshness</span>
+                    <span>Use <strong className="text-txt-primary">knowledge graph apps</strong> for linked notes, <strong className="text-txt-primary">SkillFade</strong> for time-based freshness</span>
                   </li>
                 </ul>
               </div>

@@ -21,3 +21,4 @@ class User(Base):
     learning_events = relationship("LearningEvent", back_populates="user", cascade="all, delete-orphan")
     practice_events = relationship("PracticeEvent", back_populates="user", cascade="all, delete-orphan")
     event_templates = relationship("EventTemplate", back_populates="user", cascade="all, delete-orphan")
+    categories = relationship("Category", back_populates="user", cascade="all, delete-orphan")

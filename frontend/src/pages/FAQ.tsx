@@ -20,12 +20,12 @@ const faqItems: FAQItem[] = [
     answer: "Each skill you track has a freshness score from 0% to 100%. Freshness decays at a configurable rate (default 2% per day) when you don't practice. Learning events (reading, courses, videos) provide a temporary boost, but only practice events (projects, exercises, teaching) fully reset the decay. Visual indicators show fresh (70%+, green), aging (40-70%, yellow), and decayed (below 40%, red) states. You can customize decay rates per skill based on how quickly different types of knowledge fade."
   },
   {
-    question: "How is SkillFade different from Anki or other spaced repetition apps?",
-    answer: "Anki and similar apps focus on memorizing discrete facts using flashcards and spaced repetition algorithms. They excel at vocabulary, definitions, and factual recall. SkillFade tracks broader skill competency over time, not individual facts. It measures when you last practiced a skill and whether you are balancing learning with application. There are no flashcards or quizzes. Instead, SkillFade visualizes when you last practiced a skill and how that affects your retention. You might use Anki to memorize syntax and SkillFade to track whether you are actually writing code."
+    question: "How is SkillFade different from flashcard or spaced repetition apps?",
+    answer: "Flashcard and spaced repetition apps focus on memorizing discrete facts using flashcards and spaced repetition algorithms. They excel at vocabulary, definitions, and factual recall. SkillFade tracks broader skill competency over time, not individual facts. It measures when you last practiced a skill and whether you are balancing learning with application. There are no flashcards or quizzes. Instead, SkillFade visualizes when you last practiced a skill and how that affects your retention. You might use flashcard apps to memorize syntax and SkillFade to track whether you are actually writing code."
   },
   {
-    question: "How is SkillFade different from Notion or Obsidian?",
-    answer: "Notion and Obsidian are general-purpose note-taking and knowledge management tools. They store what you learn but do not track whether your skills are decaying over time. SkillFade specifically calculates freshness scores based on time since last practice and alerts you when skills need reinforcement. You could use Notion for notes and SkillFade to track whether you are applying that knowledge. SkillFade adds the time dimension that note-taking apps lack."
+    question: "How is SkillFade different from note-taking or knowledge management apps?",
+    answer: "Note-taking and knowledge management apps are general-purpose tools for storing and organizing information. They store what you learn but do not track whether your skills are decaying over time. SkillFade specifically calculates freshness scores based on time since last practice and alerts you when skills need reinforcement. You could use note-taking apps for notes and SkillFade to track whether you are applying that knowledge. SkillFade adds the time dimension that note-taking apps lack."
   },
   {
     question: "What does 'a mirror, not a coach' mean?",

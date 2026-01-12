@@ -77,7 +77,7 @@ def export_data(
         skill_data = {
             "id": str(skill.id),
             "name": skill.name,
-            "category": skill.category,
+            "category": skill.category_obj.name if skill.category_obj else None,
             "created_at": skill.created_at.isoformat(),
             "archived_at": skill.archived_at.isoformat() if skill.archived_at else None,
             "learning_events": [],

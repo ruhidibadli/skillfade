@@ -24,7 +24,7 @@ class Skill(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     name = Column(String(100), nullable=False)
-    category = Column(String(50), nullable=True)
+    category_id = Column(UUID(as_uuid=True), ForeignKey("categories.id", ondelete="SET NULL"), nullable=True)
     decay_rate = Column(Float, default=0.02, nullable=False)  # Custom decay rate per skill
     target_freshness = Column(Float, nullable=True)  # Personal freshness threshold
     notes = Column(Text, nullable=True)  # Persistent notes for the skill
@@ -33,6 +33,7 @@ class Skill(Base):
 
     # Relationships
     user = relationship("User", back_populates="skills")
+    category_obj = relationship("Category", back_populates="skills")
     learning_events = relationship("LearningEvent", back_populates="skill", cascade="all, delete-orphan")
     practice_events = relationship("PracticeEvent", back_populates="skill", cascade="all, delete-orphan")
 

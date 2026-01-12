@@ -401,10 +401,11 @@ def get_category_stats(
     category_data = {}
 
     for skill in skills:
-        category = skill.category or "Uncategorized"
+        # Get category name from the related category object
+        category_name = skill.category_obj.name if skill.category_obj else "Uncategorized"
 
-        if category not in category_data:
-            category_data[category] = {
+        if category_name not in category_data:
+            category_data[category_name] = {
                 "skills": [],
                 "total_learning": 0,
                 "total_practice": 0,
@@ -421,19 +422,19 @@ def get_category_stats(
             base_decay_rate=skill.decay_rate or 0.02
         )
 
-        category_data[category]["skills"].append(skill.name)
-        category_data[category]["total_learning"] += len(learning_events)
-        category_data[category]["total_practice"] += len(practice_events)
-        category_data[category]["freshness_sum"] += freshness
+        category_data[category_name]["skills"].append(skill.name)
+        category_data[category_name]["total_learning"] += len(learning_events)
+        category_data[category_name]["total_practice"] += len(practice_events)
+        category_data[category_name]["freshness_sum"] += freshness
 
     # Calculate averages and format response
     result = []
-    for category, data in category_data.items():
+    for category_name, data in category_data.items():
         skill_count = len(data["skills"])
         avg_freshness = data["freshness_sum"] / skill_count if skill_count > 0 else 0
 
         result.append({
-            "category": category,
+            "category": category_name,
             "skill_count": skill_count,
             "average_freshness": round(avg_freshness, 1),
             "total_learning": data["total_learning"],

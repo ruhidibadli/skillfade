@@ -5,6 +5,19 @@ export interface User {
   created_at: string;
 }
 
+export interface Category {
+  id: string;
+  user_id: string;
+  name: string;
+  created_at: string;
+  skill_count?: number;
+}
+
+export interface CategoryInfo {
+  id: string;
+  name: string;
+}
+
 export interface SkillDependencyInfo {
   id: string;
   name: string;
@@ -16,7 +29,8 @@ export interface Skill {
   id: string;
   user_id: string;
   name: string;
-  category: string | null;
+  category_id: string | null;
+  category: CategoryInfo | null;
   decay_rate: number;
   target_freshness: number | null;
   notes: string | null;

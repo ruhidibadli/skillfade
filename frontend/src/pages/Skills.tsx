@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { skills as skillsApi } from "../services/api";
-import type { Skill } from "../types";
+import { skills as skillsApi, categories as categoriesApi } from "../services/api";
+import type { Skill, Category } from "../types";
 import {
   Plus,
   Target,
@@ -12,7 +12,11 @@ import {
   X,
   Loader2,
   AlertTriangle,
-  Link2
+  Link2,
+  ChevronDown,
+  Filter,
+  Grid3X3,
+  List
 } from "lucide-react";
 
 // Status Dot Component
@@ -29,22 +33,33 @@ const StatusDot: React.FC<{ freshness?: number }> = ({ freshness }) => {
 
 const Skills: React.FC = () => {
   const [skills, setSkills] = useState<Skill[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [newSkillName, setNewSkillName] = useState("");
-  const [newSkillCategory, setNewSkillCategory] = useState("");
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>("");
+  const [newCategoryName, setNewCategoryName] = useState("");
+  const [showNewCategoryInput, setShowNewCategoryInput] = useState(false);
   const [error, setError] = useState("");
 
+  // View and filter state
+  const [viewMode, setViewMode] = useState<"grid" | "grouped">("grid");
+  const [filterCategoryId, setFilterCategoryId] = useState<string>("all");
+
   useEffect(() => {
-    fetchSkills();
+    fetchData();
   }, []);
 
-  const fetchSkills = async () => {
+  const fetchData = async () => {
     try {
-      const response = await skillsApi.list();
-      setSkills(response.data);
+      const [skillsResponse, categoriesResponse] = await Promise.all([
+        skillsApi.list(),
+        categoriesApi.list()
+      ]);
+      setSkills(skillsResponse.data);
+      setCategories(categoriesResponse.data);
     } catch (error) {
-      console.error("Failed to fetch skills:", error);
+      console.error("Failed to fetch data:", error);
     } finally {
       setLoading(false);
     }
@@ -55,14 +70,23 @@ const Skills: React.FC = () => {
     setError("");
 
     try {
-      await skillsApi.create({
+      const createData: { name: string; category_id?: string; category_name?: string } = {
         name: newSkillName,
-        category: newSkillCategory || undefined,
-      });
+      };
+
+      if (showNewCategoryInput && newCategoryName.trim()) {
+        createData.category_name = newCategoryName.trim();
+      } else if (selectedCategoryId) {
+        createData.category_id = selectedCategoryId;
+      }
+
+      await skillsApi.create(createData);
       setShowModal(false);
       setNewSkillName("");
-      setNewSkillCategory("");
-      fetchSkills();
+      setSelectedCategoryId("");
+      setNewCategoryName("");
+      setShowNewCategoryInput(false);
+      fetchData();
     } catch (err: any) {
       setError(err.response?.data?.detail || "Failed to create skill");
     }
@@ -81,6 +105,142 @@ const Skills: React.FC = () => {
     if (freshness >= 40) return "bg-aging-base";
     return "bg-decayed-base";
   };
+
+  // Filter skills based on selected category
+  const filteredSkills = useMemo(() => {
+    if (filterCategoryId === "all") return skills;
+    if (filterCategoryId === "uncategorized") return skills.filter(s => !s.category);
+    return skills.filter(s => s.category?.id === filterCategoryId);
+  }, [skills, filterCategoryId]);
+
+  // Group skills by category
+  const groupedSkills = useMemo(() => {
+    const groups: Record<string, { category: Category | null; skills: Skill[] }> = {};
+
+    // Initialize uncategorized group
+    groups["uncategorized"] = { category: null, skills: [] };
+
+    // Initialize groups for each category
+    categories.forEach(cat => {
+      groups[cat.id] = { category: cat, skills: [] };
+    });
+
+    // Sort skills into groups
+    skills.forEach(skill => {
+      if (skill.category) {
+        if (groups[skill.category.id]) {
+          groups[skill.category.id].skills.push(skill);
+        }
+      } else {
+        groups["uncategorized"].skills.push(skill);
+      }
+    });
+
+    // Convert to array and filter out empty groups
+    return Object.entries(groups)
+      .filter(([, group]) => group.skills.length > 0)
+      .sort((a, b) => {
+        // Uncategorized goes last
+        if (a[0] === "uncategorized") return 1;
+        if (b[0] === "uncategorized") return -1;
+        // Sort alphabetically by category name
+        return (a[1].category?.name || "").localeCompare(b[1].category?.name || "");
+      });
+  }, [skills, categories]);
+
+  const renderSkillCard = (skill: Skill) => (
+    <Link
+      key={skill.id}
+      to={`/skills/${skill.id}`}
+      className="card-interactive p-5 group"
+    >
+      {/* Header */}
+      <div className="flex items-start justify-between mb-4">
+        <div className="flex items-center gap-3">
+          <StatusDot freshness={skill.freshness} />
+          <h3 className="text-lg font-semibold text-txt-primary group-hover:text-accent-400 transition-colors">
+            {skill.name}
+          </h3>
+        </div>
+        <ArrowUpRight className="w-4 h-4 text-txt-muted opacity-0 group-hover:opacity-100 transition-opacity" />
+      </div>
+
+      {/* Category */}
+      {skill.category && viewMode === "grid" && (
+        <div className="flex items-center gap-1.5 mb-4">
+          <Folder className="w-3 h-3 text-txt-muted" />
+          <span className="tag">{skill.category.name}</span>
+        </div>
+      )}
+
+      {/* Freshness Bar */}
+      <div className="mb-4">
+        <div className="flex justify-between items-center mb-1.5">
+          <span className="text-xs text-txt-muted">Freshness</span>
+          <div className="flex items-center gap-2">
+            {skill.below_target && (
+              <span className="tag-accent text-[10px] flex items-center gap-1">
+                <AlertTriangle className="w-2.5 h-2.5" />
+                Below target
+              </span>
+            )}
+            <span className={`text-sm font-semibold ${getFreshnessColor(skill.freshness)}`}>
+              {skill.freshness?.toFixed(0)}%
+            </span>
+          </div>
+        </div>
+        <div className="h-1.5 bg-surface-400 rounded-full overflow-hidden">
+          <div
+            className={`h-full rounded-full transition-all duration-500 ${getFreshnessBarColor(skill.freshness)}`}
+            style={{ width: `${skill.freshness || 0}%` }}
+          />
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div className="space-y-2 pt-3 border-t border-border-subtle">
+        {skill.target_freshness !== null && (
+          <div className="flex justify-between items-center">
+            <span className="text-xs text-txt-muted">Target</span>
+            <span className="text-xs text-txt-secondary">{skill.target_freshness}%</span>
+          </div>
+        )}
+        <div className="flex justify-between items-center">
+          <span className="text-xs text-txt-muted">Last practiced</span>
+          <span className="text-sm font-medium text-txt-primary">{skill.days_since_practice}d ago</span>
+        </div>
+        <div className="flex justify-between items-center">
+          <span className="text-xs text-txt-muted">Events</span>
+          <div className="flex items-center gap-3">
+            <span className="flex items-center gap-1 text-xs text-txt-secondary">
+              <BookOpen className="w-3 h-3 text-accent-400" />
+              {skill.learning_count}
+            </span>
+            <span className="flex items-center gap-1 text-xs text-txt-secondary">
+              <Zap className="w-3 h-3 text-fresh-base" />
+              {skill.practice_count}
+            </span>
+          </div>
+        </div>
+        {skill.dependencies && skill.dependencies.length > 0 && (
+          <div className="flex justify-between items-center">
+            <span className="text-xs text-txt-muted">Prerequisites</span>
+            <div className="flex items-center gap-2">
+              <span className="flex items-center gap-1 text-xs text-txt-secondary">
+                <Link2 className="w-3 h-3" />
+                {skill.dependencies.length}
+              </span>
+              {skill.dependencies.some(d => d.freshness !== null && d.freshness < 40) && (
+                <span className="tag text-[10px] bg-decayed-base/10 text-decayed-base border-decayed-base/20">
+                  Decaying
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </Link>
+  );
 
   if (loading) {
     return (
@@ -110,7 +270,54 @@ const Skills: React.FC = () => {
         </button>
       </div>
 
-      {/* Skills Grid */}
+      {/* View Controls */}
+      {skills.length > 0 && (
+        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+          {/* Category Filter */}
+          <div className="flex items-center gap-2">
+            <Filter className="w-4 h-4 text-txt-muted" />
+            <select
+              value={filterCategoryId}
+              onChange={(e) => setFilterCategoryId(e.target.value)}
+              className="input py-1.5 px-3 text-sm min-w-[150px]"
+            >
+              <option value="all">All Categories</option>
+              <option value="uncategorized">Uncategorized</option>
+              {categories.map(cat => (
+                <option key={cat.id} value={cat.id}>{cat.name}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* View Mode Toggle */}
+          <div className="flex items-center gap-1 p-1 bg-surface-300 rounded-lg">
+            <button
+              onClick={() => setViewMode("grid")}
+              className={`p-2 rounded-md transition-colors ${
+                viewMode === "grid"
+                  ? "bg-surface-100 text-txt-primary shadow-sm"
+                  : "text-txt-muted hover:text-txt-secondary"
+              }`}
+              title="Grid view"
+            >
+              <Grid3X3 className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setViewMode("grouped")}
+              className={`p-2 rounded-md transition-colors ${
+                viewMode === "grouped"
+                  ? "bg-surface-100 text-txt-primary shadow-sm"
+                  : "text-txt-muted hover:text-txt-secondary"
+              }`}
+              title="Grouped by category"
+            >
+              <List className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Skills Display */}
       {skills.length === 0 ? (
         <div className="card-elevated p-12 text-center">
           <div className="w-16 h-16 rounded-2xl bg-accent-400/10 flex items-center justify-center mx-auto mb-4">
@@ -119,101 +326,39 @@ const Skills: React.FC = () => {
           <p className="text-txt-secondary text-lg mb-2">No skills yet</p>
           <p className="text-txt-muted text-sm">Add your first skill to get started.</p>
         </div>
-      ) : (
+      ) : viewMode === "grid" ? (
+        /* Grid View */
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {skills.map((skill) => (
-            <Link
-              key={skill.id}
-              to={`/skills/${skill.id}`}
-              className="card-interactive p-5 group"
-            >
-              {/* Header */}
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <StatusDot freshness={skill.freshness} />
-                  <h3 className="text-lg font-semibold text-txt-primary group-hover:text-accent-400 transition-colors">
-                    {skill.name}
-                  </h3>
-                </div>
-                <ArrowUpRight className="w-4 h-4 text-txt-muted opacity-0 group-hover:opacity-100 transition-opacity" />
+          {filteredSkills.map(renderSkillCard)}
+        </div>
+      ) : (
+        /* Grouped View */
+        <div className="space-y-8">
+          {groupedSkills.map(([groupId, group]) => (
+            <div key={groupId} className="space-y-4">
+              <div className="flex items-center gap-2">
+                <Folder className="w-5 h-5 text-accent-400" />
+                <h2 className="text-lg font-semibold text-txt-primary">
+                  {group.category?.name || "Uncategorized"}
+                </h2>
+                <span className="tag">{group.skills.length} skills</span>
               </div>
-
-              {/* Category */}
-              {skill.category && (
-                <div className="flex items-center gap-1.5 mb-4">
-                  <Folder className="w-3 h-3 text-txt-muted" />
-                  <span className="tag">{skill.category}</span>
-                </div>
-              )}
-
-              {/* Freshness Bar */}
-              <div className="mb-4">
-                <div className="flex justify-between items-center mb-1.5">
-                  <span className="text-xs text-txt-muted">Freshness</span>
-                  <div className="flex items-center gap-2">
-                    {skill.below_target && (
-                      <span className="tag-accent text-[10px] flex items-center gap-1">
-                        <AlertTriangle className="w-2.5 h-2.5" />
-                        Below target
-                      </span>
-                    )}
-                    <span className={`text-sm font-semibold ${getFreshnessColor(skill.freshness)}`}>
-                      {skill.freshness?.toFixed(0)}%
-                    </span>
-                  </div>
-                </div>
-                <div className="h-1.5 bg-surface-400 rounded-full overflow-hidden">
-                  <div
-                    className={`h-full rounded-full transition-all duration-500 ${getFreshnessBarColor(skill.freshness)}`}
-                    style={{ width: `${skill.freshness || 0}%` }}
-                  />
-                </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {group.skills.map(renderSkillCard)}
               </div>
-
-              {/* Stats */}
-              <div className="space-y-2 pt-3 border-t border-border-subtle">
-                {skill.target_freshness !== null && (
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-txt-muted">Target</span>
-                    <span className="text-xs text-txt-secondary">{skill.target_freshness}%</span>
-                  </div>
-                )}
-                <div className="flex justify-between items-center">
-                  <span className="text-xs text-txt-muted">Last practiced</span>
-                  <span className="text-sm font-medium text-txt-primary">{skill.days_since_practice}d ago</span>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-xs text-txt-muted">Events</span>
-                  <div className="flex items-center gap-3">
-                    <span className="flex items-center gap-1 text-xs text-txt-secondary">
-                      <BookOpen className="w-3 h-3 text-accent-400" />
-                      {skill.learning_count}
-                    </span>
-                    <span className="flex items-center gap-1 text-xs text-txt-secondary">
-                      <Zap className="w-3 h-3 text-fresh-base" />
-                      {skill.practice_count}
-                    </span>
-                  </div>
-                </div>
-                {skill.dependencies && skill.dependencies.length > 0 && (
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs text-txt-muted">Prerequisites</span>
-                    <div className="flex items-center gap-2">
-                      <span className="flex items-center gap-1 text-xs text-txt-secondary">
-                        <Link2 className="w-3 h-3" />
-                        {skill.dependencies.length}
-                      </span>
-                      {skill.dependencies.some(d => d.freshness !== null && d.freshness < 40) && (
-                        <span className="tag text-[10px] bg-decayed-base/10 text-decayed-base border-decayed-base/20">
-                          Decaying
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </Link>
+            </div>
           ))}
+        </div>
+      )}
+
+      {/* Empty state for filtered view */}
+      {skills.length > 0 && filteredSkills.length === 0 && viewMode === "grid" && (
+        <div className="card-elevated p-12 text-center">
+          <div className="w-16 h-16 rounded-2xl bg-accent-400/10 flex items-center justify-center mx-auto mb-4">
+            <Filter className="w-8 h-8 text-accent-400" />
+          </div>
+          <p className="text-txt-secondary text-lg mb-2">No skills in this category</p>
+          <p className="text-txt-muted text-sm">Try selecting a different category filter.</p>
         </div>
       )}
 
@@ -228,7 +373,9 @@ const Skills: React.FC = () => {
                   setShowModal(false);
                   setError("");
                   setNewSkillName("");
-                  setNewSkillCategory("");
+                  setSelectedCategoryId("");
+                  setNewCategoryName("");
+                  setShowNewCategoryInput(false);
                 }}
                 className="p-1 rounded-lg text-txt-muted hover:text-txt-primary hover:bg-surface-400 transition-colors"
               >
@@ -262,14 +409,57 @@ const Skills: React.FC = () => {
                 <label className="block text-sm font-medium text-txt-secondary mb-2">
                   Category (optional)
                 </label>
-                <input
-                  type="text"
-                  maxLength={50}
-                  value={newSkillCategory}
-                  onChange={(e) => setNewSkillCategory(e.target.value)}
-                  className="input"
-                  placeholder="e.g., Programming, Music, Language"
-                />
+
+                {!showNewCategoryInput ? (
+                  <div className="space-y-2">
+                    <div className="relative">
+                      <select
+                        value={selectedCategoryId}
+                        onChange={(e) => setSelectedCategoryId(e.target.value)}
+                        className="input appearance-none pr-10"
+                      >
+                        <option value="">No category</option>
+                        {categories.map(cat => (
+                          <option key={cat.id} value={cat.id}>{cat.name}</option>
+                        ))}
+                      </select>
+                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-txt-muted pointer-events-none" />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowNewCategoryInput(true);
+                        setSelectedCategoryId("");
+                      }}
+                      className="text-sm text-accent-400 hover:text-accent-300 transition-colors flex items-center gap-1"
+                    >
+                      <Plus className="w-3 h-3" />
+                      Create new category
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <input
+                      type="text"
+                      maxLength={50}
+                      value={newCategoryName}
+                      onChange={(e) => setNewCategoryName(e.target.value)}
+                      className="input"
+                      placeholder="e.g., Programming, Music, Language"
+                      autoFocus
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowNewCategoryInput(false);
+                        setNewCategoryName("");
+                      }}
+                      className="text-sm text-txt-muted hover:text-txt-secondary transition-colors"
+                    >
+                      Cancel, select existing category
+                    </button>
+                  </div>
+                )}
               </div>
 
               <div className="flex justify-end gap-3 pt-4">
@@ -279,7 +469,9 @@ const Skills: React.FC = () => {
                     setShowModal(false);
                     setError("");
                     setNewSkillName("");
-                    setNewSkillCategory("");
+                    setSelectedCategoryId("");
+                    setNewCategoryName("");
+                    setShowNewCategoryInput(false);
                   }}
                   className="btn-secondary"
                 >

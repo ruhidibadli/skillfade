@@ -4,12 +4,21 @@ from datetime import datetime, date
 from uuid import UUID
 
 
+class CategoryInfo(BaseModel):
+    id: UUID
+    name: str
+
+    class Config:
+        from_attributes = True
+
+
 class SkillBase(BaseModel):
     name: str = Field(..., max_length=100)
-    category: Optional[str] = Field(None, max_length=50)
 
 
 class SkillCreate(SkillBase):
+    category_id: Optional[UUID] = None
+    category_name: Optional[str] = Field(None, max_length=50)
     decay_rate: Optional[float] = Field(0.02, ge=0.001, le=0.5)
     target_freshness: Optional[float] = Field(None, ge=0, le=100)
     notes: Optional[str] = Field(None)
@@ -17,7 +26,8 @@ class SkillCreate(SkillBase):
 
 class SkillUpdate(BaseModel):
     name: Optional[str] = Field(None, max_length=100)
-    category: Optional[str] = Field(None, max_length=50)
+    category_id: Optional[str] = Field(None)  # String to allow empty string for clearing
+    category_name: Optional[str] = Field(None, max_length=50)
     decay_rate: Optional[float] = Field(None, ge=0.001, le=0.5)
     target_freshness: Optional[float] = Field(None, ge=0, le=100)
     notes: Optional[str] = Field(None)
@@ -36,6 +46,8 @@ class SkillDependencyInfo(BaseModel):
 class SkillResponse(SkillBase):
     id: UUID
     user_id: UUID
+    category_id: Optional[UUID] = None
+    category: Optional[CategoryInfo] = None
     decay_rate: float = 0.02
     target_freshness: Optional[float] = None
     notes: Optional[str] = None

@@ -194,7 +194,7 @@ const Dashboard: React.FC = () => {
                     {skill.category && (
                       <div className="flex items-center gap-1.5 ml-5">
                         <Folder className="w-3 h-3 text-txt-muted" />
-                        <span className="tag text-xs">{skill.category}</span>
+                        <span className="tag text-xs">{skill.category.name}</span>
                       </div>
                     )}
                   </div>

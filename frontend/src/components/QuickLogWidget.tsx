@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { skills as skillsApi, events as eventsApi, templates as templatesApi } from '../services/api';
-import type { Skill, EventTemplate } from '../types';
+import type { Skill, EventTemplate, LearningEventType, PracticeEventType } from '../types';
 import { format } from 'date-fns';
 import {
   Plus,
@@ -80,17 +80,20 @@ const QuickLogWidget: React.FC = () => {
     }
 
     try {
-      const eventData = {
-        date,
-        type: subType,
-        notes: notes || undefined,
-        duration_minutes: duration ? parseInt(duration) : undefined
-      };
-
       if (eventType === 'practice') {
-        await eventsApi.createPractice(selectedSkill, eventData);
+        await eventsApi.createPractice(selectedSkill, {
+          date,
+          type: subType as PracticeEventType,
+          notes: notes || undefined,
+          duration_minutes: duration ? parseInt(duration) : undefined
+        });
       } else {
-        await eventsApi.createLearning(selectedSkill, eventData);
+        await eventsApi.createLearning(selectedSkill, {
+          date,
+          type: subType as LearningEventType,
+          notes: notes || undefined,
+          duration_minutes: duration ? parseInt(duration) : undefined
+        });
       }
 
       window.dispatchEvent(new Event('dashboard-refresh'));

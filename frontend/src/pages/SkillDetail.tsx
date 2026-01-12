@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { skills as skillsApi, events as eventsApi, analytics, templates as templatesApi } from '../services/api';
-import type { Skill, Event, FreshnessHistoryPoint, EventTemplate, PersonalRecords, SkillDependencyInfo } from '../types';
+import type { Skill, Event, FreshnessHistoryPoint, EventTemplate, PersonalRecords, SkillDependencyInfo, LearningEventType, PracticeEventType } from '../types';
 import { format } from 'date-fns';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from 'recharts';
 import {
@@ -20,7 +20,6 @@ import {
   Plus,
   X,
   Loader2,
-  ChevronRight,
   AlertTriangle
 } from 'lucide-react';
 
@@ -90,7 +89,7 @@ const SkillDetail: React.FC = () => {
     }
   };
 
-  const getFreshnessColor = (freshness?: number) => {
+  const getFreshnessColor = (freshness?: number | null) => {
     if (!freshness) return 'text-txt-muted';
     if (freshness > 70) return 'text-fresh-base';
     if (freshness >= 40) return 'text-aging-base';
@@ -132,7 +131,7 @@ const SkillDetail: React.FC = () => {
             <h1 className="text-display-md text-txt-primary">{skill.name}</h1>
           </div>
           {skill.category && (
-            <p className="text-txt-muted mt-1 ml-6">{skill.category}</p>
+            <p className="text-txt-muted mt-1 ml-6">{skill.category.name}</p>
           )}
         </div>
         <button onClick={handleArchive} className="btn-danger flex items-center gap-2">
@@ -408,9 +407,11 @@ const AddEventModal: React.FC<{ skillId: string; templates: EventTemplate[]; onC
     e.preventDefault();
     setError('');
     try {
-      const eventData = { date, type: subType, notes: notes || undefined, duration_minutes: duration ? parseInt(duration) : undefined };
-      if (eventType === 'practice') await eventsApi.createPractice(skillId, eventData);
-      else await eventsApi.createLearning(skillId, eventData);
+      if (eventType === 'practice') {
+        await eventsApi.createPractice(skillId, { date, type: subType as PracticeEventType, notes: notes || undefined, duration_minutes: duration ? parseInt(duration) : undefined });
+      } else {
+        await eventsApi.createLearning(skillId, { date, type: subType as LearningEventType, notes: notes || undefined, duration_minutes: duration ? parseInt(duration) : undefined });
+      }
       window.dispatchEvent(new Event('dashboard-refresh'));
       onSuccess();
     } catch (err: any) { setError(err.response?.data?.detail || 'Failed to add event'); }
@@ -515,7 +516,7 @@ const DependenciesModal: React.FC<{ currentDependencies: SkillDependencyInfo[]; 
   const [selectedIds, setSelectedIds] = useState<string[]>(currentDependencies.map(d => d.id));
   const toggleSkill = (skillId: string) => { setSelectedIds(prev => prev.includes(skillId) ? prev.filter(id => id !== skillId) : [...prev, skillId]); };
   const handleSubmit = (e: React.FormEvent) => { e.preventDefault(); onSave(selectedIds); };
-  const getFreshnessColor = (freshness?: number) => { if (!freshness) return 'text-txt-muted'; if (freshness > 70) return 'text-fresh-base'; if (freshness >= 40) return 'text-aging-base'; return 'text-decayed-base'; };
+  const getFreshnessColor = (freshness?: number | null) => { if (!freshness) return 'text-txt-muted'; if (freshness > 70) return 'text-fresh-base'; if (freshness >= 40) return 'text-aging-base'; return 'text-decayed-base'; };
 
   return (
     <div className="modal-backdrop animate-fade-in">
@@ -525,7 +526,7 @@ const DependenciesModal: React.FC<{ currentDependencies: SkillDependencyInfo[]; 
         <form onSubmit={handleSubmit} className="flex-1 flex flex-col min-h-0">
           <div className="flex-1 overflow-y-auto border border-border-subtle rounded-lg mb-4">
             {availableSkills.length === 0 ? (<p className="p-4 text-center text-txt-muted">No other skills available.</p>) : (
-              <div className="divide-y divide-border-subtle">{availableSkills.map((skill) => (<label key={skill.id} className="flex items-center justify-between p-3 hover:bg-surface-300 cursor-pointer transition-colors"><div className="flex items-center gap-3"><input type="checkbox" checked={selectedIds.includes(skill.id)} onChange={() => toggleSkill(skill.id)} className="h-4 w-4 text-accent-400 rounded border-border focus:ring-accent-400 bg-surface-300" /><div><span className="text-txt-primary font-medium">{skill.name}</span>{skill.category && <span className="ml-2 text-xs text-txt-muted">({skill.category})</span>}</div></div><span className={`text-sm font-medium ${getFreshnessColor(skill.freshness)}`}>{skill.freshness?.toFixed(0)}%</span></label>))}</div>
+              <div className="divide-y divide-border-subtle">{availableSkills.map((skill) => (<label key={skill.id} className="flex items-center justify-between p-3 hover:bg-surface-300 cursor-pointer transition-colors"><div className="flex items-center gap-3"><input type="checkbox" checked={selectedIds.includes(skill.id)} onChange={() => toggleSkill(skill.id)} className="h-4 w-4 text-accent-400 rounded border-border focus:ring-accent-400 bg-surface-300" /><div><span className="text-txt-primary font-medium">{skill.name}</span>{skill.category && <span className="ml-2 text-xs text-txt-muted">({skill.category.name})</span>}</div></div><span className={`text-sm font-medium ${getFreshnessColor(skill.freshness)}`}>{skill.freshness?.toFixed(0)}%</span></label>))}</div>
             )}
           </div>
           <div className="flex justify-between items-center"><span className="text-sm text-txt-muted">{selectedIds.length} selected</span><div className="flex gap-3"><button type="button" onClick={onClose} className="btn-secondary">Cancel</button><button type="submit" className="btn-primary">Save Dependencies</button></div></div>

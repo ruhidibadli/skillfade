@@ -225,10 +225,10 @@ const Settings: React.FC = () => {
           </div>
         </div>
         <ul className="text-txt-secondary text-sm space-y-2 ml-12">
-          <li>Your data is stored on your own server and is not shared with any third parties.</li>
+          <li>Your data is stored securely and is not shared with any third parties.</li>
           <li>We do not use any third-party analytics or tracking services.</li>
           <li>Your email is only used for authentication and optional alerts.</li>
-          <li>You have complete ownership and control of your data.</li>
+          <li>You can export all your data or delete your account at any time.</li>
         </ul>
       </div>
 

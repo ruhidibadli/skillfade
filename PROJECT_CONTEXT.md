@@ -154,23 +154,40 @@ updated_at      TIMESTAMP DEFAULT NOW()
 - Has many skills (cascade delete)
 - Has many learning_events (cascade delete)
 - Has many practice_events (cascade delete)
+- Has many categories (cascade delete)
+
+### Categories Table
+```sql
+id              UUID PRIMARY KEY DEFAULT gen_random_uuid()
+user_id         UUID REFERENCES users(id) ON DELETE CASCADE
+name            VARCHAR(50) NOT NULL
+created_at      TIMESTAMP DEFAULT NOW()
+UNIQUE(user_id, name)
+INDEX(user_id)
+```
+
+**Relationships:**
+- Belongs to user
+- Has many skills
 
 ### Skills Table
 ```sql
 id                  UUID PRIMARY KEY DEFAULT gen_random_uuid()
 user_id             UUID REFERENCES users(id) ON DELETE CASCADE
 name                VARCHAR(100) NOT NULL
-category            VARCHAR(50)
+category_id         UUID REFERENCES categories(id) ON DELETE SET NULL
 decay_rate          FLOAT DEFAULT 0.02 NOT NULL
 target_freshness    FLOAT                       -- Personal freshness threshold (Phase 2)
 notes               TEXT                        -- Persistent notes for resources, goals (Phase 6)
 created_at          TIMESTAMP DEFAULT NOW()
 archived_at         TIMESTAMP
 UNIQUE(user_id, name)
+INDEX(category_id)
 ```
 
 **Relationships:**
 - Belongs to user
+- Belongs to category (optional)
 - Has many learning_events (cascade delete)
 - Has many practice_events (cascade delete)
 - Has many dependencies (self-referential many-to-many via skill_dependencies)
@@ -304,11 +321,18 @@ Interpretation:
 
 ### Skills (`/skills/*`)
 - `GET /skills?include_archived=false` - List user's skills with freshness
-- `POST /skills` - Create skill
+- `POST /skills` - Create skill (category_id or category_name for category)
 - `GET /skills/:id` - Get skill details
-- `PATCH /skills/:id` - Update skill (name, category, notes, decay_rate, target_freshness)
+- `PATCH /skills/:id` - Update skill (name, category_id, category_name, notes, decay_rate, target_freshness)
 - `DELETE /skills/:id` - Archive skill (soft delete)
 - `PUT /skills/:id/dependencies` - Update skill dependencies (Phase 6)
+
+### Categories (`/categories/*`)
+- `GET /categories` - List user's categories with skill counts
+- `POST /categories` - Create new category
+- `GET /categories/:id` - Get specific category
+- `PATCH /categories/:id` - Update category name
+- `DELETE /categories/:id` - Delete category (skills set to uncategorized)
 
 ### Events
 - `GET /skills/:id/events` - Get all events for skill (chronological)
@@ -432,13 +456,15 @@ d:\skillfade/
 │   │   │   └── __init__.py
 │   │   ├── models/
 │   │   │   ├── user.py            # User model
-│   │   │   ├── skill.py           # Skill model (includes decay_rate)
+│   │   │   ├── skill.py           # Skill model (includes category_id, decay_rate)
+│   │   │   ├── category.py        # Category model
 │   │   │   ├── event.py           # LearningEvent, PracticeEvent models
 │   │   │   ├── event_template.py  # EventTemplate model (Phase 1)
 │   │   │   └── __init__.py
 │   │   ├── routers/
 │   │   │   ├── auth.py            # Auth endpoints
 │   │   │   ├── skills.py          # Skill CRUD endpoints
+│   │   │   ├── categories.py      # Category CRUD endpoints
 │   │   │   ├── events.py          # Event CRUD endpoints
 │   │   │   ├── analytics.py       # Analytics endpoints (includes freshness history)
 │   │   │   ├── settings.py        # Settings endpoints
@@ -446,7 +472,8 @@ d:\skillfade/
 │   │   │   └── __init__.py
 │   │   ├── schemas/
 │   │   │   ├── user.py            # Pydantic schemas for users
-│   │   │   ├── skill.py           # Pydantic schemas for skills (includes FreshnessHistory)
+│   │   │   ├── skill.py           # Pydantic schemas for skills (includes FreshnessHistory, CategoryInfo)
+│   │   │   ├── category.py        # Pydantic schemas for categories
 │   │   │   ├── event.py           # Pydantic schemas for events
 │   │   │   ├── event_template.py  # Pydantic schemas for templates (Phase 1)
 │   │   │   └── __init__.py
@@ -461,7 +488,8 @@ d:\skillfade/
 │   │   │   ├── 20240101_0001-initial_migration.py
 │   │   │   ├── 20260109_0002-phase1_features.py  # Custom decay rates + templates
 │   │   │   ├── 20260110_0003-phase2_features.py  # Freshness targets
-│   │   │   └── 20260110_0004-phase6_features.py  # Notes + skill dependencies
+│   │   │   ├── 20260110_0004-phase6_features.py  # Notes + skill dependencies
+│   │   │   └── 20260112_0005-category_as_object.py  # Categories as objects with FK
 │   │   └── env.py
 │   ├── tests/
 │   │   ├── test_auth.py
@@ -491,14 +519,14 @@ d:\skillfade/
 │   │   │   ├── Login.tsx
 │   │   │   ├── Register.tsx
 │   │   │   ├── Dashboard.tsx
-│   │   │   ├── Skills.tsx           # Updated with dependency indicators (Phase 6)
+│   │   │   ├── Skills.tsx           # Category selector, grid/grouped view, filter by category
 │   │   │   ├── SkillDetail.tsx      # Updated with notes + dependencies UI (Phase 6)
 │   │   │   ├── Analytics.tsx
 │   │   │   └── Settings.tsx
 │   │   ├── services/
-│   │   │   └── api.ts            # Axios client, all API calls
+│   │   │   └── api.ts            # Axios client, all API calls (includes categories)
 │   │   ├── types/
-│   │   │   └── index.ts          # TypeScript interfaces (includes SkillDependencyInfo)
+│   │   │   └── index.ts          # TypeScript interfaces (includes Category, CategoryInfo)
 │   │   ├── tests/
 │   │   │   └── App.test.tsx
 │   │   ├── App.tsx               # Routes, AuthContext provider
@@ -742,7 +770,7 @@ npm test
 - ✅ Full data export (JSON format)
 - ✅ Permanent account deletion (cascade deletes all data)
 - ✅ Alert preferences (enable/disable each type)
-- ✅ Self-hosted on their own server
+- ✅ Self-hosted option available (can run on their own server)
 - ✅ Email only used for alerts and password reset
 
 ---
@@ -1005,7 +1033,7 @@ npm test
 ---
 
 **Last Updated:** 2026-01-12
-**Project Status:** Production-ready MVP with Enhanced UI/UX + Dark Mode + Activity Calendar + Phase 1, 2 & 6 Features + Comprehensive VPS Deployment Guide ✅
+**Project Status:** Production-ready MVP with Enhanced UI/UX + Dark Mode + Activity Calendar + Phase 1, 2, 6 & Category Features + Comprehensive VPS Deployment Guide ✅
 
 ### Phase 1 Features (Completed 2026-01-09)
 - **Freshness History Graph**: Line chart showing skill freshness over 90 days
@@ -1019,6 +1047,14 @@ npm test
 - **Skill Category Aggregations**: View average freshness and total activity grouped by category
 - **Freshness Targets**: Set personal freshness thresholds per skill with visual indicators
 - **Personal Records**: Track longest fresh streak, peak freshness, most active week, and longest gap recovered
+
+### Category as Object Feature (Completed 2026-01-12)
+- **Categories Table**: Categories are now objects stored in database with unique names per user
+- **Category CRUD API**: Full CRUD endpoints for managing categories (`/api/categories/*`)
+- **Category Selection**: When adding a skill, users can select from existing categories or create a new one
+- **Category Filtering**: Filter skills by category in the Skills page
+- **Grouped View**: Toggle between grid view and grouped-by-category view
+- **Auto-creation**: Creating a skill with a new category name automatically creates the category
 
 ### Phase 6 Features (Completed 2026-01-10)
 - **Progressive Web App (PWA)**: App installable on mobile/desktop, works offline with service worker caching

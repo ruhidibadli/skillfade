@@ -2,6 +2,7 @@ import axios from 'axios';
 import type {
   User,
   Skill,
+  Category,
   LearningEvent,
   PracticeEvent,
   Event,
@@ -73,13 +74,13 @@ export const skills = {
   list: (includeArchived = false) =>
     api.get<Skill[]>('/skills', { params: { include_archived: includeArchived } }),
 
-  create: (data: { name: string; category?: string; decay_rate?: number; target_freshness?: number; notes?: string }) =>
+  create: (data: { name: string; category_id?: string; category_name?: string; decay_rate?: number; target_freshness?: number; notes?: string }) =>
     api.post<Skill>('/skills', data),
 
   get: (id: string) =>
     api.get<Skill>(`/skills/${id}`),
 
-  update: (id: string, data: { name?: string; category?: string; decay_rate?: number; target_freshness?: number; notes?: string }) =>
+  update: (id: string, data: { name?: string; category_id?: string; category_name?: string; decay_rate?: number; target_freshness?: number; notes?: string }) =>
     api.patch<Skill>(`/skills/${id}`, data),
 
   archive: (id: string) =>
@@ -87,6 +88,24 @@ export const skills = {
 
   updateDependencies: (id: string, dependencyIds: string[]) =>
     api.put<Skill>(`/skills/${id}/dependencies`, { dependency_ids: dependencyIds }),
+};
+
+// Categories
+export const categories = {
+  list: () =>
+    api.get<Category[]>('/categories'),
+
+  create: (data: { name: string }) =>
+    api.post<Category>('/categories', data),
+
+  get: (id: string) =>
+    api.get<Category>(`/categories/${id}`),
+
+  update: (id: string, data: { name?: string }) =>
+    api.patch<Category>(`/categories/${id}`, data),
+
+  delete: (id: string) =>
+    api.delete(`/categories/${id}`),
 };
 
 // Events

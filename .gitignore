@@ -61,3 +61,7 @@ coverage/
 # OS
 .DS_Store
 Thumbs.db
+
+# Claude Code temp files
+tmpclaude-*
+.claude/settings.local.json

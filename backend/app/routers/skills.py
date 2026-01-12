@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from app.core.database import get_db
 from app.models.user import User
 from app.models.skill import Skill
+from app.models.category import Category
 from app.schemas.skill import SkillCreate, SkillUpdate, SkillResponse, SkillArchive, SkillDependencyUpdate
 from app.services.auth import get_current_user
 from app.services.freshness import calculate_freshness
@@ -81,12 +82,21 @@ def enrich_skill_with_metrics(skill: Skill, db: Session, include_dependencies: b
                 "below_target": dep_freshness["below_target"]
             })
 
+    # Get category info
+    category_info = None
+    if skill.category_obj:
+        category_info = {
+            "id": skill.category_obj.id,
+            "name": skill.category_obj.name
+        }
+
     # Convert to dict and add metrics
     skill_dict = {
         "id": skill.id,
         "user_id": skill.user_id,
         "name": skill.name,
-        "category": skill.category,
+        "category_id": skill.category_id,
+        "category": category_info,
         "decay_rate": skill.decay_rate or 0.02,
         "target_freshness": skill.target_freshness,
         "notes": skill.notes,
@@ -147,11 +157,39 @@ def create_skill(
             detail="Skill with this name already exists"
         )
 
+    # Handle category
+    category_id = None
+    if skill_data.category_id:
+        # Verify category belongs to user
+        category = db.query(Category).filter(
+            Category.id == skill_data.category_id,
+            Category.user_id == current_user.id
+        ).first()
+        if category:
+            category_id = category.id
+    elif skill_data.category_name:
+        # Check if category with this name exists
+        category = db.query(Category).filter(
+            Category.user_id == current_user.id,
+            Category.name == skill_data.category_name
+        ).first()
+        if category:
+            category_id = category.id
+        else:
+            # Create new category
+            new_category = Category(
+                user_id=current_user.id,
+                name=skill_data.category_name
+            )
+            db.add(new_category)
+            db.flush()
+            category_id = new_category.id
+
     # Create new skill
     new_skill = Skill(
         user_id=current_user.id,
         name=skill_data.name,
-        category=skill_data.category,
+        category_id=category_id,
         decay_rate=skill_data.decay_rate if skill_data.decay_rate is not None else 0.02,
         target_freshness=skill_data.target_freshness,
         notes=skill_data.notes
@@ -225,8 +263,40 @@ def update_skill(
 
         skill.name = skill_data.name
 
-    if skill_data.category is not None:
-        skill.category = skill_data.category
+    # Handle category update
+    if skill_data.category_id is not None:
+        if skill_data.category_id == "":
+            # Clear category
+            skill.category_id = None
+        else:
+            # Verify category belongs to user
+            category = db.query(Category).filter(
+                Category.id == skill_data.category_id,
+                Category.user_id == current_user.id
+            ).first()
+            if category:
+                skill.category_id = category.id
+    elif skill_data.category_name is not None:
+        if skill_data.category_name == "":
+            # Clear category
+            skill.category_id = None
+        else:
+            # Check if category with this name exists
+            category = db.query(Category).filter(
+                Category.user_id == current_user.id,
+                Category.name == skill_data.category_name
+            ).first()
+            if category:
+                skill.category_id = category.id
+            else:
+                # Create new category
+                new_category = Category(
+                    user_id=current_user.id,
+                    name=skill_data.category_name
+                )
+                db.add(new_category)
+                db.flush()
+                skill.category_id = new_category.id
 
     if skill_data.decay_rate is not None:
         skill.decay_rate = skill_data.decay_rate
