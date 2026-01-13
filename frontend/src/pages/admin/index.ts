@@ -1,0 +1,7 @@
+export { default as AdminDashboard } from './AdminDashboard';
+export { default as AdminUsers } from './AdminUsers';
+export { default as AdminSkills } from './AdminSkills';
+export { default as AdminCategories } from './AdminCategories';
+export { default as AdminLearningEvents } from './AdminLearningEvents';
+export { default as AdminPracticeEvents } from './AdminPracticeEvents';
+export { default as AdminTemplates } from './AdminTemplates';

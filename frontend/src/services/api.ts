@@ -14,7 +14,15 @@ import type {
   EventTemplate,
   PeriodComparison,
   CategoryStatsData,
-  PersonalRecords
+  PersonalRecords,
+  AdminUser,
+  AdminSkill,
+  AdminCategory,
+  AdminLearningEvent,
+  AdminPracticeEvent,
+  AdminEventTemplate,
+  AdminDashboardStats,
+  PaginatedResponse
 } from '../types';
 
 const API_URL = import.meta.env.VITE_API_URL || '/api';
@@ -202,6 +210,109 @@ export const templates = {
 
   delete: (id: string) =>
     api.delete(`/templates/${id}`),
+};
+
+// Admin API
+export const admin = {
+  // Stats
+  getStats: () =>
+    api.get<AdminDashboardStats>('/admin/stats'),
+
+  // Users
+  listUsers: (params?: { page?: number; page_size?: number; search?: string; is_admin?: boolean }) =>
+    api.get<PaginatedResponse<AdminUser>>('/admin/users', { params }),
+
+  getUser: (id: string) =>
+    api.get<AdminUser>(`/admin/users/${id}`),
+
+  createUser: (data: { email: string; password: string; is_admin?: boolean }) =>
+    api.post<AdminUser>('/admin/users', data),
+
+  updateUser: (id: string, data: { email?: string; password?: string; is_admin?: boolean; settings?: Record<string, any> }) =>
+    api.patch<AdminUser>(`/admin/users/${id}`, data),
+
+  deleteUser: (id: string) =>
+    api.delete(`/admin/users/${id}`),
+
+  // Categories
+  listCategories: (params?: { page?: number; page_size?: number; search?: string; user_id?: string }) =>
+    api.get<PaginatedResponse<AdminCategory>>('/admin/categories', { params }),
+
+  getCategory: (id: string) =>
+    api.get<AdminCategory>(`/admin/categories/${id}`),
+
+  createCategory: (data: { name: string; user_id: string }) =>
+    api.post<AdminCategory>('/admin/categories', data),
+
+  updateCategory: (id: string, data: { name?: string; user_id?: string }) =>
+    api.patch<AdminCategory>(`/admin/categories/${id}`, data),
+
+  deleteCategory: (id: string) =>
+    api.delete(`/admin/categories/${id}`),
+
+  // Skills
+  listSkills: (params?: { page?: number; page_size?: number; search?: string; user_id?: string; category_id?: string; include_archived?: boolean }) =>
+    api.get<PaginatedResponse<AdminSkill>>('/admin/skills', { params }),
+
+  getSkill: (id: string) =>
+    api.get<AdminSkill>(`/admin/skills/${id}`),
+
+  createSkill: (data: { name: string; user_id: string; category_id?: string; decay_rate?: number; target_freshness?: number; notes?: string }) =>
+    api.post<AdminSkill>('/admin/skills', data),
+
+  updateSkill: (id: string, data: { name?: string; user_id?: string; category_id?: string; decay_rate?: number; target_freshness?: number; notes?: string; archived_at?: string }) =>
+    api.patch<AdminSkill>(`/admin/skills/${id}`, data),
+
+  deleteSkill: (id: string) =>
+    api.delete(`/admin/skills/${id}`),
+
+  // Learning Events
+  listLearningEvents: (params?: { page?: number; page_size?: number; search?: string; user_id?: string; skill_id?: string; event_type?: string }) =>
+    api.get<PaginatedResponse<AdminLearningEvent>>('/admin/learning-events', { params }),
+
+  getLearningEvent: (id: string) =>
+    api.get<AdminLearningEvent>(`/admin/learning-events/${id}`),
+
+  createLearningEvent: (data: { skill_id: string; user_id: string; date: string; type: string; notes?: string; duration_minutes?: number }) =>
+    api.post<AdminLearningEvent>('/admin/learning-events', data),
+
+  updateLearningEvent: (id: string, data: { skill_id?: string; user_id?: string; date?: string; type?: string; notes?: string; duration_minutes?: number }) =>
+    api.patch<AdminLearningEvent>(`/admin/learning-events/${id}`, data),
+
+  deleteLearningEvent: (id: string) =>
+    api.delete(`/admin/learning-events/${id}`),
+
+  // Practice Events
+  listPracticeEvents: (params?: { page?: number; page_size?: number; search?: string; user_id?: string; skill_id?: string; event_type?: string }) =>
+    api.get<PaginatedResponse<AdminPracticeEvent>>('/admin/practice-events', { params }),
+
+  getPracticeEvent: (id: string) =>
+    api.get<AdminPracticeEvent>(`/admin/practice-events/${id}`),
+
+  createPracticeEvent: (data: { skill_id: string; user_id: string; date: string; type: string; notes?: string; duration_minutes?: number }) =>
+    api.post<AdminPracticeEvent>('/admin/practice-events', data),
+
+  updatePracticeEvent: (id: string, data: { skill_id?: string; user_id?: string; date?: string; type?: string; notes?: string; duration_minutes?: number }) =>
+    api.patch<AdminPracticeEvent>(`/admin/practice-events/${id}`, data),
+
+  deletePracticeEvent: (id: string) =>
+    api.delete(`/admin/practice-events/${id}`),
+
+  // Templates
+  listTemplates: (params?: { page?: number; page_size?: number; search?: string; user_id?: string; event_type?: string }) =>
+    api.get<PaginatedResponse<AdminEventTemplate>>('/admin/templates', { params }),
+
+  getTemplate: (id: string) =>
+    api.get<AdminEventTemplate>(`/admin/templates/${id}`),
+
+  createTemplate: (data: { user_id: string; name: string; event_type: string; type: string; default_duration_minutes?: number; default_notes?: string }) =>
+    api.post<AdminEventTemplate>('/admin/templates', data),
+
+  updateTemplate: (id: string, data: { user_id?: string; name?: string; event_type?: string; type?: string; default_duration_minutes?: number; default_notes?: string }) =>
+    api.patch<AdminEventTemplate>(`/admin/templates/${id}`, data),
+
+  deleteTemplate: (id: string) =>
+    api.delete(`/admin/templates/${id}`),
 };
 
 export default api;

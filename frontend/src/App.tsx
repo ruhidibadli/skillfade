@@ -3,7 +3,9 @@ import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import Layout from './components/Layout';
+import AdminLayout from './components/AdminLayout';
 import ProtectedRoute from './components/ProtectedRoute';
+import AdminProtectedRoute from './components/AdminProtectedRoute';
 import Landing from './pages/Landing';
 import Features from './pages/Features';
 import FAQ from './pages/FAQ';
@@ -17,6 +19,15 @@ import Skills from './pages/Skills';
 import SkillDetail from './pages/SkillDetail';
 import Analytics from './pages/Analytics';
 import Settings from './pages/Settings';
+import {
+  AdminDashboard,
+  AdminUsers,
+  AdminSkills,
+  AdminCategories,
+  AdminLearningEvents,
+  AdminPracticeEvents,
+  AdminTemplates
+} from './pages/admin';
 
 const RootRedirect = () => {
   const { isAuthenticated } = useAuth();
@@ -78,6 +89,65 @@ function App() {
                     <ProtectedRoute>
                       <Settings />
                     </ProtectedRoute>
+                  }
+                />
+              </Route>
+              {/* Admin Routes */}
+              <Route element={<AdminLayout />}>
+                <Route
+                  path="/admin"
+                  element={
+                    <AdminProtectedRoute>
+                      <AdminDashboard />
+                    </AdminProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/users"
+                  element={
+                    <AdminProtectedRoute>
+                      <AdminUsers />
+                    </AdminProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/skills"
+                  element={
+                    <AdminProtectedRoute>
+                      <AdminSkills />
+                    </AdminProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/categories"
+                  element={
+                    <AdminProtectedRoute>
+                      <AdminCategories />
+                    </AdminProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/learning-events"
+                  element={
+                    <AdminProtectedRoute>
+                      <AdminLearningEvents />
+                    </AdminProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/practice-events"
+                  element={
+                    <AdminProtectedRoute>
+                      <AdminPracticeEvents />
+                    </AdminProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/templates"
+                  element={
+                    <AdminProtectedRoute>
+                      <AdminTemplates />
+                    </AdminProtectedRoute>
                   }
                 />
               </Route>

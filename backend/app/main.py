@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import auth, skills, events, analytics, settings, templates, categories
+from app.routers import auth, skills, events, analytics, settings, templates, categories, admin
 from app.core.config import settings as app_settings
 
 app = FastAPI(
@@ -26,6 +26,7 @@ app.include_router(analytics.router)
 app.include_router(settings.router)
 app.include_router(templates.router)
 app.include_router(categories.router)
+app.include_router(admin.router)
 
 
 @app.get("/")

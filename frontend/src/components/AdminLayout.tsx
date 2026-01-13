@@ -3,17 +3,19 @@ import { Link, useNavigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
   LayoutDashboard,
+  Users,
   Layers,
-  BarChart3,
-  Settings,
+  FolderOpen,
+  BookOpen,
+  Wrench,
+  FileText,
   LogOut,
-  Shield
+  ArrowLeft
 } from 'lucide-react';
-import QuickLogWidget from './QuickLogWidget';
 import LogoIcon from './LogoIcon';
 
-const Layout: React.FC = () => {
-  const { logout, isAdmin } = useAuth();
+const AdminLayout: React.FC = () => {
+  const { logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -23,13 +25,21 @@ const Layout: React.FC = () => {
   };
 
   const navItems = [
-    { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { path: '/skills', label: 'Skills', icon: Layers },
-    { path: '/analytics', label: 'Analytics', icon: BarChart3 },
-    { path: '/settings', label: 'Settings', icon: Settings },
+    { path: '/admin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
+    { path: '/admin/users', label: 'Users', icon: Users },
+    { path: '/admin/categories', label: 'Categories', icon: FolderOpen },
+    { path: '/admin/skills', label: 'Skills', icon: Layers },
+    { path: '/admin/learning-events', label: 'Learning', icon: BookOpen },
+    { path: '/admin/practice-events', label: 'Practice', icon: Wrench },
+    { path: '/admin/templates', label: 'Templates', icon: FileText },
   ];
 
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = (path: string, exact?: boolean) => {
+    if (exact) {
+      return location.pathname === path;
+    }
+    return location.pathname.startsWith(path);
+  };
 
   return (
     <div className="min-h-screen bg-mesh flex flex-col">
@@ -38,51 +48,51 @@ const Layout: React.FC = () => {
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
-            <Link to="/dashboard" className="flex items-center gap-3 group">
-              <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-accent-400 to-secondary-400 flex items-center justify-center shadow-glow-accent group-hover:shadow-glow-accent-lg transition-shadow">
-                <LogoIcon className="w-5 h-5 text-surface-50" />
-              </div>
-              <span className="text-xl font-bold text-txt-primary">
-                SkillFade
-              </span>
-              <span className="tag-accent text-[10px] uppercase tracking-wider">Beta</span>
-            </Link>
+            <div className="flex items-center gap-4">
+              <Link to="/admin" className="flex items-center gap-3 group">
+                <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center shadow-glow-accent group-hover:shadow-glow-accent-lg transition-shadow">
+                  <LogoIcon className="w-5 h-5 text-surface-50" />
+                </div>
+                <span className="text-xl font-bold text-txt-primary">
+                  SkillFade
+                </span>
+                <span className="tag-decayed text-[10px] uppercase tracking-wider">Admin</span>
+              </Link>
+            </div>
 
             {/* Navigation */}
             <div className="flex items-center gap-1">
               {navItems.map((item) => {
                 const Icon = item.icon;
-                const active = isActive(item.path);
+                const active = isActive(item.path, item.exact);
                 return (
                   <Link
                     key={item.path}
                     to={item.path}
                     className={`
-                      flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm
+                      flex items-center gap-2 px-3 py-2 rounded-lg font-medium text-sm
                       transition-all duration-200
                       ${active
-                        ? 'text-accent-400 bg-accent-400/10'
+                        ? 'text-decayed-base bg-decayed-base/10'
                         : 'text-txt-secondary hover:text-txt-primary hover:bg-surface-300'
                       }
                     `}
                   >
-                    <Icon className={`w-4 h-4 ${active ? 'text-accent-400' : ''}`} />
-                    <span className="hidden md:inline">{item.label}</span>
+                    <Icon className={`w-4 h-4 ${active ? 'text-decayed-base' : ''}`} />
+                    <span className="hidden lg:inline">{item.label}</span>
                   </Link>
                 );
               })}
 
               <div className="w-px h-6 bg-border-subtle mx-2" />
 
-              {isAdmin && (
-                <Link
-                  to="/admin"
-                  className="btn-ghost flex items-center gap-2 text-txt-muted hover:text-decayed-base"
-                >
-                  <Shield className="w-4 h-4" />
-                  <span className="hidden md:inline">Admin</span>
-                </Link>
-              )}
+              <Link
+                to="/dashboard"
+                className="btn-ghost flex items-center gap-2 text-txt-muted hover:text-accent-400"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span className="hidden md:inline">Back to App</span>
+              </Link>
 
               <button
                 onClick={handleLogout}
@@ -106,23 +116,18 @@ const Layout: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-sm text-txt-muted">
-              2026 <span className="text-gradient-accent font-semibold">SkillFade</span>. A mirror, not a coach.
+              <span className="text-decayed-base font-semibold">Admin Panel</span> - Manage all data
             </p>
             <div className="flex items-center gap-6 text-xs text-txt-muted">
-              <span>Privacy First</span>
+              <span>Full CRUD Access</span>
               <span className="w-1 h-1 rounded-full bg-border-DEFAULT" />
-              <span>No Gamification</span>
-              <span className="w-1 h-1 rounded-full bg-border-DEFAULT" />
-              <span>Self-Hosted</span>
+              <span>Handle with Care</span>
             </div>
           </div>
         </div>
       </footer>
-
-      {/* Quick Log Widget */}
-      <QuickLogWidget />
     </div>
   );
 };
 
-export default Layout;
+export default AdminLayout;

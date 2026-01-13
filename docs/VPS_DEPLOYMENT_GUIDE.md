@@ -32,7 +32,9 @@ Complete step-by-step guide to deploy SkillFade on a VPS (Virtual Private Server
 | RAM | 1 GB | 2 GB |
 | CPU | 1 vCPU | 2 vCPU |
 | Storage | 20 GB SSD | 40 GB SSD |
-| OS | Ubuntu 22.04 LTS | Ubuntu 22.04 LTS |
+| OS | Ubuntu 22.04 LTS | Ubuntu 24.04 LTS |
+
+> **Note:** This guide supports both Ubuntu 22.04 LTS and Ubuntu 24.04 LTS. Commands are compatible with both versions unless otherwise noted.
 
 ### Required Access
 - SSH access to your VPS (root or sudo user)
@@ -139,19 +141,40 @@ This is the simplest and most reliable deployment method.
 
 ### 1. Install Docker
 
+**Option A: Using Docker's Official Convenience Script (Recommended)**
+
+```bash
+# Download and run the official Docker installation script
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+
+# Add user to docker group
+sudo usermod -aG docker $USER
+
+# Apply group changes (or logout/login)
+newgrp docker
+
+# Verify installation
+docker --version
+```
+
+**Option B: Manual Installation**
+
 ```bash
 # Install dependencies
 sudo apt install apt-transport-https ca-certificates curl software-properties-common -y
 
 # Add Docker's official GPG key
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
 
-# Add Docker repository
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+# Add Docker repository (works for both Ubuntu 22.04 and 24.04)
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
 # Install Docker
 sudo apt update
-sudo apt install docker-ce docker-ce-cli containerd.io -y
+sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
 
 # Add user to docker group
 sudo usermod -aG docker $USER
@@ -165,16 +188,24 @@ docker --version
 
 ### 2. Install Docker Compose
 
-```bash
-# Download Docker Compose
-sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+> **Note:** If you used Option B above with `docker-compose-plugin`, Docker Compose is already installed as a plugin. You can use `docker compose` (without hyphen) directly.
 
-# Make executable
-sudo chmod +x /usr/local/bin/docker-compose
+**If Docker Compose is not installed:**
+
+```bash
+# Option 1: Install as Docker plugin (Recommended for Ubuntu 24.04)
+sudo apt install docker-compose-plugin -y
 
 # Verify installation
+docker compose version
+
+# Option 2: Install standalone binary (Legacy method)
+sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
 docker-compose --version
 ```
+
+> **Ubuntu 24.04 Note:** The plugin version (`docker compose`) is preferred over the standalone binary (`docker-compose`). Both commands work the same way. This guide uses `docker-compose` syntax for compatibility, but you can substitute with `docker compose`.
 
 ### 3. Clone the Repository
 
@@ -652,6 +683,26 @@ For those who prefer not to use Docker.
 
 ### 1. Install System Dependencies
 
+**For Ubuntu 24.04 LTS:**
+
+```bash
+sudo apt update
+sudo apt install -y \
+    python3 \
+    python3-venv \
+    python3-dev \
+    python3-pip \
+    postgresql \
+    postgresql-contrib \
+    nginx \
+    git \
+    supervisor
+```
+
+> **Note:** Ubuntu 24.04 includes Python 3.12 and PostgreSQL 16 by default, which are fully compatible with SkillFade.
+
+**For Ubuntu 22.04 LTS:**
+
 ```bash
 sudo apt update
 sudo apt install -y \
@@ -662,17 +713,23 @@ sudo apt install -y \
     postgresql \
     postgresql-contrib \
     nginx \
-    nodejs \
-    npm \
     git \
     supervisor
 ```
 
-Install Node.js 18+ if not available:
+**Install Node.js 20 LTS (Required for both versions):**
+
 ```bash
-curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+# Install Node.js 20 LTS via NodeSource
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
 sudo apt install -y nodejs
+
+# Verify installation
+node --version  # Should show v20.x.x
+npm --version
 ```
+
+> **Note:** Node.js 18 is also supported but Node.js 20 LTS is recommended for longer support.
 
 ### 2. Setup PostgreSQL
 
@@ -707,8 +764,13 @@ git clone <your-repository-url> .
 cd /opt/skillfade/backend
 
 # Create virtual environment
-python3.11 -m venv venv
+# Ubuntu 24.04: use python3 (which is Python 3.12)
+# Ubuntu 22.04: use python3.11
+python3 -m venv venv
 source venv/bin/activate
+
+# Verify Python version (should be 3.11+ )
+python --version
 
 # Install dependencies
 pip install --upgrade pip
@@ -1403,6 +1465,8 @@ echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
 
 ### Docker Deployment
 
+> **Ubuntu 24.04 Note:** Use `docker compose` (with space) instead of `docker-compose` (with hyphen) if you installed the Docker Compose plugin.
+
 | Action | Command |
 |--------|---------|
 | Start all services | `docker-compose -f docker-compose.prod.yml up -d` |
@@ -1476,4 +1540,6 @@ sudo nginx -t
 
 ---
 
-**Last Updated:** 2026-01-12
+**Last Updated:** 2026-01-13
+
+**Supported OS:** Ubuntu 22.04 LTS, Ubuntu 24.04 LTS

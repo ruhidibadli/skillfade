@@ -24,6 +24,7 @@ class UserUpdate(BaseModel):
 
 class UserResponse(UserBase):
     id: UUID
+    is_admin: bool = False
     settings: Dict[str, Any] = {}
     created_at: datetime
 

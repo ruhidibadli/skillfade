@@ -145,6 +145,7 @@
 id              UUID PRIMARY KEY DEFAULT gen_random_uuid()
 email           VARCHAR(255) UNIQUE NOT NULL
 password_hash   VARCHAR(255) NOT NULL
+is_admin        BOOLEAN DEFAULT FALSE NOT NULL
 settings        JSONB DEFAULT '{}'
 created_at      TIMESTAMP DEFAULT NOW()
 updated_at      TIMESTAMP DEFAULT NOW()
@@ -369,6 +370,34 @@ Interpretation:
 ### Health
 - `GET /health` - Health check endpoint
 
+### Admin (`/admin/*`) - Requires admin privileges
+- `GET /admin/stats` - Dashboard statistics (user counts, event counts, etc.)
+- `GET /admin/users` - List all users with pagination and filtering
+- `GET /admin/users/:id` - Get user details
+- `POST /admin/users` - Create new user
+- `PATCH /admin/users/:id` - Update user (email, password, is_admin)
+- `DELETE /admin/users/:id` - Delete user
+- `GET /admin/categories` - List all categories
+- `POST /admin/categories` - Create category
+- `PATCH /admin/categories/:id` - Update category
+- `DELETE /admin/categories/:id` - Delete category
+- `GET /admin/skills` - List all skills with freshness
+- `POST /admin/skills` - Create skill
+- `PATCH /admin/skills/:id` - Update skill
+- `DELETE /admin/skills/:id` - Delete skill
+- `GET /admin/learning-events` - List all learning events
+- `POST /admin/learning-events` - Create learning event
+- `PATCH /admin/learning-events/:id` - Update learning event
+- `DELETE /admin/learning-events/:id` - Delete learning event
+- `GET /admin/practice-events` - List all practice events
+- `POST /admin/practice-events` - Create practice event
+- `PATCH /admin/practice-events/:id` - Update practice event
+- `DELETE /admin/practice-events/:id` - Delete practice event
+- `GET /admin/templates` - List all event templates
+- `POST /admin/templates` - Create template
+- `PATCH /admin/templates/:id` - Update template
+- `DELETE /admin/templates/:id` - Delete template
+
 **Response Format:**
 - Success: `{ data: ... }` or direct data
 - Error: `{ detail: "error message" }`
@@ -388,10 +417,22 @@ Interpretation:
 8. **Analytics** (`/analytics`) - Activity calendar, charts for balance and freshness distribution
 9. **Settings** (`/settings`) - Alert preferences, export, account deletion
 
+### Admin Pages (Admin only)
+1. **Admin Dashboard** (`/admin`) - System statistics and quick actions
+2. **Admin Users** (`/admin/users`) - User management with CRUD operations
+3. **Admin Categories** (`/admin/categories`) - Category management
+4. **Admin Skills** (`/admin/skills`) - Skills management with freshness display
+5. **Admin Learning Events** (`/admin/learning-events`) - Learning event management
+6. **Admin Practice Events** (`/admin/practice-events`) - Practice event management
+7. **Admin Templates** (`/admin/templates`) - Event template management
+
 ### Components
 - **Layout** - Header with navigation, footer with tagline (for authenticated pages)
+- **AdminLayout** - Admin-specific layout with admin navigation
 - **Landing** - Full marketing page with hero, features, and footer
 - **ProtectedRoute** - Auth guard for authenticated pages
+- **AdminProtectedRoute** - Auth guard for admin pages (requires is_admin = true)
+- **Pagination** - Reusable pagination component for admin tables
 
 ### Context
 - **AuthContext** - User authentication state, login/logout functions
@@ -469,6 +510,7 @@ d:\skillfade/
 │   │   │   ├── analytics.py       # Analytics endpoints (includes freshness history)
 │   │   │   ├── settings.py        # Settings endpoints
 │   │   │   ├── templates.py       # Event template CRUD endpoints (Phase 1)
+│   │   │   ├── admin.py           # Admin panel CRUD endpoints for all tables
 │   │   │   └── __init__.py
 │   │   ├── schemas/
 │   │   │   ├── user.py            # Pydantic schemas for users
@@ -476,6 +518,7 @@ d:\skillfade/
 │   │   │   ├── category.py        # Pydantic schemas for categories
 │   │   │   ├── event.py           # Pydantic schemas for events
 │   │   │   ├── event_template.py  # Pydantic schemas for templates (Phase 1)
+│   │   │   ├── admin.py           # Admin-specific Pydantic schemas
 │   │   │   └── __init__.py
 │   │   ├── services/
 │   │   │   ├── auth.py            # Auth business logic
@@ -489,7 +532,8 @@ d:\skillfade/
 │   │   │   ├── 20260109_0002-phase1_features.py  # Custom decay rates + templates
 │   │   │   ├── 20260110_0003-phase2_features.py  # Freshness targets
 │   │   │   ├── 20260110_0004-phase6_features.py  # Notes + skill dependencies
-│   │   │   └── 20260112_0005-category_as_object.py  # Categories as objects with FK
+│   │   │   ├── 20260112_0005-category_as_object.py  # Categories as objects with FK
+│   │   │   └── 20260113_0006-admin_panel.py      # Admin panel - is_admin field
 │   │   └── env.py
 │   ├── tests/
 │   │   ├── test_auth.py
@@ -508,8 +552,12 @@ d:\skillfade/
 │   ├── src/
 │   │   ├── components/
 │   │   │   ├── Layout.tsx           # Includes QuickLogWidget
+│   │   │   ├── AdminLayout.tsx      # Admin-specific layout with admin navigation
 │   │   │   ├── ProtectedRoute.tsx
-│   │   │   └── QuickLogWidget.tsx   # Floating quick log button (Phase 1)
+│   │   │   ├── AdminProtectedRoute.tsx  # Auth guard for admin pages
+│   │   │   ├── QuickLogWidget.tsx   # Floating quick log button (Phase 1)
+│   │   │   └── admin/
+│   │   │       └── Pagination.tsx   # Reusable pagination for admin tables
 │   │   ├── context/
 │   │   │   ├── AuthContext.tsx
 │   │   │   └── ThemeContext.tsx     # Dark/Light theme management
@@ -522,7 +570,16 @@ d:\skillfade/
 │   │   │   ├── Skills.tsx           # Category selector, grid/grouped view, filter by category
 │   │   │   ├── SkillDetail.tsx      # Updated with notes + dependencies UI (Phase 6)
 │   │   │   ├── Analytics.tsx
-│   │   │   └── Settings.tsx
+│   │   │   ├── Settings.tsx
+│   │   │   └── admin/               # Admin panel pages
+│   │   │       ├── index.ts
+│   │   │       ├── AdminDashboard.tsx
+│   │   │       ├── AdminUsers.tsx
+│   │   │       ├── AdminSkills.tsx
+│   │   │       ├── AdminCategories.tsx
+│   │   │       ├── AdminLearningEvents.tsx
+│   │   │       ├── AdminPracticeEvents.tsx
+│   │   │       └── AdminTemplates.tsx
 │   │   ├── services/
 │   │   │   └── api.ts            # Axios client, all API calls (includes categories)
 │   │   ├── types/
@@ -546,7 +603,8 @@ d:\skillfade/
 ├── scripts/
 │   ├── deploy.sh                 # Automated deployment script (git pull, build, migrate, restart)
 │   ├── healthcheck.sh            # Service health monitoring script
-│   └── backup.sh                 # Database backup script with retention
+│   ├── backup.sh                 # Database backup script with retention
+│   └── grant_admin.py            # Script to grant/revoke admin privileges
 ├── .env                          # Environment variables (gitignored)
 ├── .env.example                  # Environment template
 ├── .gitignore
@@ -841,7 +899,7 @@ npm test
 - [docs/architecture.md](docs/architecture.md) - System architecture details
 - [docs/api.md](docs/api.md) - Complete API reference
 - [docs/deployment.md](docs/deployment.md) - Basic deployment guide
-- [docs/VPS_DEPLOYMENT_GUIDE.md](docs/VPS_DEPLOYMENT_GUIDE.md) - Comprehensive VPS deployment guide (Docker & manual, SSL, backups, monitoring)
+- [docs/VPS_DEPLOYMENT_GUIDE.md](docs/VPS_DEPLOYMENT_GUIDE.md) - Comprehensive VPS deployment guide (Docker & manual, SSL, backups, monitoring) - Supports Ubuntu 22.04 & 24.04 LTS
 
 ---
 
@@ -1032,8 +1090,8 @@ npm test
 
 ---
 
-**Last Updated:** 2026-01-12
-**Project Status:** Production-ready MVP with Enhanced UI/UX + Dark Mode + Activity Calendar + Phase 1, 2, 6 & Category Features + Comprehensive VPS Deployment Guide ✅
+**Last Updated:** 2026-01-13
+**Project Status:** Production-ready MVP with Enhanced UI/UX + Dark Mode + Activity Calendar + Phase 1, 2, 6 & Category Features + Admin Panel + Comprehensive VPS Deployment Guide (Ubuntu 22.04 & 24.04 LTS) ✅
 
 ### Phase 1 Features (Completed 2026-01-09)
 - **Freshness History Graph**: Line chart showing skill freshness over 90 days
@@ -1060,3 +1118,17 @@ npm test
 - **Progressive Web App (PWA)**: App installable on mobile/desktop, works offline with service worker caching
 - **Skill Dependencies**: Mark prerequisite relationships between skills, see alerts when foundations decay
 - **Skill Notes/Journal**: Add persistent notes to skills for resources, goals, and context
+
+### Admin Panel Feature (Completed 2026-01-13)
+- **Admin Dashboard**: System statistics showing total users, skills, events, templates
+- **User Management**: Full CRUD operations for users, toggle admin privileges
+- **Category Management**: Create, edit, delete categories for any user
+- **Skill Management**: View and edit all skills with freshness indicators
+- **Learning Event Management**: Full CRUD for learning events across all users
+- **Practice Event Management**: Full CRUD for practice events across all users
+- **Template Management**: Manage event templates for all users
+- **Filters & Search**: All admin tables have search bars and filter options
+- **Pagination**: Server-side pagination for all admin tables
+- **Admin Script**: `scripts/grant_admin.py` to grant/revoke admin privileges via CLI
+- **Access Control**: Admin routes protected by `is_admin` flag on user model
+- **Admin Navigation**: Separate admin layout with dedicated navigation menu

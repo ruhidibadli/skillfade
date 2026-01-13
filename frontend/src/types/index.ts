@@ -1,8 +1,105 @@
 export interface User {
   id: string;
   email: string;
+  is_admin?: boolean;
   settings: Record<string, any>;
   created_at: string;
+}
+
+// Admin Types
+export interface AdminUser {
+  id: string;
+  email: string;
+  is_admin: boolean;
+  settings: Record<string, any>;
+  created_at: string;
+  updated_at: string;
+  skills_count: number;
+  learning_events_count: number;
+  practice_events_count: number;
+}
+
+export interface AdminCategory {
+  id: string;
+  name: string;
+  user_id: string;
+  created_at: string;
+  user_email: string | null;
+  skills_count: number;
+}
+
+export interface AdminSkill {
+  id: string;
+  name: string;
+  user_id: string;
+  category_id: string | null;
+  decay_rate: number;
+  target_freshness: number | null;
+  notes: string | null;
+  created_at: string;
+  archived_at: string | null;
+  user_email: string | null;
+  category_name: string | null;
+  learning_events_count: number;
+  practice_events_count: number;
+  freshness: number | null;
+}
+
+export interface AdminLearningEvent {
+  id: string;
+  skill_id: string;
+  user_id: string;
+  date: string;
+  type: string;
+  notes: string | null;
+  duration_minutes: number | null;
+  created_at: string;
+  user_email: string | null;
+  skill_name: string | null;
+}
+
+export interface AdminPracticeEvent {
+  id: string;
+  skill_id: string;
+  user_id: string;
+  date: string;
+  type: string;
+  notes: string | null;
+  duration_minutes: number | null;
+  created_at: string;
+  user_email: string | null;
+  skill_name: string | null;
+}
+
+export interface AdminEventTemplate {
+  id: string;
+  user_id: string;
+  name: string;
+  event_type: string;
+  type: string;
+  default_duration_minutes: number | null;
+  default_notes: string | null;
+  created_at: string;
+  user_email: string | null;
+}
+
+export interface PaginatedResponse<T> {
+  items: T[];
+  total: number;
+  page: number;
+  page_size: number;
+  total_pages: number;
+}
+
+export interface AdminDashboardStats {
+  total_users: number;
+  total_skills: number;
+  total_categories: number;
+  total_learning_events: number;
+  total_practice_events: number;
+  total_templates: number;
+  users_last_7_days: number;
+  events_last_7_days: number;
 }
 
 export interface Category {
