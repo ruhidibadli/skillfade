@@ -8,11 +8,9 @@ import {
   BookOpen,
   Target,
   FolderOpen,
-  Clock,
   FileText,
   Shield,
   ShieldOff,
-  Calendar,
   Activity,
   TrendingUp
 } from 'lucide-react';
