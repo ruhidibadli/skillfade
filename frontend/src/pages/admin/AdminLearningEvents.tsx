@@ -17,7 +17,7 @@ const AdminLearningEvents: React.FC = () => {
   const [total, setTotal] = useState(0);
   const [search, setSearch] = useState('');
   const [filterUserId, setFilterUserId] = useState<string>('');
-  const [filterSkillId, setFilterSkillId] = useState<string>('');
+  const [filterSkillId] = useState<string>('');
   const [filterType, setFilterType] = useState<string>('');
   const pageSize = 20;
 
