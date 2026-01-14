@@ -208,15 +208,15 @@ deploy_docker() {
 
     if [ "$SKIP_BUILD" = false ]; then
         print_step "Building Docker images..."
-        docker-compose -f "$DOCKER_COMPOSE_FILE" build --no-cache
+        docker compose -f "$DOCKER_COMPOSE_FILE" build --no-cache
         print_success "Images built"
     fi
 
     print_step "Stopping existing containers..."
-    docker-compose -f "$DOCKER_COMPOSE_FILE" down
+    docker compose -f "$DOCKER_COMPOSE_FILE" down
 
     print_step "Starting containers..."
-    docker-compose -f "$DOCKER_COMPOSE_FILE" up -d
+    docker compose -f "$DOCKER_COMPOSE_FILE" up -d
 
     # Wait for services to be ready
     print_step "Waiting for services to start..."
