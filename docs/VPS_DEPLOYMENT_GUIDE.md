@@ -42,7 +42,7 @@ That's it! The script will:
 1. Visit your site and register a user
 2. Make yourself admin:
 ```bash
-docker exec skillfade_backend python scripts/grant_admin.py your-email@example.com
+docker exec skillfade_backend python grant_admin.py your-email@example.com
 ```
 
 ---

@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-Script to grant admin privileges to a user.
+Grant admin privileges to a user.
 
-Usage (inside Docker container):
-    docker-compose exec backend python grant_admin.py [email]
-
-If no email is provided, defaults to: ruhid.ibadli@gmail.com
+Usage inside Docker:
+    docker exec skillfade_backend python grant_admin.py user@email.com
+    docker exec skillfade_backend python grant_admin.py --list
+    docker exec skillfade_backend python grant_admin.py --revoke user@email.com
 """
 
 import sys
@@ -16,27 +16,23 @@ from app.core.config import settings
 from app.models.user import User
 
 
-def grant_admin(email: str):
-    """Grant admin privileges to a user by email."""
-    engine = create_engine(
-        settings.DATABASE_URL,
-        connect_args={"check_same_thread": False} if "sqlite" in settings.DATABASE_URL else {}
-    )
+def get_db():
+    engine = create_engine(settings.DATABASE_URL)
     SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-    db = SessionLocal()
+    return SessionLocal()
 
+
+def grant_admin(email: str):
+    db = get_db()
     try:
         user = db.query(User).filter(User.email == email).first()
 
         if not user:
-            print(f"Error: User with email '{email}' not found.")
-            print("\nAvailable users:")
-            users = db.query(User).all()
-            for u in users[:10]:
-                admin_badge = " [ADMIN]" if u.is_admin else ""
-                print(f"  - {u.email}{admin_badge}")
-            if len(users) > 10:
-                print(f"  ... and {len(users) - 10} more")
+            print(f"Error: User '{email}' not found.")
+            print("\nRegistered users:")
+            for u in db.query(User).limit(10).all():
+                badge = " [ADMIN]" if u.is_admin else ""
+                print(f"  - {u.email}{badge}")
             return False
 
         if user.is_admin:
@@ -45,102 +41,60 @@ def grant_admin(email: str):
 
         user.is_admin = True
         db.commit()
-
-        print(f"Successfully granted admin privileges to '{email}'.")
-        print("\nThe user can now:")
-        print("  - Access the admin panel at /admin")
-        print("  - View and manage all users, skills, events, and categories")
-        print("\nNote: The user needs to log out and log back in for changes to take effect.")
+        print(f"Admin privileges granted to '{email}'.")
+        print("User needs to log out and back in for changes to take effect.")
         return True
-
-    except Exception as e:
-        print(f"Error: {str(e)}")
-        db.rollback()
-        return False
     finally:
         db.close()
 
 
 def revoke_admin(email: str):
-    """Revoke admin privileges from a user."""
-    engine = create_engine(
-        settings.DATABASE_URL,
-        connect_args={"check_same_thread": False} if "sqlite" in settings.DATABASE_URL else {}
-    )
-    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-    db = SessionLocal()
-
+    db = get_db()
     try:
         user = db.query(User).filter(User.email == email).first()
         if not user:
-            print(f"Error: User with email '{email}' not found.")
+            print(f"Error: User '{email}' not found.")
             return False
-
-        if not user.is_admin:
-            print(f"User '{email}' is not an admin.")
-            return True
-
         user.is_admin = False
         db.commit()
-        print(f"Successfully revoked admin privileges from '{email}'.")
+        print(f"Admin privileges revoked from '{email}'.")
         return True
-
-    except Exception as e:
-        print(f"Error: {str(e)}")
-        db.rollback()
-        return False
     finally:
         db.close()
 
 
 def list_admins():
-    """List all admin users."""
-    engine = create_engine(
-        settings.DATABASE_URL,
-        connect_args={"check_same_thread": False} if "sqlite" in settings.DATABASE_URL else {}
-    )
-    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-    db = SessionLocal()
-
+    db = get_db()
     try:
         admins = db.query(User).filter(User.is_admin == True).all()
         if not admins:
             print("No admin users found.")
-            return
-        print(f"Admin users ({len(admins)}):")
-        for admin in admins:
-            print(f"  - {admin.email} (created: {admin.created_at.strftime('%Y-%m-%d')})")
+        else:
+            print(f"Admin users ({len(admins)}):")
+            for a in admins:
+                print(f"  - {a.email}")
     finally:
         db.close()
 
 
 if __name__ == "__main__":
-    default_email = "ruhid.ibadli@gmail.com"
+    if len(sys.argv) < 2:
+        print("Usage:")
+        print("  python grant_admin.py <email>           - Grant admin")
+        print("  python grant_admin.py --revoke <email>  - Revoke admin")
+        print("  python grant_admin.py --list            - List admins")
+        sys.exit(1)
 
-    if len(sys.argv) > 1:
-        command = sys.argv[1].lower()
+    cmd = sys.argv[1]
 
-        if command in ("--help", "-h"):
-            print(__doc__)
-            print("\nCommands:")
-            print("  python grant_admin.py [email]          - Grant admin to user")
-            print("  python grant_admin.py --revoke [email] - Revoke admin from user")
-            print("  python grant_admin.py --list           - List all admin users")
-            sys.exit(0)
-
-        elif command == "--list":
-            list_admins()
-            sys.exit(0)
-
-        elif command == "--revoke":
-            email = sys.argv[2] if len(sys.argv) > 2 else default_email
-            success = revoke_admin(email)
-            sys.exit(0 if success else 1)
-
-        else:
-            success = grant_admin(command)
-            sys.exit(0 if success else 1)
+    if cmd == "--list":
+        list_admins()
+    elif cmd == "--revoke":
+        if len(sys.argv) < 3:
+            print("Error: Email required")
+            sys.exit(1)
+        revoke_admin(sys.argv[2])
+    elif cmd == "--help" or cmd == "-h":
+        print(__doc__)
     else:
-        print(f"No email provided, using default: {default_email}")
-        success = grant_admin(default_email)
-        sys.exit(0 if success else 1)
+        grant_admin(cmd)
