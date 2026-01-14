@@ -25,7 +25,7 @@
 ## Project Overview
 
 **Name:** SkillFade
-**Type:** Self-hosted web application (monolithic)
+**Type:** SaaS web application (monolithic)
 **Purpose:** Track skill learning and practice, exposing three realities:
 1. **Learning Decay** - Skills degrade without reinforcement
 2. **Practice Scarcity** - Learning without application leads to forgetting
@@ -59,7 +59,7 @@
 
 ### Design Principles
 1. **Simplicity First** - No microservices, no complex state management, no unnecessary abstractions
-2. **User Trust & Privacy** - No third-party analytics, self-hosted, full data export, permanent deletion
+2. **User Trust & Privacy** - No third-party analytics, full data export, permanent deletion
 3. **Calm Design** - Soft colors, ample whitespace, no red warnings, no gamification, data over motivation
 4. **Long-term Maintainability** - Type safety, clear separation of concerns, comprehensive documentation
 5. **Boring Tech** - Proven, reliable solutions over trendy ones
@@ -831,7 +831,6 @@ npm test
 - ✅ Full data export (JSON format)
 - ✅ Permanent account deletion (cascade deletes all data)
 - ✅ Alert preferences (enable/disable each type)
-- ✅ Self-hosted option available (can run on their own server)
 - ✅ Email only used for alerts and password reset
 
 ---
