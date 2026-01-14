@@ -374,6 +374,7 @@ Interpretation:
 - `GET /admin/stats` - Dashboard statistics (user counts, event counts, etc.)
 - `GET /admin/users` - List all users with pagination and filtering
 - `GET /admin/users/:id` - Get user details
+- `GET /admin/users/:id/details` - Get comprehensive user details (all skills, events, categories, templates)
 - `POST /admin/users` - Create new user
 - `PATCH /admin/users/:id` - Update user (email, password, is_admin)
 - `DELETE /admin/users/:id` - Delete user
@@ -420,11 +421,12 @@ Interpretation:
 ### Admin Pages (Admin only)
 1. **Admin Dashboard** (`/admin`) - System statistics and quick actions
 2. **Admin Users** (`/admin/users`) - User management with CRUD operations
-3. **Admin Categories** (`/admin/categories`) - Category management
-4. **Admin Skills** (`/admin/skills`) - Skills management with freshness display
-5. **Admin Learning Events** (`/admin/learning-events`) - Learning event management
-6. **Admin Practice Events** (`/admin/practice-events`) - Practice event management
-7. **Admin Templates** (`/admin/templates`) - Event template management
+3. **Admin User Detail** (`/admin/users/:userId`) - Comprehensive user data view with tabs for overview, skills, learning events, practice events, categories, and templates
+4. **Admin Categories** (`/admin/categories`) - Category management
+5. **Admin Skills** (`/admin/skills`) - Skills management with freshness display
+6. **Admin Learning Events** (`/admin/learning-events`) - Learning event management
+7. **Admin Practice Events** (`/admin/practice-events`) - Practice event management
+8. **Admin Templates** (`/admin/templates`) - Event template management
 
 ### Components
 - **Layout** - Header with navigation, footer with tagline (for authenticated pages)
@@ -575,6 +577,7 @@ d:\skillfade/
 │   │   │       ├── index.ts
 │   │   │       ├── AdminDashboard.tsx
 │   │   │       ├── AdminUsers.tsx
+│   │   │       ├── AdminUserDetail.tsx  # Comprehensive user data view
 │   │   │       ├── AdminSkills.tsx
 │   │   │       ├── AdminCategories.tsx
 │   │   │       ├── AdminLearningEvents.tsx
@@ -1090,7 +1093,7 @@ npm test
 
 ---
 
-**Last Updated:** 2026-01-13
+**Last Updated:** 2026-01-14
 **Project Status:** Production-ready MVP with Enhanced UI/UX + Dark Mode + Activity Calendar + Phase 1, 2, 6 & Category Features + Admin Panel + Comprehensive VPS Deployment Guide (Ubuntu 22.04 & 24.04 LTS) ✅
 
 ### Phase 1 Features (Completed 2026-01-09)
@@ -1119,9 +1122,18 @@ npm test
 - **Skill Dependencies**: Mark prerequisite relationships between skills, see alerts when foundations decay
 - **Skill Notes/Journal**: Add persistent notes to skills for resources, goals, and context
 
-### Admin Panel Feature (Completed 2026-01-13)
+### Admin Panel Feature (Completed 2026-01-13, Updated 2026-01-14)
 - **Admin Dashboard**: System statistics showing total users, skills, events, templates
 - **User Management**: Full CRUD operations for users, toggle admin privileges
+- **Comprehensive User Details View**: View all user data in one place including:
+  - Summary statistics (skills, events, time spent, average freshness)
+  - All skills with freshness indicators
+  - All learning events with skill names, dates, types, durations
+  - All practice events with skill names, dates, types, durations
+  - All categories with skill counts
+  - All event templates
+  - Recent activity (last 30 days)
+  - User settings
 - **Category Management**: Create, edit, delete categories for any user
 - **Skill Management**: View and edit all skills with freshness indicators
 - **Learning Event Management**: Full CRUD for learning events across all users

@@ -22,6 +22,7 @@ import Settings from './pages/Settings';
 import {
   AdminDashboard,
   AdminUsers,
+  AdminUserDetail,
   AdminSkills,
   AdminCategories,
   AdminLearningEvents,
@@ -107,6 +108,14 @@ function App() {
                   element={
                     <AdminProtectedRoute>
                       <AdminUsers />
+                    </AdminProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/users/:userId"
+                  element={
+                    <AdminProtectedRoute>
+                      <AdminUserDetail />
                     </AdminProtectedRoute>
                   }
                 />

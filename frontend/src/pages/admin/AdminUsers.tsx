@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { admin } from '../../services/api';
 import type { AdminUser } from '../../types';
 import Pagination from '../../components/admin/Pagination';
@@ -10,10 +11,12 @@ import {
   Shield,
   ShieldOff,
   X,
-  Check
+  Check,
+  Eye
 } from 'lucide-react';
 
 const AdminUsers: React.FC = () => {
+  const navigate = useNavigate();
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -229,8 +232,16 @@ const AdminUsers: React.FC = () => {
                     <td className="px-4 py-3 text-right">
                       <div className="flex items-center justify-end gap-2">
                         <button
+                          onClick={() => navigate(`/admin/users/${user.id}`)}
+                          className="p-1.5 rounded hover:bg-surface-300 text-txt-muted hover:text-accent-400 transition-colors"
+                          title="View user details"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </button>
+                        <button
                           onClick={() => openEditModal(user)}
                           className="p-1.5 rounded hover:bg-surface-300 text-txt-muted hover:text-accent-400 transition-colors"
+                          title="Edit user"
                         >
                           <Edit2 className="w-4 h-4" />
                         </button>

@@ -22,7 +22,8 @@ import type {
   AdminPracticeEvent,
   AdminEventTemplate,
   AdminDashboardStats,
-  PaginatedResponse
+  PaginatedResponse,
+  AdminUserFullDetails
 } from '../types';
 
 const API_URL = import.meta.env.VITE_API_URL || '/api';
@@ -224,6 +225,9 @@ export const admin = {
 
   getUser: (id: string) =>
     api.get<AdminUser>(`/admin/users/${id}`),
+
+  getUserFullDetails: (id: string) =>
+    api.get<AdminUserFullDetails>(`/admin/users/${id}/details`),
 
   createUser: (data: { email: string; password: string; is_admin?: boolean }) =>
     api.post<AdminUser>('/admin/users', data),

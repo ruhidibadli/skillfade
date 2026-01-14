@@ -307,3 +307,79 @@ export interface PersonalRecords {
   total_learning_events: number;
   total_practice_events: number;
 }
+
+// Admin User Full Details
+export interface AdminUserDetailSummary {
+  total_skills: number;
+  active_skills: number;
+  archived_skills: number;
+  total_categories: number;
+  total_learning_events: number;
+  total_practice_events: number;
+  total_templates: number;
+  total_learning_minutes: number;
+  total_practice_minutes: number;
+  average_freshness: number;
+  recent_learning_events: number;
+  recent_practice_events: number;
+}
+
+export interface AdminUserDetailCategory {
+  id: string;
+  name: string;
+  created_at: string;
+  skills_count: number;
+}
+
+export interface AdminUserDetailSkill {
+  id: string;
+  name: string;
+  category_id: string | null;
+  category_name: string | null;
+  decay_rate: number;
+  target_freshness: number | null;
+  notes: string | null;
+  created_at: string;
+  archived_at: string | null;
+  learning_events_count: number;
+  practice_events_count: number;
+  freshness: number;
+}
+
+export interface AdminUserDetailEvent {
+  id: string;
+  skill_id: string;
+  skill_name: string | null;
+  date: string;
+  type: string;
+  notes: string | null;
+  duration_minutes: number | null;
+  created_at: string;
+}
+
+export interface AdminUserDetailTemplate {
+  id: string;
+  name: string;
+  event_type: string;
+  type: string;
+  default_duration_minutes: number | null;
+  default_notes: string | null;
+  created_at: string;
+}
+
+export interface AdminUserFullDetails {
+  user: {
+    id: string;
+    email: string;
+    is_admin: boolean;
+    settings: Record<string, any>;
+    created_at: string;
+    updated_at: string;
+  };
+  summary: AdminUserDetailSummary;
+  categories: AdminUserDetailCategory[];
+  skills: AdminUserDetailSkill[];
+  learning_events: AdminUserDetailEvent[];
+  practice_events: AdminUserDetailEvent[];
+  templates: AdminUserDetailTemplate[];
+}

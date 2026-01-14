@@ -124,6 +124,158 @@ def get_user(
     }
 
 
+@router.get("/users/{user_id}/details")
+def get_user_full_details(
+    user_id: UUID,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_admin_user)
+):
+    """Get comprehensive user details including all their data."""
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Get all categories
+    categories = db.query(Category).filter(Category.user_id == user.id).order_by(Category.name).all()
+    categories_data = []
+    for cat in categories:
+        skills_count = db.query(Skill).filter(Skill.category_id == cat.id).count()
+        categories_data.append({
+            "id": cat.id,
+            "name": cat.name,
+            "created_at": cat.created_at,
+            "skills_count": skills_count
+        })
+
+    # Get all skills with freshness
+    skills = db.query(Skill).filter(Skill.user_id == user.id).order_by(Skill.created_at.desc()).all()
+    skills_data = []
+    for skill in skills:
+        category = db.query(Category).filter(Category.id == skill.category_id).first() if skill.category_id else None
+        learning_events = db.query(LearningEvent).filter(LearningEvent.skill_id == skill.id).all()
+        practice_events = db.query(PracticeEvent).filter(PracticeEvent.skill_id == skill.id).all()
+        freshness = calculate_freshness(
+            skill_created_at=skill.created_at.date() if hasattr(skill.created_at, 'date') else skill.created_at,
+            learning_events=[(e.date, e.type) for e in learning_events],
+            practice_events=[(e.date, e.type) for e in practice_events],
+            base_decay_rate=skill.decay_rate or 0.02
+        )
+        skills_data.append({
+            "id": skill.id,
+            "name": skill.name,
+            "category_id": skill.category_id,
+            "category_name": category.name if category else None,
+            "decay_rate": skill.decay_rate,
+            "target_freshness": skill.target_freshness,
+            "notes": skill.notes,
+            "created_at": skill.created_at,
+            "archived_at": skill.archived_at,
+            "learning_events_count": len(learning_events),
+            "practice_events_count": len(practice_events),
+            "freshness": freshness
+        })
+
+    # Get all learning events
+    learning_events = db.query(LearningEvent).filter(
+        LearningEvent.user_id == user.id
+    ).order_by(LearningEvent.date.desc()).all()
+    learning_events_data = []
+    for event in learning_events:
+        skill = db.query(Skill).filter(Skill.id == event.skill_id).first()
+        learning_events_data.append({
+            "id": event.id,
+            "skill_id": event.skill_id,
+            "skill_name": skill.name if skill else None,
+            "date": event.date,
+            "type": event.type,
+            "notes": event.notes,
+            "duration_minutes": event.duration_minutes,
+            "created_at": event.created_at
+        })
+
+    # Get all practice events
+    practice_events = db.query(PracticeEvent).filter(
+        PracticeEvent.user_id == user.id
+    ).order_by(PracticeEvent.date.desc()).all()
+    practice_events_data = []
+    for event in practice_events:
+        skill = db.query(Skill).filter(Skill.id == event.skill_id).first()
+        practice_events_data.append({
+            "id": event.id,
+            "skill_id": event.skill_id,
+            "skill_name": skill.name if skill else None,
+            "date": event.date,
+            "type": event.type,
+            "notes": event.notes,
+            "duration_minutes": event.duration_minutes,
+            "created_at": event.created_at
+        })
+
+    # Get all templates
+    templates = db.query(EventTemplate).filter(
+        EventTemplate.user_id == user.id
+    ).order_by(EventTemplate.created_at.desc()).all()
+    templates_data = []
+    for template in templates:
+        templates_data.append({
+            "id": template.id,
+            "name": template.name,
+            "event_type": template.event_type,
+            "type": template.type,
+            "default_duration_minutes": template.default_duration_minutes,
+            "default_notes": template.default_notes,
+            "created_at": template.created_at
+        })
+
+    # Calculate summary statistics
+    total_learning_minutes = sum(e.duration_minutes or 0 for e in learning_events)
+    total_practice_minutes = sum(e.duration_minutes or 0 for e in practice_events)
+    active_skills = len([s for s in skills if s.archived_at is None])
+    archived_skills = len([s for s in skills if s.archived_at is not None])
+    avg_freshness = sum(s["freshness"] for s in skills_data if s["freshness"] is not None and s["archived_at"] is None) / active_skills if active_skills > 0 else 0
+
+    # Get recent activity (last 30 days)
+    thirty_days_ago = datetime.utcnow() - timedelta(days=30)
+    recent_learning = db.query(LearningEvent).filter(
+        LearningEvent.user_id == user.id,
+        LearningEvent.date >= thirty_days_ago.date()
+    ).count()
+    recent_practice = db.query(PracticeEvent).filter(
+        PracticeEvent.user_id == user.id,
+        PracticeEvent.date >= thirty_days_ago.date()
+    ).count()
+
+    return {
+        "user": {
+            "id": user.id,
+            "email": user.email,
+            "is_admin": user.is_admin,
+            "settings": user.settings or {},
+            "created_at": user.created_at,
+            "updated_at": user.updated_at
+        },
+        "summary": {
+            "total_skills": len(skills),
+            "active_skills": active_skills,
+            "archived_skills": archived_skills,
+            "total_categories": len(categories),
+            "total_learning_events": len(learning_events),
+            "total_practice_events": len(practice_events),
+            "total_templates": len(templates),
+            "total_learning_minutes": total_learning_minutes,
+            "total_practice_minutes": total_practice_minutes,
+            "average_freshness": round(avg_freshness, 1),
+            "recent_learning_events": recent_learning,
+            "recent_practice_events": recent_practice
+        },
+        "categories": categories_data,
+        "skills": skills_data,
+        "learning_events": learning_events_data,
+        "practice_events": practice_events_data,
+        "templates": templates_data
+    }
+
+
 @router.post("/users", response_model=AdminUserResponse, status_code=status.HTTP_201_CREATED)
 def create_user(
     data: AdminUserCreate,
