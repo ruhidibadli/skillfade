@@ -27,6 +27,8 @@ wheels/
 .venv/
 venv/
 
+/certbot
+
 # Environment variables
 .env
 .env.local
