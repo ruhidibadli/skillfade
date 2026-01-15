@@ -26,8 +26,8 @@ wheels/
 # Virtual environments
 .venv/
 venv/
-
 /certbot
+certbot/
 
 # Environment variables
 .env
