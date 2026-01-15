@@ -206,6 +206,47 @@ class PaginatedResponse(BaseModel):
     total_pages: int
 
 
+# ==================== Ticket Schemas ====================
+class AdminTicketReplyCreate(BaseModel):
+    message: str = Field(..., min_length=1)
+
+
+class AdminTicketReplyResponse(BaseModel):
+    id: UUID
+    ticket_id: UUID
+    user_id: UUID
+    message: str
+    is_admin_reply: bool
+    created_at: datetime
+    user_email: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+
+class AdminTicketUpdate(BaseModel):
+    status: Optional[str] = Field(None, max_length=20)
+
+
+class AdminTicketResponse(BaseModel):
+    id: UUID
+    user_id: UUID
+    subject: str
+    message: str
+    status: str
+    created_at: datetime
+    updated_at: datetime
+    user_email: Optional[str] = None
+    reply_count: int = 0
+
+    class Config:
+        from_attributes = True
+
+
+class AdminTicketDetailResponse(AdminTicketResponse):
+    replies: List[AdminTicketReplyResponse] = []
+
+
 # ==================== Stats Schemas ====================
 class AdminDashboardStats(BaseModel):
     total_users: int
@@ -214,5 +255,7 @@ class AdminDashboardStats(BaseModel):
     total_learning_events: int
     total_practice_events: int
     total_templates: int
+    total_tickets: int = 0
+    open_tickets: int = 0
     users_last_7_days: int
     events_last_7_days: int

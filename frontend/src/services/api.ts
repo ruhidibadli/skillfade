@@ -23,7 +23,14 @@ import type {
   AdminEventTemplate,
   AdminDashboardStats,
   PaginatedResponse,
-  AdminUserFullDetails
+  AdminUserFullDetails,
+  Ticket,
+  TicketListItem,
+  TicketReply,
+  TicketStatus,
+  AdminTicket,
+  AdminTicketDetail,
+  AdminTicketReply
 } from '../types';
 
 const API_URL = import.meta.env.VITE_API_URL || '/api';
@@ -317,6 +324,37 @@ export const admin = {
 
   deleteTemplate: (id: string) =>
     api.delete(`/admin/templates/${id}`),
+
+  // Tickets
+  listTickets: (params?: { page?: number; page_size?: number; search?: string; user_id?: string; status?: TicketStatus }) =>
+    api.get<PaginatedResponse<AdminTicket>>('/admin/tickets', { params }),
+
+  getTicket: (id: string) =>
+    api.get<AdminTicketDetail>(`/admin/tickets/${id}`),
+
+  updateTicket: (id: string, data: { status?: TicketStatus }) =>
+    api.patch<AdminTicket>(`/admin/tickets/${id}`, data),
+
+  addTicketReply: (id: string, data: { message: string }) =>
+    api.post<AdminTicketReply>(`/admin/tickets/${id}/replies`, data),
+
+  deleteTicket: (id: string) =>
+    api.delete(`/admin/tickets/${id}`),
+};
+
+// Tickets (User)
+export const tickets = {
+  list: () =>
+    api.get<TicketListItem[]>('/tickets'),
+
+  create: (data: { subject: string; message: string }) =>
+    api.post<Ticket>('/tickets', data),
+
+  get: (id: string) =>
+    api.get<Ticket>(`/tickets/${id}`),
+
+  addReply: (id: string, data: { message: string }) =>
+    api.post<TicketReply>(`/tickets/${id}/replies`, data),
 };
 
 export default api;

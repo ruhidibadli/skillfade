@@ -98,6 +98,8 @@ export interface AdminDashboardStats {
   total_learning_events: number;
   total_practice_events: number;
   total_templates: number;
+  total_tickets: number;
+  open_tickets: number;
   users_last_7_days: number;
   events_last_7_days: number;
 }
@@ -382,4 +384,64 @@ export interface AdminUserFullDetails {
   learning_events: AdminUserDetailEvent[];
   practice_events: AdminUserDetailEvent[];
   templates: AdminUserDetailTemplate[];
+}
+
+// Ticket Types
+export type TicketStatus = 'open' | 'in_progress' | 'resolved' | 'closed';
+
+export interface TicketReply {
+  id: string;
+  ticket_id: string;
+  user_id: string;
+  message: string;
+  is_admin_reply: boolean;
+  created_at: string;
+}
+
+export interface Ticket {
+  id: string;
+  user_id: string;
+  subject: string;
+  message: string;
+  status: TicketStatus;
+  created_at: string;
+  updated_at: string;
+  replies: TicketReply[];
+}
+
+export interface TicketListItem {
+  id: string;
+  user_id: string;
+  subject: string;
+  status: TicketStatus;
+  created_at: string;
+  updated_at: string;
+  reply_count: number;
+}
+
+// Admin Ticket Types
+export interface AdminTicket {
+  id: string;
+  user_id: string;
+  subject: string;
+  message: string;
+  status: TicketStatus;
+  created_at: string;
+  updated_at: string;
+  user_email: string | null;
+  reply_count: number;
+}
+
+export interface AdminTicketReply {
+  id: string;
+  ticket_id: string;
+  user_id: string;
+  message: string;
+  is_admin_reply: boolean;
+  created_at: string;
+  user_email: string | null;
+}
+
+export interface AdminTicketDetail extends AdminTicket {
+  replies: AdminTicketReply[];
 }

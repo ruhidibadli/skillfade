@@ -10,7 +10,8 @@ import {
   Wrench,
   FileText,
   TrendingUp,
-  Activity
+  Activity,
+  MessageSquare
 } from 'lucide-react';
 
 const AdminDashboard: React.FC = () => {
@@ -61,6 +62,7 @@ const AdminDashboard: React.FC = () => {
     { label: 'Learning Events', value: stats?.total_learning_events || 0, icon: BookOpen, link: '/admin/learning-events', color: 'text-accent-300' },
     { label: 'Practice Events', value: stats?.total_practice_events || 0, icon: Wrench, link: '/admin/practice-events', color: 'text-fresh-bright' },
     { label: 'Templates', value: stats?.total_templates || 0, icon: FileText, link: '/admin/templates', color: 'text-aging-base' },
+    { label: 'Support Tickets', value: stats?.total_tickets || 0, icon: MessageSquare, link: '/admin/tickets', color: 'text-decayed-base', badge: stats?.open_tickets },
   ];
 
   return (
@@ -84,9 +86,16 @@ const AdminDashboard: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-txt-muted text-sm">{stat.label}</p>
-                  <p className={`text-3xl font-bold mt-1 ${stat.color}`}>
-                    {stat.value.toLocaleString()}
-                  </p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <p className={`text-3xl font-bold ${stat.color}`}>
+                      {stat.value.toLocaleString()}
+                    </p>
+                    {stat.badge !== undefined && stat.badge > 0 && (
+                      <span className="px-2 py-0.5 text-xs font-medium bg-aging-base/10 text-aging-base rounded-full">
+                        {stat.badge} open
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <div className={`p-3 rounded-lg bg-surface-300 ${stat.color}`}>
                   <Icon className="w-6 h-6" />

@@ -156,6 +156,8 @@ updated_at      TIMESTAMP DEFAULT NOW()
 - Has many learning_events (cascade delete)
 - Has many practice_events (cascade delete)
 - Has many categories (cascade delete)
+- Has many tickets (cascade delete)
+- Has many ticket_replies (cascade delete)
 
 ### Categories Table
 ```sql
@@ -254,6 +256,38 @@ INDEX(depends_on_id)
 - Self-referential many-to-many for skills
 - skill_id → the skill that has a prerequisite
 - depends_on_id → the prerequisite skill
+
+### Tickets Table
+```sql
+id              UUID PRIMARY KEY DEFAULT gen_random_uuid()
+user_id         UUID REFERENCES users(id) ON DELETE CASCADE
+subject         VARCHAR(200) NOT NULL
+message         TEXT NOT NULL
+status          VARCHAR(20) DEFAULT 'open' NOT NULL  -- open, in_progress, resolved, closed
+created_at      TIMESTAMP DEFAULT NOW()
+updated_at      TIMESTAMP DEFAULT NOW()
+INDEX(user_id)
+INDEX(status)
+```
+
+**Relationships:**
+- Belongs to user
+- Has many ticket_replies (cascade delete)
+
+### Ticket Replies Table
+```sql
+id              UUID PRIMARY KEY DEFAULT gen_random_uuid()
+ticket_id       UUID REFERENCES tickets(id) ON DELETE CASCADE
+user_id         UUID REFERENCES users(id) ON DELETE CASCADE
+message         TEXT NOT NULL
+is_admin_reply  BOOLEAN DEFAULT FALSE NOT NULL
+created_at      TIMESTAMP DEFAULT NOW()
+INDEX(ticket_id)
+```
+
+**Relationships:**
+- Belongs to ticket
+- Belongs to user
 
 ---
 
@@ -367,6 +401,12 @@ Interpretation:
 - `PATCH /templates/:id` - Update template
 - `DELETE /templates/:id` - Delete template
 
+### Tickets (`/tickets/*`)
+- `GET /tickets` - List user's support tickets
+- `POST /tickets` - Create new support ticket
+- `GET /tickets/:id` - Get ticket with replies
+- `POST /tickets/:id/replies` - Add reply to ticket
+
 ### Health
 - `GET /health` - Health check endpoint
 
@@ -398,6 +438,11 @@ Interpretation:
 - `POST /admin/templates` - Create template
 - `PATCH /admin/templates/:id` - Update template
 - `DELETE /admin/templates/:id` - Delete template
+- `GET /admin/tickets` - List all tickets with pagination and filtering
+- `GET /admin/tickets/:id` - Get ticket with replies
+- `PATCH /admin/tickets/:id` - Update ticket status
+- `POST /admin/tickets/:id/replies` - Add admin reply to ticket
+- `DELETE /admin/tickets/:id` - Delete ticket
 
 **Response Format:**
 - Success: `{ data: ... }` or direct data
@@ -417,6 +462,8 @@ Interpretation:
 7. **Skill Detail** (`/skills/:id`) - Timeline of events, add event forms
 8. **Analytics** (`/analytics`) - Activity calendar, charts for balance and freshness distribution
 9. **Settings** (`/settings`) - Alert preferences, export, account deletion
+10. **Support** (`/support`) - Support ticket list, create new tickets
+11. **Ticket Detail** (`/support/:id`) - View ticket details and replies, add replies
 
 ### Admin Pages (Admin only)
 1. **Admin Dashboard** (`/admin`) - System statistics and quick actions
@@ -427,6 +474,8 @@ Interpretation:
 6. **Admin Learning Events** (`/admin/learning-events`) - Learning event management
 7. **Admin Practice Events** (`/admin/practice-events`) - Practice event management
 8. **Admin Templates** (`/admin/templates`) - Event template management
+9. **Admin Tickets** (`/admin/tickets`) - Support ticket management, view all tickets
+10. **Admin Ticket Detail** (`/admin/tickets/:id`) - View ticket details, respond to users, update status
 
 ### Components
 - **Layout** - Header with navigation, footer with tagline (for authenticated pages)
@@ -503,6 +552,7 @@ d:\skillfade/
 │   │   │   ├── category.py        # Category model
 │   │   │   ├── event.py           # LearningEvent, PracticeEvent models
 │   │   │   ├── event_template.py  # EventTemplate model (Phase 1)
+│   │   │   ├── ticket.py          # Ticket, TicketReply models
 │   │   │   └── __init__.py
 │   │   ├── routers/
 │   │   │   ├── auth.py            # Auth endpoints
@@ -512,7 +562,8 @@ d:\skillfade/
 │   │   │   ├── analytics.py       # Analytics endpoints (includes freshness history)
 │   │   │   ├── settings.py        # Settings endpoints
 │   │   │   ├── templates.py       # Event template CRUD endpoints (Phase 1)
-│   │   │   ├── admin.py           # Admin panel CRUD endpoints for all tables
+│   │   │   ├── tickets.py         # User ticket endpoints
+│   │   │   ├── admin.py           # Admin panel CRUD endpoints for all tables (includes tickets)
 │   │   │   └── __init__.py
 │   │   ├── schemas/
 │   │   │   ├── user.py            # Pydantic schemas for users
@@ -520,7 +571,8 @@ d:\skillfade/
 │   │   │   ├── category.py        # Pydantic schemas for categories
 │   │   │   ├── event.py           # Pydantic schemas for events
 │   │   │   ├── event_template.py  # Pydantic schemas for templates (Phase 1)
-│   │   │   ├── admin.py           # Admin-specific Pydantic schemas
+│   │   │   ├── ticket.py          # Pydantic schemas for tickets
+│   │   │   ├── admin.py           # Admin-specific Pydantic schemas (includes tickets)
 │   │   │   └── __init__.py
 │   │   ├── services/
 │   │   │   ├── auth.py            # Auth business logic
@@ -535,7 +587,8 @@ d:\skillfade/
 │   │   │   ├── 20260110_0003-phase2_features.py  # Freshness targets
 │   │   │   ├── 20260110_0004-phase6_features.py  # Notes + skill dependencies
 │   │   │   ├── 20260112_0005-category_as_object.py  # Categories as objects with FK
-│   │   │   └── 20260113_0006-admin_panel.py      # Admin panel - is_admin field
+│   │   │   ├── 20260113_0006-admin_panel.py      # Admin panel - is_admin field
+│   │   │   └── 20260115_0007-tickets_system.py   # Tickets and ticket replies tables
 │   │   └── env.py
 │   ├── tests/
 │   │   ├── test_auth.py
@@ -574,6 +627,8 @@ d:\skillfade/
 │   │   │   ├── SkillDetail.tsx      # Updated with notes + dependencies UI (Phase 6)
 │   │   │   ├── Analytics.tsx
 │   │   │   ├── Settings.tsx         # Includes BuyMeACoffee support card
+│   │   │   ├── Support.tsx          # User support ticket list and creation
+│   │   │   ├── TicketDetail.tsx     # User ticket detail with replies
 │   │   │   └── admin/               # Admin panel pages
 │   │   │       ├── index.ts
 │   │   │       ├── AdminDashboard.tsx
@@ -583,7 +638,9 @@ d:\skillfade/
 │   │   │       ├── AdminCategories.tsx
 │   │   │       ├── AdminLearningEvents.tsx
 │   │   │       ├── AdminPracticeEvents.tsx
-│   │   │       └── AdminTemplates.tsx
+│   │   │       ├── AdminTemplates.tsx
+│   │   │       ├── AdminTickets.tsx     # Admin ticket list and management
+│   │   │       └── AdminTicketDetail.tsx # Admin ticket detail with status updates
 │   │   ├── services/
 │   │   │   └── api.ts            # Axios client, all API calls (includes categories)
 │   │   ├── types/
@@ -1094,7 +1151,7 @@ npm test
 ---
 
 **Last Updated:** 2026-01-15
-**Project Status:** Production-ready MVP with Enhanced UI/UX + Dark Mode + Activity Calendar + Phase 1, 2, 6 & Category Features + Admin Panel + Buy Me a Coffee Integration + Comprehensive VPS Deployment Guide (Ubuntu 22.04 & 24.04 LTS) ✅
+**Project Status:** Production-ready MVP with Enhanced UI/UX + Dark Mode + Activity Calendar + Phase 1, 2, 6 & Category Features + Admin Panel + Buy Me a Coffee Integration + Support Ticketing System + Comprehensive VPS Deployment Guide (Ubuntu 22.04 & 24.04 LTS) ✅
 
 ### Phase 1 Features (Completed 2026-01-09)
 - **Freshness History Graph**: Line chart showing skill freshness over 90 days
@@ -1159,3 +1216,19 @@ npm test
 - **Features Page Styling Fix**: Updated Features page to use design system classes (bg-mesh, card-interactive, card-elevated, text-txt-*, etc.) matching Landing page
 - **Styling**: Uses amber/orange gradient to stand out subtly while fitting the design system
 - **Configuration**: Update `coffeeUrl` in `BuyMeACoffee.tsx` with your actual Buy Me a Coffee URL
+
+### Support Ticketing System (Added 2026-01-15)
+- **Database Models**: Tickets and TicketReplies tables with proper relationships and cascade deletes
+- **Ticket Workflow**: Status progression (open → in_progress → resolved → closed)
+- **User Features**:
+  - Support page (`/support`) to view all tickets and create new ones
+  - Ticket detail page (`/support/:id`) to view ticket details and add replies
+  - Navigation link in main layout with MessageSquare icon
+- **Admin Features**:
+  - Admin tickets page (`/admin/tickets`) with filtering by status and search
+  - Admin ticket detail page (`/admin/tickets/:id`) with status updates and admin replies
+  - Dashboard stat card showing total tickets with open ticket badge
+  - Full CRUD operations for ticket management
+- **API Endpoints**:
+  - User: List tickets, create ticket, get ticket, add reply
+  - Admin: List all tickets, get ticket, update status, add admin reply, delete ticket

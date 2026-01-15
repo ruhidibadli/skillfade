@@ -19,6 +19,8 @@ import Skills from './pages/Skills';
 import SkillDetail from './pages/SkillDetail';
 import Analytics from './pages/Analytics';
 import Settings from './pages/Settings';
+import Support from './pages/Support';
+import TicketDetail from './pages/TicketDetail';
 import {
   AdminDashboard,
   AdminUsers,
@@ -27,7 +29,9 @@ import {
   AdminCategories,
   AdminLearningEvents,
   AdminPracticeEvents,
-  AdminTemplates
+  AdminTemplates,
+  AdminTickets,
+  AdminTicketDetail
 } from './pages/admin';
 
 const RootRedirect = () => {
@@ -89,6 +93,22 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <Settings />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/support"
+                  element={
+                    <ProtectedRoute>
+                      <Support />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/support/:id"
+                  element={
+                    <ProtectedRoute>
+                      <TicketDetail />
                     </ProtectedRoute>
                   }
                 />
@@ -156,6 +176,22 @@ function App() {
                   element={
                     <AdminProtectedRoute>
                       <AdminTemplates />
+                    </AdminProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/tickets"
+                  element={
+                    <AdminProtectedRoute>
+                      <AdminTickets />
+                    </AdminProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/tickets/:id"
+                  element={
+                    <AdminProtectedRoute>
+                      <AdminTicketDetail />
                     </AdminProtectedRoute>
                   }
                 />
