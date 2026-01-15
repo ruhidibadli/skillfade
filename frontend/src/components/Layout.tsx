@@ -7,7 +7,8 @@ import {
   BarChart3,
   Settings,
   LogOut,
-  Shield
+  Shield,
+  MessageSquare
 } from 'lucide-react';
 import QuickLogWidget from './QuickLogWidget';
 import LogoIcon from './LogoIcon';
@@ -28,6 +29,7 @@ const Layout: React.FC = () => {
     { path: '/skills', label: 'Skills', icon: Layers },
     { path: '/analytics', label: 'Analytics', icon: BarChart3 },
     { path: '/settings', label: 'Settings', icon: Settings },
+    { path: '/support', label: 'Support', icon: MessageSquare },
   ];
 
   const isActive = (path: string) => location.pathname === path;

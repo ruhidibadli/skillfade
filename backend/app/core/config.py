@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     SMTP_PORT: int = 587
     SMTP_USER: str = ""
     SMTP_PASSWORD: str = ""
-    SMTP_FROM: str = "noreply@learning-tracker.local"
+    SMTP_FROM: str = "noreply@skillfade.website"
 
     # Application
     FRONTEND_URL: str = "http://localhost:3000"

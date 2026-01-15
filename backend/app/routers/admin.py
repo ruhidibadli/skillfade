@@ -14,6 +14,7 @@ from app.models.skill import Skill
 from app.models.category import Category
 from app.models.event import LearningEvent, PracticeEvent
 from app.models.event_template import EventTemplate
+from app.models.ticket import Ticket, TicketReply
 from app.schemas.admin import (
     AdminUserCreate, AdminUserUpdate, AdminUserResponse,
     AdminCategoryCreate, AdminCategoryUpdate, AdminCategoryResponse,
@@ -21,6 +22,7 @@ from app.schemas.admin import (
     AdminLearningEventCreate, AdminLearningEventUpdate, AdminLearningEventResponse,
     AdminPracticeEventCreate, AdminPracticeEventUpdate, AdminPracticeEventResponse,
     AdminEventTemplateCreate, AdminEventTemplateUpdate, AdminEventTemplateResponse,
+    AdminTicketUpdate, AdminTicketResponse, AdminTicketDetailResponse, AdminTicketReplyCreate, AdminTicketReplyResponse,
     AdminDashboardStats
 )
 
@@ -43,6 +45,8 @@ def get_admin_stats(
         total_learning_events=db.query(LearningEvent).count(),
         total_practice_events=db.query(PracticeEvent).count(),
         total_templates=db.query(EventTemplate).count(),
+        total_tickets=db.query(Ticket).count(),
+        open_tickets=db.query(Ticket).filter(Ticket.status.in_(["open", "in_progress"])).count(),
         users_last_7_days=db.query(User).filter(User.created_at >= seven_days_ago).count(),
         events_last_7_days=(
             db.query(LearningEvent).filter(LearningEvent.created_at >= seven_days_ago).count() +
@@ -1300,4 +1304,186 @@ def delete_template(
         raise HTTPException(status_code=404, detail="Template not found")
 
     db.delete(template)
+    db.commit()
+
+
+# ==================== Tickets CRUD ====================
+@router.get("/tickets", response_model=dict)
+def list_tickets(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=100),
+    search: Optional[str] = None,
+    user_id: Optional[UUID] = None,
+    status_filter: Optional[str] = Query(None, alias="status"),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_admin_user)
+):
+    """List all tickets with pagination and filtering."""
+    query = db.query(Ticket)
+
+    if search:
+        query = query.filter(or_(
+            Ticket.subject.ilike(f"%{search}%"),
+            Ticket.message.ilike(f"%{search}%")
+        ))
+    if user_id:
+        query = query.filter(Ticket.user_id == user_id)
+    if status_filter:
+        query = query.filter(Ticket.status == status_filter)
+
+    total = query.count()
+    tickets = query.order_by(Ticket.updated_at.desc()).offset((page - 1) * page_size).limit(page_size).all()
+
+    items = []
+    for ticket in tickets:
+        user = db.query(User).filter(User.id == ticket.user_id).first()
+        reply_count = db.query(func.count(TicketReply.id)).filter(TicketReply.ticket_id == ticket.id).scalar()
+        items.append({
+            "id": ticket.id,
+            "user_id": ticket.user_id,
+            "subject": ticket.subject,
+            "message": ticket.message,
+            "status": ticket.status,
+            "created_at": ticket.created_at,
+            "updated_at": ticket.updated_at,
+            "user_email": user.email if user else None,
+            "reply_count": reply_count
+        })
+
+    return {
+        "items": items,
+        "total": total,
+        "page": page,
+        "page_size": page_size,
+        "total_pages": (total + page_size - 1) // page_size
+    }
+
+
+@router.get("/tickets/{ticket_id}", response_model=AdminTicketDetailResponse)
+def get_ticket(
+    ticket_id: UUID,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_admin_user)
+):
+    """Get a specific ticket with replies."""
+    ticket = db.query(Ticket).filter(Ticket.id == ticket_id).first()
+    if not ticket:
+        raise HTTPException(status_code=404, detail="Ticket not found")
+
+    user = db.query(User).filter(User.id == ticket.user_id).first()
+    replies = db.query(TicketReply).filter(TicketReply.ticket_id == ticket_id).order_by(TicketReply.created_at).all()
+
+    replies_data = []
+    for reply in replies:
+        reply_user = db.query(User).filter(User.id == reply.user_id).first()
+        replies_data.append({
+            "id": reply.id,
+            "ticket_id": reply.ticket_id,
+            "user_id": reply.user_id,
+            "message": reply.message,
+            "is_admin_reply": reply.is_admin_reply,
+            "created_at": reply.created_at,
+            "user_email": reply_user.email if reply_user else None
+        })
+
+    return {
+        "id": ticket.id,
+        "user_id": ticket.user_id,
+        "subject": ticket.subject,
+        "message": ticket.message,
+        "status": ticket.status,
+        "created_at": ticket.created_at,
+        "updated_at": ticket.updated_at,
+        "user_email": user.email if user else None,
+        "reply_count": len(replies),
+        "replies": replies_data
+    }
+
+
+@router.patch("/tickets/{ticket_id}", response_model=AdminTicketResponse)
+def update_ticket(
+    ticket_id: UUID,
+    data: AdminTicketUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_admin_user)
+):
+    """Update a ticket status."""
+    ticket = db.query(Ticket).filter(Ticket.id == ticket_id).first()
+    if not ticket:
+        raise HTTPException(status_code=404, detail="Ticket not found")
+
+    if data.status is not None:
+        if data.status not in ["open", "in_progress", "resolved", "closed"]:
+            raise HTTPException(status_code=400, detail="Invalid status")
+        ticket.status = data.status
+
+    db.commit()
+    db.refresh(ticket)
+
+    user = db.query(User).filter(User.id == ticket.user_id).first()
+    reply_count = db.query(func.count(TicketReply.id)).filter(TicketReply.ticket_id == ticket.id).scalar()
+
+    return {
+        "id": ticket.id,
+        "user_id": ticket.user_id,
+        "subject": ticket.subject,
+        "message": ticket.message,
+        "status": ticket.status,
+        "created_at": ticket.created_at,
+        "updated_at": ticket.updated_at,
+        "user_email": user.email if user else None,
+        "reply_count": reply_count
+    }
+
+
+@router.post("/tickets/{ticket_id}/replies", response_model=AdminTicketReplyResponse, status_code=status.HTTP_201_CREATED)
+def add_admin_reply(
+    ticket_id: UUID,
+    data: AdminTicketReplyCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_admin_user)
+):
+    """Add an admin reply to a ticket."""
+    ticket = db.query(Ticket).filter(Ticket.id == ticket_id).first()
+    if not ticket:
+        raise HTTPException(status_code=404, detail="Ticket not found")
+
+    reply = TicketReply(
+        ticket_id=ticket_id,
+        user_id=current_user.id,
+        message=data.message,
+        is_admin_reply=True
+    )
+
+    # Update ticket status to in_progress if it was open
+    if ticket.status == "open":
+        ticket.status = "in_progress"
+
+    db.add(reply)
+    db.commit()
+    db.refresh(reply)
+
+    return {
+        "id": reply.id,
+        "ticket_id": reply.ticket_id,
+        "user_id": reply.user_id,
+        "message": reply.message,
+        "is_admin_reply": reply.is_admin_reply,
+        "created_at": reply.created_at,
+        "user_email": current_user.email
+    }
+
+
+@router.delete("/tickets/{ticket_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_ticket(
+    ticket_id: UUID,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_admin_user)
+):
+    """Delete a ticket."""
+    ticket = db.query(Ticket).filter(Ticket.id == ticket_id).first()
+    if not ticket:
+        raise HTTPException(status_code=404, detail="Ticket not found")
+
+    db.delete(ticket)
     db.commit()
