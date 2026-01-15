@@ -15,6 +15,7 @@ import {
   FileText,
   Loader2
 } from 'lucide-react';
+import BuyMeACoffee from '../components/BuyMeACoffee';
 
 const Settings: React.FC = () => {
   const [exporting, setExporting] = useState(false);
@@ -231,6 +232,9 @@ const Settings: React.FC = () => {
           <li>You can export all your data or delete your account at any time.</li>
         </ul>
       </div>
+
+      {/* Support */}
+      <BuyMeACoffee variant="card" />
 
       {/* Danger Zone */}
       <div className="card border-2 border-decayed-base/30 p-6">

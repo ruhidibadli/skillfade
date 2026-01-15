@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import LogoIcon from '../components/LogoIcon';
 import { SEO } from '../components/SEO';
+import BuyMeACoffee from '../components/BuyMeACoffee';
 import {
   generateOrganizationSchema,
   generateSoftwareApplicationSchema,
@@ -73,12 +74,12 @@ const Landing: React.FC = () => {
               <span className="tag-accent text-[10px] uppercase tracking-wider">Beta</span>
             </div>
             <div className="hidden md:flex items-center gap-6 text-sm">
-              <Link to="/features" className="text-txt-secondary hover:text-txt-primary transition-colors">Features</Link>
               <Link to="/what-is-learning-decay" className="text-txt-secondary hover:text-txt-primary transition-colors">What is Learning Decay?</Link>
               <Link to="/use-cases" className="text-txt-secondary hover:text-txt-primary transition-colors">Use Cases</Link>
               <Link to="/faq" className="text-txt-secondary hover:text-txt-primary transition-colors">FAQ</Link>
             </div>
             <div className="flex items-center gap-4">
+              <BuyMeACoffee variant="button" className="hidden sm:inline-flex" />
               <Link
                 to="/login"
                 className="btn-ghost"
@@ -342,16 +343,14 @@ const Landing: React.FC = () => {
                 </div>
                 <span className="font-bold text-txt-primary">SkillFade</span>
               </div>
-              <p className="text-sm text-txt-muted leading-relaxed">
+              <p className="text-sm text-txt-muted leading-relaxed mb-4">
                 A skill decay tracking application for developers and self-directed learners. Track learning decay, practice scarcity, and input/output balance.
               </p>
+              <BuyMeACoffee variant="link" />
             </div>
             <div>
               <h4 className="text-txt-primary font-semibold mb-4">Product</h4>
               <ul className="space-y-2 text-sm text-txt-muted">
-                <li>
-                  <Link to="/features" className="hover:text-accent-400 transition-colors">Features</Link>
-                </li>
                 <li>
                   <Link to="/use-cases" className="hover:text-accent-400 transition-colors">Use Cases</Link>
                 </li>

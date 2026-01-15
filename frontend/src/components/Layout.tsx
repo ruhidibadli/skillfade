@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import QuickLogWidget from './QuickLogWidget';
 import LogoIcon from './LogoIcon';
+import BuyMeACoffee from './BuyMeACoffee';
 
 const Layout: React.FC = () => {
   const { logout, isAdmin } = useAuth();
@@ -74,6 +75,10 @@ const Layout: React.FC = () => {
 
               <div className="w-px h-6 bg-border-subtle mx-2" />
 
+              <BuyMeACoffee variant="button" className="hidden sm:inline-flex" />
+
+              <div className="w-px h-6 bg-border-subtle mx-2 hidden sm:block" />
+
               {isAdmin && (
                 <Link
                   to="/admin"
@@ -114,6 +119,8 @@ const Layout: React.FC = () => {
               <span>No Gamification</span>
               <span className="w-1 h-1 rounded-full bg-border-DEFAULT" />
               <span>Self-Hosted</span>
+              <span className="w-1 h-1 rounded-full bg-border-DEFAULT" />
+              <BuyMeACoffee variant="link" className="text-xs" />
             </div>
           </div>
         </div>

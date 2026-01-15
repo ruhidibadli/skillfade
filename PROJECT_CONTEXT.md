@@ -553,18 +553,19 @@ d:\skillfade/
 │   │   └── pwa-512x512.svg          # PWA icon 512x512 (Phase 6 PWA)
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── Layout.tsx           # Includes QuickLogWidget
+│   │   │   ├── Layout.tsx           # Includes QuickLogWidget + BuyMeACoffee footer link
 │   │   │   ├── AdminLayout.tsx      # Admin-specific layout with admin navigation
 │   │   │   ├── ProtectedRoute.tsx
 │   │   │   ├── AdminProtectedRoute.tsx  # Auth guard for admin pages
 │   │   │   ├── QuickLogWidget.tsx   # Floating quick log button (Phase 1)
+│   │   │   ├── BuyMeACoffee.tsx     # Subtle support button component (link/button/card variants)
 │   │   │   └── admin/
 │   │   │       └── Pagination.tsx   # Reusable pagination for admin tables
 │   │   ├── context/
 │   │   │   ├── AuthContext.tsx
 │   │   │   └── ThemeContext.tsx     # Dark/Light theme management
 │   │   ├── pages/
-│   │   │   ├── Landing.tsx          # Marketing homepage
+│   │   │   ├── Landing.tsx          # Marketing homepage + BuyMeACoffee footer link
 │   │   │   ├── Features.tsx         # Detailed features page (public)
 │   │   │   ├── Login.tsx
 │   │   │   ├── Register.tsx
@@ -572,7 +573,7 @@ d:\skillfade/
 │   │   │   ├── Skills.tsx           # Category selector, grid/grouped view, filter by category
 │   │   │   ├── SkillDetail.tsx      # Updated with notes + dependencies UI (Phase 6)
 │   │   │   ├── Analytics.tsx
-│   │   │   ├── Settings.tsx
+│   │   │   ├── Settings.tsx         # Includes BuyMeACoffee support card
 │   │   │   └── admin/               # Admin panel pages
 │   │   │       ├── index.ts
 │   │   │       ├── AdminDashboard.tsx
@@ -1092,8 +1093,8 @@ npm test
 
 ---
 
-**Last Updated:** 2026-01-14
-**Project Status:** Production-ready MVP with Enhanced UI/UX + Dark Mode + Activity Calendar + Phase 1, 2, 6 & Category Features + Admin Panel + Comprehensive VPS Deployment Guide (Ubuntu 22.04 & 24.04 LTS) ✅
+**Last Updated:** 2026-01-15
+**Project Status:** Production-ready MVP with Enhanced UI/UX + Dark Mode + Activity Calendar + Phase 1, 2, 6 & Category Features + Admin Panel + Buy Me a Coffee Integration + Comprehensive VPS Deployment Guide (Ubuntu 22.04 & 24.04 LTS) ✅
 
 ### Phase 1 Features (Completed 2026-01-09)
 - **Freshness History Graph**: Line chart showing skill freshness over 90 days
@@ -1143,3 +1144,18 @@ npm test
 - **Admin Script**: `scripts/grant_admin.py` to grant/revoke admin privileges via CLI
 - **Access Control**: Admin routes protected by `is_admin` flag on user model
 - **Admin Navigation**: Separate admin layout with dedicated navigation menu
+
+### Buy Me a Coffee Integration (Added 2026-01-15)
+- **Reusable Component**: `BuyMeACoffee.tsx` with three variants (link, button, card)
+- **Subtle Placement**: Non-intrusive integration that respects the calm design philosophy
+- **Locations**:
+  - Layout header (authenticated pages) - Small button between nav and Admin/Logout (hidden on mobile)
+  - Layout footer (authenticated pages) - Small link alongside philosophy badges
+  - Landing page header (public) - Small button before Sign In (hidden on mobile)
+  - Landing page footer (public) - Link in the brand column
+  - Features page header (public) - Small button before Sign In (hidden on mobile)
+  - Features page footer (public) - Link in the brand column
+  - Settings page - Card variant between Privacy Statement and Danger Zone
+- **Features Page Styling Fix**: Updated Features page to use design system classes (bg-mesh, card-interactive, card-elevated, text-txt-*, etc.) matching Landing page
+- **Styling**: Uses amber/orange gradient to stand out subtly while fitting the design system
+- **Configuration**: Update `coffeeUrl` in `BuyMeACoffee.tsx` with your actual Buy Me a Coffee URL
