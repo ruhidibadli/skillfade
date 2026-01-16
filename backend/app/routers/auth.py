@@ -2,10 +2,17 @@ from datetime import timedelta
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.core.database import get_db
-from app.core.security import verify_password, get_password_hash, create_access_token
+from app.core.security import (
+    verify_password,
+    get_password_hash,
+    create_access_token,
+    create_password_reset_token,
+    decode_password_reset_token
+)
 from app.core.config import settings
 from app.models.user import User
-from app.schemas.user import UserCreate, UserLogin, UserResponse, Token
+from app.schemas.user import UserCreate, UserLogin, UserResponse, Token, PasswordResetRequest, PasswordReset
+from app.services.alerts import send_password_reset_email
 
 router = APIRouter(prefix="/api/auth", tags=["Authentication"])
 
@@ -73,3 +80,48 @@ def logout():
     Logout endpoint (token invalidation handled client-side).
     """
     return {"message": "Successfully logged out"}
+
+
+@router.post("/forgot-password")
+def forgot_password(request: PasswordResetRequest, db: Session = Depends(get_db)):
+    """
+    Request a password reset email.
+    Always returns success to prevent email enumeration attacks.
+    """
+    user = db.query(User).filter(User.email == request.email).first()
+
+    if user:
+        reset_token = create_password_reset_token(user.email)
+        send_password_reset_email(user.email, reset_token)
+
+    return {"message": "If an account with that email exists, a password reset link has been sent."}
+
+
+@router.post("/reset-password")
+def reset_password(request: PasswordReset, db: Session = Depends(get_db)):
+    """
+    Reset password using a valid reset token.
+    """
+    # Decode and validate token
+    email = decode_password_reset_token(request.token)
+
+    if not email:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid or expired reset token"
+        )
+
+    # Find user
+    user = db.query(User).filter(User.email == email).first()
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid or expired reset token"
+        )
+
+    # Update password
+    user.password_hash = get_password_hash(request.new_password)
+    db.commit()
+
+    return {"message": "Password has been reset successfully"}

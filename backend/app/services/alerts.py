@@ -11,11 +11,14 @@ from app.models.event import LearningEvent, PracticeEvent
 from app.services.freshness import calculate_freshness
 
 
-def send_email(to_email: str, subject: str, body: str) -> bool:
+def send_email(to_email: str, subject: str, body: str, require_alerts_enabled: bool = True) -> bool:
     """
     Send an email using SMTP.
+    Set require_alerts_enabled=False for critical emails like password reset.
     """
-    if not settings.SMTP_HOST or not settings.ENABLE_ALERTS:
+    if not settings.SMTP_HOST:
+        return False
+    if require_alerts_enabled and not settings.ENABLE_ALERTS:
         return False
 
     try:
@@ -24,20 +27,43 @@ def send_email(to_email: str, subject: str, body: str) -> bool:
         msg['To'] = to_email
         msg['Subject'] = subject
 
-        # Plain text email (as per spec)
         msg.attach(MIMEText(body, 'plain'))
 
-        # Connect to SMTP server
-        with smtplib.SMTP(settings.SMTP_HOST, settings.SMTP_PORT) as server:
-            server.starttls()
-            if settings.SMTP_USER and settings.SMTP_PASSWORD:
-                server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
-            server.send_message(msg)
+        server = smtplib.SMTP(settings.SMTP_HOST, settings.SMTP_PORT, timeout=30)
+        server.ehlo()
+        server.starttls()
+        server.ehlo()
+        if settings.SMTP_USER and settings.SMTP_PASSWORD:
+            server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
+        server.send_message(msg)
+        server.quit()
 
         return True
-    except Exception as e:
-        print(f"Failed to send email: {e}")
+    except Exception:
         return False
+
+
+def send_password_reset_email(to_email: str, reset_token: str) -> bool:
+    """
+    Send a password reset email with a link containing the reset token.
+    """
+    reset_url = f"{settings.FRONTEND_URL}/reset-password?token={reset_token}"
+
+    subject = "SkillFade - Password Reset Request"
+    body = f"""You requested to reset your password for SkillFade.
+
+Click the link below to set a new password:
+{reset_url}
+
+This link will expire in 1 hour.
+
+If you didn't request this, you can safely ignore this email.
+
+---
+SkillFade
+"""
+
+    return send_email(to_email, subject, body, require_alerts_enabled=False)
 
 
 def check_decay_alerts(db: Session) -> List[Tuple[User, Skill, float]]:

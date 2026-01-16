@@ -353,6 +353,8 @@ Interpretation:
 - `POST /auth/register` - Create account
 - `POST /auth/login` - Get JWT token
 - `POST /auth/logout` - Invalidate token
+- `POST /auth/forgot-password` - Request password reset email
+- `POST /auth/reset-password` - Reset password with token
 
 ### Skills (`/skills/*`)
 - `GET /skills?include_archived=false` - List user's skills with freshness
@@ -457,13 +459,15 @@ Interpretation:
 2. **Features** (`/features`) - Detailed features page with all capabilities (public)
 3. **Login** (`/login`) - User authentication
 4. **Register** (`/register`) - Account creation
-5. **Dashboard** (`/dashboard`) - Overview with weekly stats and skill freshness
-6. **Skills** (`/skills`) - Grid/list view of all skills
-7. **Skill Detail** (`/skills/:id`) - Timeline of events, add event forms
-8. **Analytics** (`/analytics`) - Activity calendar, charts for balance and freshness distribution
-9. **Settings** (`/settings`) - Alert preferences, export, account deletion
-10. **Support** (`/support`) - Support ticket list, create new tickets
-11. **Ticket Detail** (`/support/:id`) - View ticket details and replies, add replies
+5. **Forgot Password** (`/forgot-password`) - Request password reset email
+6. **Reset Password** (`/reset-password`) - Set new password with token
+7. **Dashboard** (`/dashboard`) - Overview with weekly stats and skill freshness
+8. **Skills** (`/skills`) - Grid/list view of all skills
+9. **Skill Detail** (`/skills/:id`) - Timeline of events, add event forms
+10. **Analytics** (`/analytics`) - Activity calendar, charts for balance and freshness distribution
+11. **Settings** (`/settings`) - Alert preferences, export, account deletion
+12. **Support** (`/support`) - Support ticket list, create new tickets
+13. **Ticket Detail** (`/support/:id`) - View ticket details and replies, add replies
 
 ### Admin Pages (Admin only)
 1. **Admin Dashboard** (`/admin`) - System statistics and quick actions
@@ -625,6 +629,8 @@ d:\skillfade/
 │   │   │   ├── Features.tsx         # Detailed features page (public)
 │   │   │   ├── Login.tsx
 │   │   │   ├── Register.tsx
+│   │   │   ├── ForgotPassword.tsx   # Password reset request page
+│   │   │   ├── ResetPassword.tsx    # Set new password page
 │   │   │   ├── Dashboard.tsx
 │   │   │   ├── Skills.tsx           # Category selector, grid/grouped view, filter by category
 │   │   │   ├── SkillDetail.tsx      # Updated with notes + dependencies UI (Phase 6)
@@ -1154,7 +1160,7 @@ npm test
 ---
 
 **Last Updated:** 2026-01-16
-**Project Status:** Production-ready MVP with Enhanced UI/UX + Dark Mode + Activity Calendar + Phase 1, 2, 6 & Category Features + Admin Panel + Buy Me a Coffee Integration + Support Ticketing System + Onboarding Wizard + Comprehensive VPS Deployment Guide (Ubuntu 22.04 & 24.04 LTS) ✅
+**Project Status:** Production-ready MVP with Enhanced UI/UX + Dark Mode + Activity Calendar + Phase 1, 2, 6 & Category Features + Admin Panel + Buy Me a Coffee Integration + Support Ticketing System + Onboarding Wizard + Forgot Password System + Comprehensive VPS Deployment Guide (Ubuntu 22.04 & 24.04 LTS) ✅
 
 ### Phase 1 Features (Completed 2026-01-09)
 - **Freshness History Graph**: Line chart showing skill freshness over 90 days
@@ -1272,3 +1278,28 @@ npm test
   - `App.tsx` - Wraps routes with OnboardingProvider
   - `Settings.tsx` - Added "View Tour Again" button
   - `index.css` - Added step transition animations (slideUpFade, pulseSlow)
+
+### Forgot Password System (Added 2026-01-16)
+- **Password Reset Flow**:
+  1. User clicks "Forgot password?" on login page
+  2. Enters email on `/forgot-password` page
+  3. Backend generates JWT reset token (1 hour expiry)
+  4. Email sent with reset link containing token
+  5. User clicks link, lands on `/reset-password?token=...`
+  6. Enters new password, token validated and password updated
+- **Security Features**:
+  - Token-based reset using JWT with 1-hour expiry
+  - Reset token contains email and type claim for validation
+  - Same response for valid/invalid emails (prevents email enumeration)
+  - Password minimum 8 characters, bcrypt hashing
+- **Backend Implementation**:
+  - `security.py` - `create_password_reset_token()`, `decode_password_reset_token()`
+  - `alerts.py` - `send_password_reset_email()` (bypasses ENABLE_ALERTS setting)
+  - `auth.py` - `/forgot-password`, `/reset-password` endpoints
+  - `schemas/user.py` - `PasswordResetRequest`, `PasswordReset` schemas (already existed)
+- **Frontend Implementation**:
+  - `ForgotPassword.tsx` - Email input form with success state
+  - `ResetPassword.tsx` - New password form with validation, token error state
+  - `Login.tsx` - Added "Forgot password?" link
+  - `api.ts` - `forgotPassword()`, `resetPassword()` functions
+  - `App.tsx` - Routes for `/forgot-password`, `/reset-password`
