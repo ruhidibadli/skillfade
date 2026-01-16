@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { settings as settingsApi, templates as templatesApi } from '../services/api';
+import { useOnboarding } from '../context/OnboardingContext';
 import type { EventTemplate } from '../types';
 import {
   Download,
@@ -13,7 +14,8 @@ import {
   Zap,
   Clock,
   FileText,
-  Loader2
+  Loader2,
+  HelpCircle
 } from 'lucide-react';
 import BuyMeACoffee from '../components/BuyMeACoffee';
 
@@ -23,6 +25,7 @@ const Settings: React.FC = () => {
   const [showTemplateModal, setShowTemplateModal] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<EventTemplate | null>(null);
   const navigate = useNavigate();
+  const { restartOnboarding } = useOnboarding();
 
   useEffect(() => {
     fetchTemplates();
@@ -181,6 +184,28 @@ const Settings: React.FC = () => {
             ))}
           </div>
         )}
+      </div>
+
+      {/* App Tour */}
+      <div className="card-elevated p-6">
+        <div className="flex items-start gap-3 mb-4">
+          <div className="p-2 rounded-lg bg-accent-400/10">
+            <HelpCircle className="w-5 h-5 text-accent-400" />
+          </div>
+          <div>
+            <h2 className="text-lg font-semibold text-txt-primary">App Tour</h2>
+            <p className="text-sm text-txt-muted mt-1">
+              View the onboarding tour again to learn about all features and how SkillFade works.
+            </p>
+          </div>
+        </div>
+        <button
+          onClick={restartOnboarding}
+          className="btn-secondary flex items-center gap-2"
+        >
+          <HelpCircle className="w-4 h-4" />
+          View Tour Again
+        </button>
       </div>
 
       {/* Data Export */}

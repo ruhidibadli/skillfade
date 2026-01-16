@@ -11,6 +11,7 @@ import {
   MessageSquare
 } from 'lucide-react';
 import QuickLogWidget from './QuickLogWidget';
+import OnboardingWizard from './OnboardingWizard';
 import LogoIcon from './LogoIcon';
 import BuyMeACoffee from './BuyMeACoffee';
 
@@ -130,6 +131,9 @@ const Layout: React.FC = () => {
 
       {/* Quick Log Widget */}
       <QuickLogWidget />
+
+      {/* Onboarding Wizard */}
+      <OnboardingWizard />
     </div>
   );
 };
