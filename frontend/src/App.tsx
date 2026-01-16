@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { OnboardingProvider } from './context/OnboardingContext';
 import Layout from './components/Layout';
 import AdminLayout from './components/AdminLayout';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -44,8 +45,9 @@ function App() {
     <HelmetProvider>
       <ThemeProvider>
         <AuthProvider>
-          <BrowserRouter>
-            <Routes>
+          <OnboardingProvider>
+            <BrowserRouter>
+              <Routes>
               <Route path="/" element={<RootRedirect />} />
               <Route path="/home" element={<Landing />} />
               <Route path="/features" element={<Features />} />
@@ -197,8 +199,9 @@ function App() {
                 />
               </Route>
               <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </BrowserRouter>
+              </Routes>
+            </BrowserRouter>
+          </OnboardingProvider>
         </AuthProvider>
       </ThemeProvider>
     </HelmetProvider>

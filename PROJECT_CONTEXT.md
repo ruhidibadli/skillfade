@@ -488,6 +488,7 @@ Interpretation:
 ### Context
 - **AuthContext** - User authentication state, login/logout functions
 - **ThemeContext** - Dark/light theme state, theme toggle, localStorage persistence
+- **OnboardingContext** - Onboarding wizard state, step navigation, completion tracking
 
 ### Services
 - **api.ts** - Axios instance with interceptors, all API calls organized by resource
@@ -611,12 +612,14 @@ d:\skillfade/
 │   │   │   ├── ProtectedRoute.tsx
 │   │   │   ├── AdminProtectedRoute.tsx  # Auth guard for admin pages
 │   │   │   ├── QuickLogWidget.tsx   # Floating quick log button (Phase 1)
+│   │   │   ├── OnboardingWizard.tsx # 13-step onboarding wizard for first-time users
 │   │   │   ├── BuyMeACoffee.tsx     # Subtle support button component (link/button/card variants)
 │   │   │   └── admin/
 │   │   │       └── Pagination.tsx   # Reusable pagination for admin tables
 │   │   ├── context/
 │   │   │   ├── AuthContext.tsx
-│   │   │   └── ThemeContext.tsx     # Dark/Light theme management
+│   │   │   ├── ThemeContext.tsx     # Dark/Light theme management
+│   │   │   └── OnboardingContext.tsx # Onboarding wizard state management
 │   │   ├── pages/
 │   │   │   ├── Landing.tsx          # Marketing homepage + BuyMeACoffee footer link
 │   │   │   ├── Features.tsx         # Detailed features page (public)
@@ -1150,8 +1153,8 @@ npm test
 
 ---
 
-**Last Updated:** 2026-01-15
-**Project Status:** Production-ready MVP with Enhanced UI/UX + Dark Mode + Activity Calendar + Phase 1, 2, 6 & Category Features + Admin Panel + Buy Me a Coffee Integration + Support Ticketing System + Comprehensive VPS Deployment Guide (Ubuntu 22.04 & 24.04 LTS) ✅
+**Last Updated:** 2026-01-16
+**Project Status:** Production-ready MVP with Enhanced UI/UX + Dark Mode + Activity Calendar + Phase 1, 2, 6 & Category Features + Admin Panel + Buy Me a Coffee Integration + Support Ticketing System + Onboarding Wizard + Comprehensive VPS Deployment Guide (Ubuntu 22.04 & 24.04 LTS) ✅
 
 ### Phase 1 Features (Completed 2026-01-09)
 - **Freshness History Graph**: Line chart showing skill freshness over 90 days
@@ -1232,3 +1235,40 @@ npm test
 - **API Endpoints**:
   - User: List tickets, create ticket, get ticket, add reply
   - Admin: List all tickets, get ticket, update status, add admin reply, delete ticket
+
+### Onboarding Wizard (Added 2026-01-16)
+- **13-Step Interactive Tour**: Comprehensive onboarding wizard that explains all SkillFade features
+- **Step Overview**:
+  1. Welcome - Greeting and tour duration (~2 min)
+  2. Philosophy - "A mirror, not a coach" concept
+  3. Three Realities - Learning Decay, Practice Scarcity, Input/Output Imbalance
+  4. Freshness - Decay algorithm and visual indicators
+  5. Skills Overview - Categories, custom decay rates, targets, dependencies
+  6. Create First Skill - **Interactive** form to create an actual skill
+  7. Events - Learning types vs Practice types comparison
+  8. Balance Ratio - Input/output ratio explanation
+  9. Dashboard - Overview of dashboard components
+  10. Analytics - Calendar, charts, category stats
+  11. Quick Log - Floating widget explanation
+  12. Settings - Templates, export, alerts, privacy
+  13. Complete - Summary and quick action buttons
+- **User Settings Storage**: Uses `/api/settings` endpoint to store:
+  - `hasCompletedOnboarding: boolean`
+  - `onboardingCompletedAt: string (ISO timestamp)`
+- **Trigger Conditions**: Shows for authenticated users where `hasCompletedOnboarding !== true`
+- **UI/UX Features**:
+  - Progress bar showing completion percentage
+  - Step indicator dots
+  - Smooth slide animations between steps
+  - Skip Tour option (updates settings)
+  - Back/Continue navigation
+  - Responsive design (full-width on mobile, max-w-2xl on desktop)
+- **View Tour Again**: Button in Settings page to restart the onboarding wizard
+- **Components**:
+  - `OnboardingContext.tsx` - State management for wizard visibility, current step, skill creation
+  - `OnboardingWizard.tsx` - Main wizard component with all 13 step sub-components
+- **Files Modified**:
+  - `Layout.tsx` - Renders OnboardingWizard alongside QuickLogWidget
+  - `App.tsx` - Wraps routes with OnboardingProvider
+  - `Settings.tsx` - Added "View Tour Again" button
+  - `index.css` - Added step transition animations (slideUpFade, pulseSlow)

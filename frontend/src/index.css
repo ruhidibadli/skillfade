@@ -210,3 +210,67 @@
   border: 1px solid #3f3f46 !important;
   border-radius: 8px !important;
 }
+
+/* Onboarding Wizard Animations */
+@keyframes slideUpFade {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideLeftFade {
+  0% {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideRightFade {
+  0% {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulseSlow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.animate-slide-up {
+  animation: slideUpFade 0.4s ease-out forwards;
+}
+
+.animate-slide-left {
+  animation: slideLeftFade 0.4s ease-out forwards;
+}
+
+.animate-slide-right {
+  animation: slideRightFade 0.4s ease-out forwards;
+}
+
+.animate-pulse-slow {
+  animation: pulseSlow 3s ease-in-out infinite;
+}
+
+/* Onboarding step content transitions */
+.onboarding-step-content {
+  animation: slideUpFade 0.4s ease-out;
+}
