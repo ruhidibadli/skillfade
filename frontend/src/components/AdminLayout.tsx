@@ -11,7 +11,8 @@ import {
   FileText,
   LogOut,
   ArrowLeft,
-  MessageSquare
+  MessageSquare,
+  Activity
 } from 'lucide-react';
 import LogoIcon from './LogoIcon';
 
@@ -34,6 +35,7 @@ const AdminLayout: React.FC = () => {
     { path: '/admin/practice-events', label: 'Practice', icon: Wrench },
     { path: '/admin/templates', label: 'Templates', icon: FileText },
     { path: '/admin/tickets', label: 'Tickets', icon: MessageSquare },
+    { path: '/admin/activity-logs', label: 'Activity', icon: Activity },
   ];
 
   const isActive = (path: string, exact?: boolean) => {

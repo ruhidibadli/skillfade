@@ -30,7 +30,11 @@ import type {
   TicketStatus,
   AdminTicket,
   AdminTicketDetail,
-  AdminTicketReply
+  AdminTicketReply,
+  ActivityLog,
+  ActivityLogCreate,
+  AdminActivityLog,
+  ActivityLogStats
 } from '../types';
 
 const API_URL = import.meta.env.VITE_API_URL || '/api';
@@ -368,6 +372,37 @@ export const tickets = {
 
   addReply: (id: string, data: { message: string }) =>
     api.post<TicketReply>(`/tickets/${id}/replies`, data),
+};
+
+// Activity Logs (Public endpoint for creating logs)
+export const logs = {
+  create: (data: ActivityLogCreate) =>
+    api.post<ActivityLog>('/logs', data),
+};
+
+// Admin Activity Logs
+export const adminLogs = {
+  list: (params?: {
+    page?: number;
+    page_size?: number;
+    action_type?: string;
+    anonymous_only?: boolean;
+    start_date?: string;
+    end_date?: string;
+  }) =>
+    api.get<PaginatedResponse<AdminActivityLog>>('/admin/logs', { params }),
+
+  getStats: () =>
+    api.get<ActivityLogStats>('/admin/logs/stats'),
+
+  getActionTypes: () =>
+    api.get<string[]>('/admin/logs/action-types'),
+
+  delete: (id: string) =>
+    api.delete(`/admin/logs/${id}`),
+
+  bulkDelete: (data: { start_date?: string; end_date?: string }) =>
+    api.post<{ deleted_count: number }>('/admin/logs/bulk-delete', data),
 };
 
 export default api;

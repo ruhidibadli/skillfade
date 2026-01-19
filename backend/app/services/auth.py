@@ -1,4 +1,5 @@
-from fastapi import Depends, HTTPException, status
+from typing import Optional
+from fastapi import Depends, HTTPException, status, Header
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from app.core.database import get_db
@@ -6,6 +7,7 @@ from app.core.security import decode_access_token
 from app.models.user import User
 
 security = HTTPBearer()
+optional_security = HTTPBearer(auto_error=False)
 
 
 async def get_current_user(
@@ -57,3 +59,28 @@ async def get_current_admin_user(
             detail="Admin privileges required"
         )
     return current_user
+
+
+async def get_optional_current_user(
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(optional_security),
+    db: Session = Depends(get_db)
+) -> Optional[User]:
+    """
+    Get current authenticated user if token provided, otherwise return None.
+    Used for endpoints that work for both authenticated and anonymous users.
+    """
+    if credentials is None:
+        return None
+
+    token = credentials.credentials
+    payload = decode_access_token(token)
+
+    if payload is None:
+        return None
+
+    email: str = payload.get("sub")
+    if email is None:
+        return None
+
+    user = db.query(User).filter(User.email == email).first()
+    return user

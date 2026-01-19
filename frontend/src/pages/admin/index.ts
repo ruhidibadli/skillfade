@@ -8,3 +8,4 @@ export { default as AdminPracticeEvents } from './AdminPracticeEvents';
 export { default as AdminTemplates } from './AdminTemplates';
 export { default as AdminTickets } from './AdminTickets';
 export { default as AdminTicketDetail } from './AdminTicketDetail';
+export { default as AdminActivityLogs } from './AdminActivityLogs';
