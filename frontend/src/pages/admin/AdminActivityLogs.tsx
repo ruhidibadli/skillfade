@@ -4,11 +4,9 @@ import type { AdminActivityLog, ActivityLogStats } from '../../types';
 import Pagination from '../../components/admin/Pagination';
 import {
   Activity,
-  Search,
   Trash2,
   X,
   Filter,
-  Calendar,
   Users,
   Eye,
   Clock,
@@ -27,7 +25,6 @@ const AdminActivityLogs: React.FC = () => {
 
   // Stats state
   const [stats, setStats] = useState<ActivityLogStats | null>(null);
-  const [statsLoading, setStatsLoading] = useState(true);
 
   // Filter state
   const [actionType, setActionType] = useState<string>('');
@@ -71,13 +68,10 @@ const AdminActivityLogs: React.FC = () => {
   // Fetch stats
   const fetchStats = useCallback(async () => {
     try {
-      setStatsLoading(true);
       const response = await adminLogs.getStats();
       setStats(response.data);
     } catch (err) {
       console.error('Failed to load stats:', err);
-    } finally {
-      setStatsLoading(false);
     }
   }, []);
 
@@ -156,13 +150,6 @@ const AdminActivityLogs: React.FC = () => {
   // Format date
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString();
-  };
-
-  // Format user agent (truncate)
-  const formatUserAgent = (ua: string | null) => {
-    if (!ua) return '-';
-    if (ua.length > 50) return ua.substring(0, 50) + '...';
-    return ua;
   };
 
   return (
