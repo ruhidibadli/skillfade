@@ -34,8 +34,10 @@ import {
   AdminPracticeEvents,
   AdminTemplates,
   AdminTickets,
-  AdminTicketDetail
+  AdminTicketDetail,
+  AdminActivityLogs
 } from './pages/admin';
+import { ActivityLoggerWrapper } from './hooks/useActivityLogger';
 
 const RootRedirect = () => {
   const { isAuthenticated } = useAuth();
@@ -49,6 +51,7 @@ function App() {
         <AuthProvider>
           <OnboardingProvider>
             <BrowserRouter>
+              <ActivityLoggerWrapper>
               <Routes>
               <Route path="/" element={<RootRedirect />} />
               <Route path="/home" element={<Landing />} />
@@ -201,9 +204,18 @@ function App() {
                     </AdminProtectedRoute>
                   }
                 />
+                <Route
+                  path="/admin/activity-logs"
+                  element={
+                    <AdminProtectedRoute>
+                      <AdminActivityLogs />
+                    </AdminProtectedRoute>
+                  }
+                />
               </Route>
               <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
+              </ActivityLoggerWrapper>
             </BrowserRouter>
           </OnboardingProvider>
         </AuthProvider>

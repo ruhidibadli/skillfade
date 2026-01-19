@@ -445,3 +445,41 @@ export interface AdminTicketReply {
 export interface AdminTicketDetail extends AdminTicket {
   replies: AdminTicketReply[];
 }
+
+// Activity Log Types
+export interface ActivityLogCreate {
+  session_id: string;
+  action_type: string;
+  page?: string;
+  details?: Record<string, any>;
+}
+
+export interface ActivityLog {
+  id: string;
+  user_id: string | null;
+  session_id: string;
+  action_type: string;
+  page: string | null;
+  details: Record<string, any>;
+  ip_address: string | null;
+  user_agent: string | null;
+  created_at: string;
+}
+
+export interface AdminActivityLog extends ActivityLog {
+  user_email: string | null;
+}
+
+export interface ActivityLogStats {
+  total_logs: number;
+  unique_users: number;
+  unique_sessions: number;
+  logs_last_24h: number;
+  top_pages: Array<{ page: string; count: number }>;
+  top_actions: Array<{ action: string; count: number }>;
+}
+
+export interface BulkDeleteRequest {
+  start_date?: string;
+  end_date?: string;
+}
