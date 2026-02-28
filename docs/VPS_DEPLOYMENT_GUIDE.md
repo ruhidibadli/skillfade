@@ -47,6 +47,60 @@ docker exec skillfade_backend python grant_admin.py your-email@example.com
 
 ---
 
+## Shared VPS Deployment (Another Project Already Running)
+
+If your VPS already has another website using ports 80/443, use this method instead. It deploys SkillFade alongside the existing project using a shared host Nginx.
+
+### One-Command Deploy
+
+```bash
+ssh root@your-server-ip
+cd /opt
+git clone <your-repository-url> skillfade
+cd skillfade
+chmod +x scripts/setup-shared-vps.sh
+./scripts/setup-shared-vps.sh --domain skillfade.website --email you@email.com
+```
+
+This single script will:
+- Install Docker if needed
+- Install/configure host Nginx alongside your existing sites
+- Generate secure secrets and `.env`
+- Build and start containers (db, backend, frontend — no nginx container)
+- Configure Nginx to route `skillfade.website` to SkillFade containers
+- Obtain SSL certificate via Let's Encrypt
+- Set up daily backup cron and SSL auto-renewal
+
+### How It Works
+
+```
+                    Host Nginx (port 80/443)
+                   /                        \
+    other-site.com                    skillfade.website
+    → existing project                → 127.0.0.1:8100 (backend API)
+                                      → 127.0.0.1:8101 (frontend)
+```
+
+### Shared VPS Commands
+
+| Action | Command |
+|--------|---------|
+| View logs | `docker compose -f docker-compose.shared.yml logs -f` |
+| Stop | `docker compose -f docker-compose.shared.yml down` |
+| Start | `docker compose -f docker-compose.shared.yml up -d` |
+| Restart | `docker compose -f docker-compose.shared.yml restart` |
+| Rebuild | `docker compose -f docker-compose.shared.yml up -d --build` |
+| Update | `git pull && docker compose -f docker-compose.shared.yml up -d --build` |
+| Nginx config | `sudo nano /etc/nginx/sites-available/skillfade` |
+
+---
+
+## Dedicated VPS Deployment (Original)
+
+If you have a dedicated VPS with no other projects, use the original method below.
+
+---
+
 ## Common Commands
 
 | Action | Command |
@@ -268,4 +322,4 @@ curl http://localhost/health
 
 ---
 
-**Last Updated:** 2026-01-14
+**Last Updated:** 2026-02-27

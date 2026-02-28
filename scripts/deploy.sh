@@ -21,9 +21,12 @@ LOG_DIR="/var/log/skillfade"
 BACKUP_DIR="$PROJECT_DIR/backups"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 
-# Deployment mode
-DOCKER_COMPOSE_FILE="$PROJECT_DIR/docker-compose.prod.yml"
-if [ ! -f "$DOCKER_COMPOSE_FILE" ]; then
+# Deployment mode - prefer shared (co-hosted VPS), then prod, then dev
+if [ -f "$PROJECT_DIR/docker-compose.shared.yml" ] && docker ps --format '{{.Names}}' 2>/dev/null | grep -q "skillfade_" && ! docker ps --format '{{.Names}}' 2>/dev/null | grep -q "skillfade_nginx"; then
+    DOCKER_COMPOSE_FILE="$PROJECT_DIR/docker-compose.shared.yml"
+elif [ -f "$PROJECT_DIR/docker-compose.prod.yml" ]; then
+    DOCKER_COMPOSE_FILE="$PROJECT_DIR/docker-compose.prod.yml"
+else
     DOCKER_COMPOSE_FILE="$PROJECT_DIR/docker-compose.yml"
 fi
 

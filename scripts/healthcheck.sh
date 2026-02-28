@@ -83,8 +83,12 @@ check_docker_containers() {
 
     cd "$PROJECT_DIR"
 
-    # Check each container
-    containers=("skillfade_db" "skillfade_backend" "skillfade_frontend" "skillfade_nginx")
+    # Check each container (nginx may not exist in shared VPS mode)
+    if docker ps --format '{{.Names}}' | grep -q "skillfade_nginx"; then
+        containers=("skillfade_db" "skillfade_backend" "skillfade_frontend" "skillfade_nginx")
+    else
+        containers=("skillfade_db" "skillfade_backend" "skillfade_frontend")
+    fi
     all_running=true
 
     for container in "${containers[@]}"; do
