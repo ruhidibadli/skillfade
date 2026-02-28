@@ -370,9 +370,9 @@ SKILLFADE_EOF
     sudo ln -sf /etc/nginx/sites-available/ucuzbot /etc/nginx/sites-enabled/ucuzbot
     sudo ln -sf /etc/nginx/sites-available/skillfade /etc/nginx/sites-enabled/skillfade
 
-    # Test and start
+    # Test and start (use restart to handle both fresh start and reload cases)
     if sudo nginx -t 2>&1; then
-        sudo systemctl start nginx
+        sudo systemctl restart nginx
         print_success "Host Nginx started with both sites"
         print_success "  ucuzbot.az       → localhost:8200"
         print_success "  $DOMAIN → localhost:8100 + 8101"
@@ -516,7 +516,7 @@ SKILLFADE_SSL
     fi
 
     # Reload nginx with SSL configs
-    sudo nginx -t && sudo systemctl reload nginx
+    sudo nginx -t && sudo systemctl restart nginx
     print_success "Nginx reloaded with SSL"
 
     # Auto-renewal cron
