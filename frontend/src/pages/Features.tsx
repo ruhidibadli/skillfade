@@ -3,10 +3,18 @@ import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import LogoIcon from '../components/LogoIcon';
 import BuyMeACoffee from '../components/BuyMeACoffee';
+import { SEO } from '../components/SEO';
+import { generateSoftwareApplicationSchema } from '../utils/seo';
 
 const Features: React.FC = () => {
   return (
     <div className="min-h-screen bg-mesh">
+      <SEO
+        title="Features — Skill Freshness, Decay Alerts, Analytics"
+        description="See every SkillFade feature: skill freshness scores, custom decay rates, practice gap alerts, balance ratio analytics, freshness history charts, and event templates. No gamification, no judgment."
+        canonicalUrl="https://skillfade.app/features"
+        structuredData={generateSoftwareApplicationSchema()}
+      />
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-surface-200/80 backdrop-blur-xl border-b border-border-subtle">
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

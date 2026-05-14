@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Loader2, Eye, EyeOff } from 'lucide-react';
 import LogoIcon from '../components/LogoIcon';
+import { SEO } from '../components/SEO';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -30,6 +31,12 @@ const Login: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-mesh relative">
+      <SEO
+        title="Sign In"
+        description="Sign in to your SkillFade account to track skill decay, log learning and practice events, and view your freshness analytics."
+        canonicalUrl="https://skillfade.app/login"
+        noIndex
+      />
       {/* Background Effects */}
       <div className="absolute top-1/4 left-1/3 w-96 h-96 bg-accent-400/5 rounded-full blur-3xl" />
       <div className="absolute bottom-1/4 right-1/3 w-96 h-96 bg-secondary-400/5 rounded-full blur-3xl" />

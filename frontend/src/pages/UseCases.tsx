@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Code, BookOpen, Briefcase, GraduationCap, Shield, Palette, Zap, CheckCircle } from 'lucide-react';
 import LogoIcon from '../components/LogoIcon';
 import { SEO } from '../components/SEO';
+import { generateArticleSchema } from '../utils/seo';
 
 interface UseCase {
   icon: React.ComponentType<{ className?: string }>;
@@ -82,9 +83,14 @@ const UseCases: React.FC = () => {
   return (
     <div className="min-h-screen bg-mesh">
       <SEO
-        title="Use Cases - Who Is SkillFade For?"
-        description="SkillFade is a skill decay tracking application for developers, self-directed learners, career switchers, and knowledge workers. Learn how different users track learning decay and practice scarcity."
+        title="Use Cases — Who Uses SkillFade and Why"
+        description="From developers maintaining tech stacks to designers, writers, and career switchers — real use cases for tracking skill decay, practice scarcity, and learning balance. A calm tool for self-directed learners."
         canonicalUrl="https://skillfade.app/use-cases"
+        ogType="article"
+        structuredData={generateArticleSchema(
+          'Use Cases — Who Uses SkillFade and Why',
+          'Real-world scenarios showing how developers, designers, writers, career switchers, and knowledge workers use SkillFade to track skill decay and learning balance.'
+        )}
       />
 
       {/* Header */}

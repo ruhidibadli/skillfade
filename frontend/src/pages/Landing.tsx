@@ -56,9 +56,9 @@ const Landing: React.FC = () => {
   return (
     <div className="min-h-screen bg-mesh">
       <SEO
-        title="SkillFade - Track Skill Decay and Learning Balance"
-        description="SkillFade is a skill decay tracking application for developers, self-directed learners, career switchers, and knowledge workers. Track learning decay, practice scarcity, and input/output imbalance. A calm mirror, not a coach. Free and open source."
-        canonicalUrl="https://skillfade.app"
+        title="SkillFade — Skill Decay Tracker for Self-Directed Learners"
+        description="Track skill decay, practice gaps, and learning balance. A calm productivity tool for developers, designers, and self-directed learners. No gamification, no streaks — just the truth. Free and open source."
+        canonicalUrl="https://skillfade.app/"
         structuredData={structuredData}
       />
 

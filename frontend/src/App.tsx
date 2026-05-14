@@ -13,6 +13,7 @@ import FAQ from './pages/FAQ';
 import WhatIsLearningDecay from './pages/WhatIsLearningDecay';
 import UseCases from './pages/UseCases';
 import Comparisons from './pages/Comparisons';
+import Privacy from './pages/Privacy';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
@@ -38,6 +39,8 @@ import {
   AdminActivityLogs
 } from './pages/admin';
 import { ActivityLoggerWrapper } from './hooks/useActivityLogger';
+import RouteTracker from './components/RouteTracker';
+import CookieBanner from './components/CookieBanner';
 
 const RootRedirect = () => {
   const { isAuthenticated } = useAuth();
@@ -51,6 +54,8 @@ function App() {
         <AuthProvider>
           <OnboardingProvider>
             <BrowserRouter>
+              <RouteTracker />
+              <CookieBanner />
               <ActivityLoggerWrapper>
               <Routes>
               <Route path="/" element={<RootRedirect />} />
@@ -60,6 +65,7 @@ function App() {
               <Route path="/what-is-learning-decay" element={<WhatIsLearningDecay />} />
               <Route path="/use-cases" element={<UseCases />} />
               <Route path="/comparisons" element={<Comparisons />} />
+              <Route path="/privacy" element={<Privacy />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />

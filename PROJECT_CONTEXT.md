@@ -888,11 +888,17 @@ npm test
 ## Privacy & Data Ownership
 
 ### What We Don't Do
-- ❌ No third-party analytics (no Google Analytics, Mixpanel, etc.)
-- ❌ No external API calls (except user-configured SMTP)
+- ❌ No analytics inside the app — your activity on `/dashboard`, `/skills`, `/analytics`, `/settings`, `/support`, and `/admin` is never tracked
+- ❌ No external API calls (except user-configured SMTP and Google Analytics on public marketing pages — see below)
 - ❌ No data sharing
 - ❌ No tracking pixels
-- ❌ No cookies (except auth token in localStorage)
+- ❌ No ads, no ad personalization, no cross-site tracking
+
+### Analytics on public marketing pages only
+- Google Analytics 4 fires on public pages (`/`, `/features`, `/faq`, `/what-is-learning-decay`, `/use-cases`, `/comparisons`, `/login`, `/register`, `/forgot-password`, `/reset-password`, `/privacy`) to count visitors and see country distribution.
+- Gated by Consent Mode v2 — no data is sent until the user accepts the cookie banner.
+- Configured with `anonymize_ip`, `send_page_view: false` (manual page views from `RouteTracker`), and ad signals disabled.
+- Full disclosure on `/privacy`.
 
 ### What Users Control
 - ✅ Full data export (JSON format)
@@ -1159,8 +1165,8 @@ npm test
 
 ---
 
-**Last Updated:** 2026-01-16
-**Project Status:** Production-ready MVP with Enhanced UI/UX + Dark Mode + Activity Calendar + Phase 1, 2, 6 & Category Features + Admin Panel + Buy Me a Coffee Integration + Support Ticketing System + Onboarding Wizard + Forgot Password System + Comprehensive VPS Deployment Guide (Ubuntu 22.04 & 24.04 LTS) ✅
+**Last Updated:** 2026-05-14
+**Project Status:** Production-ready MVP with Enhanced UI/UX + Dark Mode + Activity Calendar + Phase 1, 2, 6 & Category Features + Admin Panel + Buy Me a Coffee Integration + Support Ticketing System + Onboarding Wizard + Forgot Password System + Comprehensive VPS Deployment Guide (Ubuntu 22.04 & 24.04 LTS) + Google Search Console + Google Analytics 4 (Consent Mode v2) + Per-page SEO with structured data + robots.txt + sitemap.xml + Privacy Policy page ✅
 
 ### Phase 1 Features (Completed 2026-01-09)
 - **Freshness History Graph**: Line chart showing skill freshness over 90 days
@@ -1303,3 +1309,63 @@ npm test
   - `Login.tsx` - Added "Forgot password?" link
   - `api.ts` - `forgotPassword()`, `resetPassword()` functions
   - `App.tsx` - Routes for `/forgot-password`, `/reset-password`
+
+### SEO + Analytics Integration (Added 2026-05-14)
+Full implementation plan lives in `SEO_AND_ANALYTICS_PLAN.md` at the project root.
+
+#### Google Search Console
+- **Property type:** URL prefix (`https://skillfade.app/`)
+- **Verification method:** HTML meta tag in `frontend/index.html`
+- **Verification code:** `dAQgMIpPclGzzEYBrPMV7zF-OHkKRtbqawB3eB4Tp14`
+
+#### Google Analytics 4
+- **Measurement ID:** `G-31B1MG861C`
+- **Scope:** Public marketing pages only — never fires on `/dashboard`, `/skills`, `/analytics`, `/settings`, `/support`, `/admin`
+- **Privacy:**
+  - Consent Mode v2 with `analytics_storage: denied` as the default
+  - `anonymize_ip: true`
+  - `send_page_view: false` (manual page views from `RouteTracker` only)
+  - Ad signals (`ad_storage`, `ad_user_data`, `ad_personalization`) all denied
+- **Reports used:** Realtime, Acquisition, Demographics → Country, Pages and screens. No custom events.
+
+#### New components
+- `frontend/src/components/RouteTracker.tsx` — Whitelists 12 public routes (`/`, `/home`, `/features`, `/faq`, `/what-is-learning-decay`, `/use-cases`, `/comparisons`, `/login`, `/register`, `/forgot-password`, `/reset-password`, `/privacy`). Fires `gtag('event', 'page_view', ...)` only on those routes. Mounted in `App.tsx` inside `BrowserRouter`.
+- `frontend/src/components/CookieBanner.tsx` — Calm bottom banner with Accept/Decline. Stores choice in `localStorage.analytics_consent`. Calls `gtag('consent', 'update', ...)` on accept. Only renders on public routes.
+
+#### New page
+- `frontend/src/pages/Privacy.tsx` — Full privacy disclosure at `/privacy`. Lists data collected, retention, opt-out instructions. Includes "Reset cookie preference" button.
+
+#### SEO infrastructure files
+- `frontend/public/robots.txt` — Allows public marketing pages, disallows authenticated routes (`/dashboard`, `/skills`, `/analytics`, `/settings`, `/support`, `/admin`, auth pages), links to sitemap.
+- `frontend/public/sitemap.xml` — Static sitemap covering 7 URLs: `/`, `/features`, `/what-is-learning-decay`, `/use-cases`, `/comparisons`, `/faq`, `/privacy`.
+
+#### Per-page SEO updates
+All public pages use the `<SEO />` component (`frontend/src/components/SEO.tsx`) with `react-helmet-async`. Each sets unique title, description, canonical URL, and page-appropriate structured data.
+
+| Page | Title | Schema |
+|---|---|---|
+| `Landing.tsx` (`/`) | SkillFade — Skill Decay Tracker for Self-Directed Learners | WebSite + Organization + SoftwareApplication |
+| `Features.tsx` (`/features`) | Features — Skill Freshness, Decay Alerts, Analytics | SoftwareApplication |
+| `WhatIsLearningDecay.tsx` (`/what-is-learning-decay`) | What Is Learning Decay? Understanding the Forgetting Curve | Article |
+| `UseCases.tsx` (`/use-cases`) | Use Cases — Who Uses SkillFade and Why | Article |
+| `Comparisons.tsx` (`/comparisons`) | SkillFade vs Anki, Notion, Obsidian — Compared | Article |
+| `FAQ.tsx` (`/faq`) | Frequently Asked Questions | FAQPage |
+| `Privacy.tsx` (`/privacy`) | Privacy Policy | — |
+
+Auth pages (`Login`, `Register`, `ForgotPassword`, `ResetPassword`) use `<SEO noIndex />` so they aren't indexed by search engines.
+
+#### TypeScript ambient declarations
+- `frontend/src/vite-env.d.ts` — Added `Window.dataLayer` and `Window.gtag` declarations for typed access to the GA4 globals.
+
+#### Updated `index.html`
+- Added Google Search Console verification meta tag.
+- Added GA4 `gtag.js` snippet (async) with Consent Mode v2 default-denied, `anonymize_ip`, `send_page_view: false`.
+- Reads `localStorage.analytics_consent` on page load and updates consent to `granted` if previously accepted (so returning visitors don't see the banner again).
+
+#### Updated `Settings.tsx`
+- Privacy statement rewritten to reflect that GA4 runs only on public pages and explicitly states in-app activity is never tracked.
+- Added "Read the full privacy policy" link to `/privacy`.
+
+#### Files modified summary
+- Created: `RouteTracker.tsx`, `CookieBanner.tsx`, `Privacy.tsx`, `robots.txt`, `sitemap.xml`
+- Modified: `index.html`, `App.tsx`, `vite-env.d.ts`, `Settings.tsx`, `Landing.tsx`, `Features.tsx`, `Comparisons.tsx`, `UseCases.tsx`, `Login.tsx`, `Register.tsx`, `ForgotPassword.tsx`, `ResetPassword.tsx`

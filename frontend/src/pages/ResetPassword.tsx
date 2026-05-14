@@ -3,6 +3,7 @@ import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { Loader2, ArrowLeft, Eye, EyeOff, KeyRound, CheckCircle, AlertCircle } from 'lucide-react';
 import { auth } from '../services/api';
 import LogoIcon from '../components/LogoIcon';
+import { SEO } from '../components/SEO';
 
 const ResetPassword: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -48,10 +49,20 @@ const ResetPassword: React.FC = () => {
     }
   };
 
+  const seo = (
+    <SEO
+      title="Reset Password"
+      description="Set a new password for your SkillFade account using your reset link."
+      canonicalUrl="https://skillfade.app/reset-password"
+      noIndex
+    />
+  );
+
   // Invalid or missing token
   if (!token) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-mesh relative">
+        {seo}
         <div className="absolute top-1/4 left-1/3 w-96 h-96 bg-accent-400/5 rounded-full blur-3xl" />
         <div className="absolute bottom-1/4 right-1/3 w-96 h-96 bg-secondary-400/5 rounded-full blur-3xl" />
 
@@ -89,6 +100,7 @@ const ResetPassword: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-mesh relative">
+      {seo}
       {/* Background Effects */}
       <div className="absolute top-1/4 left-1/3 w-96 h-96 bg-accent-400/5 rounded-full blur-3xl" />
       <div className="absolute bottom-1/4 right-1/3 w-96 h-96 bg-secondary-400/5 rounded-full blur-3xl" />

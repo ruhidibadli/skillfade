@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Loader2, ArrowLeft, Mail, CheckCircle } from 'lucide-react';
 import { auth } from '../services/api';
 import LogoIcon from '../components/LogoIcon';
+import { SEO } from '../components/SEO';
 
 const ForgotPassword: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -27,6 +28,12 @@ const ForgotPassword: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-mesh relative">
+      <SEO
+        title="Forgot Password"
+        description="Reset your SkillFade password. Enter your email and we'll send you a secure reset link."
+        canonicalUrl="https://skillfade.app/forgot-password"
+        noIndex
+      />
       {/* Background Effects */}
       <div className="absolute top-1/4 left-1/3 w-96 h-96 bg-accent-400/5 rounded-full blur-3xl" />
       <div className="absolute bottom-1/4 right-1/3 w-96 h-96 bg-secondary-400/5 rounded-full blur-3xl" />

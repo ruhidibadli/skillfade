@@ -1,0 +1,21 @@
+User-agent: *
+Allow: /
+Allow: /features
+Allow: /faq
+Allow: /what-is-learning-decay
+Allow: /use-cases
+Allow: /comparisons
+Allow: /privacy
+
+Disallow: /dashboard
+Disallow: /skills
+Disallow: /analytics
+Disallow: /settings
+Disallow: /support
+Disallow: /admin
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /reset-password
+
+Sitemap: https://skillfade.app/sitemap.xml

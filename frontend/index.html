@@ -11,6 +11,33 @@
     <meta name="title" content="SkillFade - Track Skill Decay and Learning Balance" />
     <meta name="description" content="SkillFade is a skill decay tracking application for developers and self-directed learners. Track learning decay, practice scarcity, and input/output imbalance. A calm mirror, not a coach. Free and open source." />
 
+    <!-- Google Search Console verification -->
+    <meta name="google-site-verification" content="dAQgMIpPclGzzEYBrPMV7zF-OHkKRtbqawB3eB4Tp14" />
+
+    <!-- Google Analytics 4 (Consent Mode v2; default denied until user accepts cookie banner) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-31B1MG861C"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('consent', 'default', {
+        ad_storage: 'denied',
+        ad_user_data: 'denied',
+        ad_personalization: 'denied',
+        analytics_storage: 'denied',
+        wait_for_update: 500
+      });
+      try {
+        if (localStorage.getItem('analytics_consent') === 'granted') {
+          gtag('consent', 'update', { analytics_storage: 'granted' });
+        }
+      } catch (e) {}
+      gtag('js', new Date());
+      gtag('config', 'G-31B1MG861C', {
+        anonymize_ip: true,
+        send_page_view: false
+      });
+    </script>
+
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://skillfade.app/" />

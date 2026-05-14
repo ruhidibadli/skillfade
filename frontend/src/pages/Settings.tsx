@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { settings as settingsApi, templates as templatesApi } from '../services/api';
 import { useOnboarding } from '../context/OnboardingContext';
 import type { EventTemplate } from '../types';
@@ -251,11 +251,16 @@ const Settings: React.FC = () => {
           </div>
         </div>
         <ul className="text-txt-secondary text-sm space-y-2 ml-12">
-          <li>Your data is stored securely and is not shared with any third parties.</li>
-          <li>We do not use any third-party analytics or tracking services.</li>
+          <li>Your in-app data (skills, events, notes) is stored securely and never shared with third parties.</li>
+          <li>Your activity inside the app is never tracked. Google Analytics runs only on our public marketing pages to count visitors by country.</li>
           <li>Your email is only used for authentication and optional alerts.</li>
           <li>You can export all your data or delete your account at any time.</li>
         </ul>
+        <div className="ml-12 mt-4">
+          <Link to="/privacy" className="text-sm text-accent-400 hover:underline">
+            Read the full privacy policy
+          </Link>
+        </div>
       </div>
 
       {/* Support */}

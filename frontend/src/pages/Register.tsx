@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { auth } from '../services/api';
 import { Loader2 } from 'lucide-react';
 import LogoIcon from '../components/LogoIcon';
+import { SEO } from '../components/SEO';
 
 const Register: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -40,6 +41,12 @@ const Register: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-mesh relative">
+      <SEO
+        title="Create Account"
+        description="Create a free SkillFade account to start tracking skill decay, learning balance, and practice gaps. No credit card, no gamification."
+        canonicalUrl="https://skillfade.app/register"
+        noIndex
+      />
       {/* Background Effects */}
       <div className="absolute top-1/4 left-1/3 w-96 h-96 bg-accent-400/5 rounded-full blur-3xl" />
       <div className="absolute bottom-1/4 right-1/3 w-96 h-96 bg-secondary-400/5 rounded-full blur-3xl" />

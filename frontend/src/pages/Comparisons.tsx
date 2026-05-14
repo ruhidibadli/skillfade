@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Shield, Palette, Zap, Check, X, Minus } from 'lucide-react';
 import LogoIcon from '../components/LogoIcon';
 import { SEO } from '../components/SEO';
+import { generateArticleSchema } from '../utils/seo';
 
 interface Comparison {
   competitor: string;
@@ -85,9 +86,14 @@ const Comparisons: React.FC = () => {
   return (
     <div className="min-h-screen bg-mesh">
       <SEO
-        title="SkillFade vs Other Learning Tools - Comparisons"
-        description="Compare SkillFade to flashcard apps, note-taking apps, knowledge graphs, and spaced repetition apps. Learn how skill decay tracking differs from other learning tools. Find the right tool for your learning needs."
+        title="SkillFade vs Anki, Notion, Obsidian — Compared"
+        description="How SkillFade compares to flashcard apps (Anki), note-taking tools (Notion, Obsidian), knowledge graphs, and spaced repetition apps. A calm mirror versus gamified coaches and memorization tools."
         canonicalUrl="https://skillfade.app/comparisons"
+        ogType="article"
+        structuredData={generateArticleSchema(
+          'SkillFade vs Anki, Notion, Obsidian — Compared',
+          'Detailed comparison of SkillFade against flashcard apps, note-taking tools, knowledge graphs, and spaced repetition apps.'
+        )}
       />
 
       {/* Header */}
