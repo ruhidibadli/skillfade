@@ -18,6 +18,7 @@ import {
 import LogoIcon from '../components/LogoIcon';
 import { SEO } from '../components/SEO';
 import BuyMeACoffee from '../components/BuyMeACoffee';
+import PublicFooter from '../components/PublicFooter';
 import {
   generateOrganizationSchema,
   generateSoftwareApplicationSchema,
@@ -58,7 +59,7 @@ const Landing: React.FC = () => {
       <SEO
         title="SkillFade — Skill Decay Tracker for Self-Directed Learners"
         description="Track skill decay, practice gaps, and learning balance. A calm productivity tool for developers, designers, and self-directed learners. No gamification, no streaks — just the truth. Free and open source."
-        canonicalUrl="https://skillfade.app/"
+        canonicalUrl="https://skillfade.website/"
         structuredData={structuredData}
       />
 
@@ -332,84 +333,7 @@ const Landing: React.FC = () => {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-12 px-4 sm:px-6 lg:px-8 bg-surface-50 border-t border-border-subtle">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-accent-400 to-secondary-400 flex items-center justify-center">
-                  <LogoIcon className="w-4 h-4 text-surface-50" />
-                </div>
-                <span className="font-bold text-txt-primary">SkillFade</span>
-              </div>
-              <p className="text-sm text-txt-muted leading-relaxed mb-4">
-                A skill decay tracking application for developers and self-directed learners. Track learning decay, practice scarcity, and input/output balance.
-              </p>
-              <BuyMeACoffee variant="link" />
-            </div>
-            <div>
-              <h4 className="text-txt-primary font-semibold mb-4">Product</h4>
-              <ul className="space-y-2 text-sm text-txt-muted">
-                <li>
-                  <Link to="/use-cases" className="hover:text-accent-400 transition-colors">Use Cases</Link>
-                </li>
-                <li>
-                  <Link to="/comparisons" className="hover:text-accent-400 transition-colors">Comparisons</Link>
-                </li>
-                <li>
-                  <Link to="/faq" className="hover:text-accent-400 transition-colors">FAQ</Link>
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-txt-primary font-semibold mb-4">Learn</h4>
-              <ul className="space-y-2 text-sm text-txt-muted">
-                <li>
-                  <Link to="/what-is-learning-decay" className="hover:text-accent-400 transition-colors">What is Learning Decay?</Link>
-                </li>
-              </ul>
-              <h4 className="text-txt-primary font-semibold mb-4 mt-6">Philosophy</h4>
-              <ul className="space-y-2 text-sm text-txt-muted">
-                <li className="flex items-center gap-2">
-                  <Zap className="w-3 h-3 text-accent-400" />
-                  No Gamification
-                </li>
-                <li className="flex items-center gap-2">
-                  <Shield className="w-3 h-3 text-accent-400" />
-                  Privacy First
-                </li>
-                <li className="flex items-center gap-2">
-                  <Palette className="w-3 h-3 text-accent-400" />
-                  Calm Design
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-txt-primary font-semibold mb-4">Legal</h4>
-              <ul className="space-y-2 text-sm text-txt-muted">
-                <li>Self-Hosted</li>
-                <li>Open Source</li>
-                <li>MIT License</li>
-              </ul>
-              <h4 className="text-txt-primary font-semibold mb-4 mt-6">Account</h4>
-              <ul className="space-y-2 text-sm text-txt-muted">
-                <li>
-                  <Link to="/register" className="hover:text-accent-400 transition-colors flex items-center gap-1">
-                    Get Started <ArrowUpRight className="w-3 h-3" />
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/login" className="hover:text-accent-400 transition-colors">Sign In</Link>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-border-subtle pt-8 text-center text-sm text-txt-muted">
-            <p>2026 SkillFade. A skill decay tracking application. A mirror, not a coach.</p>
-          </div>
-        </div>
-      </footer>
+      <PublicFooter />
     </div>
   );
 };

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowRight, Shield } from 'lucide-react';
 import LogoIcon from '../components/LogoIcon';
 import { SEO } from '../components/SEO';
+import PublicFooter from '../components/PublicFooter';
 
 const Privacy: React.FC = () => {
   const resetConsent = () => {
@@ -17,7 +18,7 @@ const Privacy: React.FC = () => {
       <SEO
         title="Privacy Policy"
         description="SkillFade privacy policy. What we collect, what we don't, and how to opt out. We use Google Analytics on marketing pages only to count page views by country. Your in-app activity is never tracked."
-        canonicalUrl="https://skillfade.app/privacy"
+        canonicalUrl="https://skillfade.website/privacy"
       />
 
       {/* Header */}
@@ -140,6 +141,7 @@ const Privacy: React.FC = () => {
           </div>
         </div>
       </main>
+      <PublicFooter />
     </div>
   );
 };

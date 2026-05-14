@@ -13,6 +13,11 @@ import FAQ from './pages/FAQ';
 import WhatIsLearningDecay from './pages/WhatIsLearningDecay';
 import UseCases from './pages/UseCases';
 import Comparisons from './pages/Comparisons';
+import LearningVsPractice from './pages/LearningVsPractice';
+import SkillDecayFormula from './pages/SkillDecayFormula';
+import CompareAnki from './pages/compare/Anki';
+import CompareNotion from './pages/compare/Notion';
+import CompareObsidian from './pages/compare/Obsidian';
 import Privacy from './pages/Privacy';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -65,6 +70,11 @@ function App() {
               <Route path="/what-is-learning-decay" element={<WhatIsLearningDecay />} />
               <Route path="/use-cases" element={<UseCases />} />
               <Route path="/comparisons" element={<Comparisons />} />
+              <Route path="/compare/anki" element={<CompareAnki />} />
+              <Route path="/compare/notion" element={<CompareNotion />} />
+              <Route path="/compare/obsidian" element={<CompareObsidian />} />
+              <Route path="/learning-vs-practice" element={<LearningVsPractice />} />
+              <Route path="/skill-decay-formula" element={<SkillDecayFormula />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />

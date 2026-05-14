@@ -1,9 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Clock, TrendingDown, Brain, RefreshCw, Shield, Palette, Zap } from 'lucide-react';
+import { ArrowRight, Clock, TrendingDown, Brain, RefreshCw } from 'lucide-react';
 import LogoIcon from '../components/LogoIcon';
 import { SEO } from '../components/SEO';
 import { generateArticleSchema } from '../utils/seo';
+import PublicFooter from '../components/PublicFooter';
 
 const WhatIsLearningDecay: React.FC = () => {
   const articleSchema = generateArticleSchema(
@@ -17,7 +18,7 @@ const WhatIsLearningDecay: React.FC = () => {
       <SEO
         title="What Is Learning Decay? Understanding the Forgetting Curve"
         description="Learning decay is the gradual loss of knowledge and skills over time without reinforcement. Learn about the forgetting curve, why skills fade, and how to track and prevent skill decay with SkillFade."
-        canonicalUrl="https://skillfade.app/what-is-learning-decay"
+        canonicalUrl="https://skillfade.website/what-is-learning-decay"
         ogType="article"
         structuredData={articleSchema}
       />
@@ -219,6 +220,37 @@ const WhatIsLearningDecay: React.FC = () => {
             </div>
           </section>
 
+          {/* Related Reading */}
+          <section className="mt-16">
+            <h2 className="text-2xl font-bold text-txt-primary mb-6 text-center">
+              Related Reading
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Link to="/skill-decay-formula" className="card-interactive p-6 group">
+                <h3 className="text-lg font-semibold text-txt-primary mb-2 group-hover:text-accent-400 transition-colors">
+                  The Skill Decay Formula
+                </h3>
+                <p className="text-sm text-txt-secondary leading-relaxed mb-4">
+                  A transparent walkthrough of how SkillFade calculates the 0–100% freshness score. Exponential decay, learning boosts, custom rates.
+                </p>
+                <span className="inline-flex items-center gap-1 text-sm text-accent-400 group-hover:gap-2 transition-all">
+                  Read article <ArrowRight className="w-4 h-4" />
+                </span>
+              </Link>
+              <Link to="/learning-vs-practice" className="card-interactive p-6 group">
+                <h3 className="text-lg font-semibold text-txt-primary mb-2 group-hover:text-accent-400 transition-colors">
+                  Learning vs Practice
+                </h3>
+                <p className="text-sm text-txt-secondary leading-relaxed mb-4">
+                  The input/output ratio that separates people who consume knowledge from people who own it. The fix for tutorial hell.
+                </p>
+                <span className="inline-flex items-center gap-1 text-sm text-accent-400 group-hover:gap-2 transition-all">
+                  Read article <ArrowRight className="w-4 h-4" />
+                </span>
+              </Link>
+            </div>
+          </section>
+
           {/* CTA Section */}
           <div className="mt-16 text-center">
             <h2 className="text-2xl font-bold text-txt-primary mb-4">
@@ -246,56 +278,7 @@ const WhatIsLearningDecay: React.FC = () => {
         </div>
       </article>
 
-      {/* Footer */}
-      <footer className="py-12 px-4 sm:px-6 lg:px-8 bg-surface-50 border-t border-border-subtle">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <h4 className="text-txt-primary font-semibold mb-4">Product</h4>
-              <ul className="space-y-2 text-sm text-txt-muted">
-                <li><Link to="/features" className="hover:text-txt-primary transition-colors">Features</Link></li>
-                <li><Link to="/use-cases" className="hover:text-txt-primary transition-colors">Use Cases</Link></li>
-                <li><Link to="/comparisons" className="hover:text-txt-primary transition-colors">Comparisons</Link></li>
-                <li><Link to="/faq" className="hover:text-txt-primary transition-colors">FAQ</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-txt-primary font-semibold mb-4">Learn</h4>
-              <ul className="space-y-2 text-sm text-txt-muted">
-                <li><Link to="/what-is-learning-decay" className="hover:text-txt-primary transition-colors">What is Learning Decay?</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-txt-primary font-semibold mb-4">Philosophy</h4>
-              <ul className="space-y-2 text-sm text-txt-muted">
-                <li className="flex items-center gap-2">
-                  <Zap className="w-3 h-3 text-accent-400" />
-                  No Gamification
-                </li>
-                <li className="flex items-center gap-2">
-                  <Shield className="w-3 h-3 text-accent-400" />
-                  Privacy First
-                </li>
-                <li className="flex items-center gap-2">
-                  <Palette className="w-3 h-3 text-accent-400" />
-                  Calm Design
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-txt-primary font-semibold mb-4">Legal</h4>
-              <ul className="space-y-2 text-sm text-txt-muted">
-                <li>Self-Hosted</li>
-                <li>Open Source</li>
-                <li>MIT License</li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-border-subtle pt-8 text-center text-sm text-txt-muted">
-            <p>2026 SkillFade. A mirror, not a coach.</p>
-          </div>
-        </div>
-      </footer>
+      <PublicFooter />
     </div>
   );
 };

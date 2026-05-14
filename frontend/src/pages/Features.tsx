@@ -5,6 +5,7 @@ import LogoIcon from '../components/LogoIcon';
 import BuyMeACoffee from '../components/BuyMeACoffee';
 import { SEO } from '../components/SEO';
 import { generateSoftwareApplicationSchema } from '../utils/seo';
+import PublicFooter from '../components/PublicFooter';
 
 const Features: React.FC = () => {
   return (
@@ -12,7 +13,7 @@ const Features: React.FC = () => {
       <SEO
         title="Features — Skill Freshness, Decay Alerts, Analytics"
         description="See every SkillFade feature: skill freshness scores, custom decay rates, practice gap alerts, balance ratio analytics, freshness history charts, and event templates. No gamification, no judgment."
-        canonicalUrl="https://skillfade.app/features"
+        canonicalUrl="https://skillfade.website/features"
         structuredData={generateSoftwareApplicationSchema()}
       />
       {/* Header */}
@@ -287,52 +288,7 @@ const Features: React.FC = () => {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-12 px-4 sm:px-6 lg:px-8 bg-surface-50 border-t border-border-subtle">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-accent-400 to-secondary-400 flex items-center justify-center">
-                  <LogoIcon className="w-4 h-4 text-surface-50" />
-                </div>
-                <span className="font-bold text-txt-primary">SkillFade</span>
-              </div>
-              <p className="text-sm text-txt-muted leading-relaxed mb-4">
-                Track learning decay, practice scarcity, and input/output balance.
-              </p>
-              <BuyMeACoffee variant="link" />
-            </div>
-            <div>
-              <h4 className="text-txt-primary font-semibold mb-4">Product</h4>
-              <ul className="space-y-2 text-sm text-txt-muted">
-                <li><Link to="/register" className="hover:text-accent-400 transition-colors">Get Started</Link></li>
-                <li><Link to="/features" className="hover:text-accent-400 transition-colors">Features</Link></li>
-                <li><Link to="/login" className="hover:text-accent-400 transition-colors">Sign In</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-txt-primary font-semibold mb-4">Philosophy</h4>
-              <ul className="space-y-2 text-sm text-txt-muted">
-                <li>No Gamification</li>
-                <li>Privacy First</li>
-                <li>Calm Design</li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-txt-primary font-semibold mb-4">Legal</h4>
-              <ul className="space-y-2 text-sm text-txt-muted">
-                <li>Self-Hosted</li>
-                <li>Open Source</li>
-                <li>MIT License</li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-border-subtle pt-8 text-center text-sm text-txt-muted">
-            <p>2026 SkillFade. A mirror, not a coach.</p>
-          </div>
-        </div>
-      </footer>
+      <PublicFooter />
     </div>
   );
 };

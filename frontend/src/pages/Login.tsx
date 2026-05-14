@@ -34,7 +34,7 @@ const Login: React.FC = () => {
       <SEO
         title="Sign In"
         description="Sign in to your SkillFade account to track skill decay, log learning and practice events, and view your freshness analytics."
-        canonicalUrl="https://skillfade.app/login"
+        canonicalUrl="https://skillfade.website/login"
         noIndex
       />
       {/* Background Effects */}

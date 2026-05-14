@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, ChevronDown, ChevronUp, Shield, Palette, Zap } from 'lucide-react';
+import { ArrowRight, ChevronDown, ChevronUp } from 'lucide-react';
 import LogoIcon from '../components/LogoIcon';
 import { SEO } from '../components/SEO';
 import { generateFAQSchema } from '../utils/seo';
+import PublicFooter from '../components/PublicFooter';
 
 interface FAQItem {
   question: string;
@@ -63,7 +64,7 @@ const FAQ: React.FC = () => {
       <SEO
         title="Frequently Asked Questions"
         description="Common questions about SkillFade, the skill decay tracking application for developers and self-directed learners. Learn how freshness tracking works, how it differs from Anki or Notion, and how to get started."
-        canonicalUrl="https://skillfade.app/faq"
+        canonicalUrl="https://skillfade.website/faq"
         structuredData={faqSchema}
       />
 
@@ -159,56 +160,7 @@ const FAQ: React.FC = () => {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="py-12 px-4 sm:px-6 lg:px-8 bg-surface-50 border-t border-border-subtle">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <h4 className="text-txt-primary font-semibold mb-4">Product</h4>
-              <ul className="space-y-2 text-sm text-txt-muted">
-                <li><Link to="/features" className="hover:text-txt-primary transition-colors">Features</Link></li>
-                <li><Link to="/use-cases" className="hover:text-txt-primary transition-colors">Use Cases</Link></li>
-                <li><Link to="/comparisons" className="hover:text-txt-primary transition-colors">Comparisons</Link></li>
-                <li><Link to="/faq" className="hover:text-txt-primary transition-colors">FAQ</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-txt-primary font-semibold mb-4">Learn</h4>
-              <ul className="space-y-2 text-sm text-txt-muted">
-                <li><Link to="/what-is-learning-decay" className="hover:text-txt-primary transition-colors">What is Learning Decay?</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-txt-primary font-semibold mb-4">Philosophy</h4>
-              <ul className="space-y-2 text-sm text-txt-muted">
-                <li className="flex items-center gap-2">
-                  <Zap className="w-3 h-3 text-accent-400" />
-                  No Gamification
-                </li>
-                <li className="flex items-center gap-2">
-                  <Shield className="w-3 h-3 text-accent-400" />
-                  Privacy First
-                </li>
-                <li className="flex items-center gap-2">
-                  <Palette className="w-3 h-3 text-accent-400" />
-                  Calm Design
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-txt-primary font-semibold mb-4">Legal</h4>
-              <ul className="space-y-2 text-sm text-txt-muted">
-                <li>Self-Hosted</li>
-                <li>Open Source</li>
-                <li>MIT License</li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-border-subtle pt-8 text-center text-sm text-txt-muted">
-            <p>2026 SkillFade. A mirror, not a coach.</p>
-          </div>
-        </div>
-      </footer>
+      <PublicFooter />
     </div>
   );
 };

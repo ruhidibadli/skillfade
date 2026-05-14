@@ -53,7 +53,7 @@ const ResetPassword: React.FC = () => {
     <SEO
       title="Reset Password"
       description="Set a new password for your SkillFade account using your reset link."
-      canonicalUrl="https://skillfade.app/reset-password"
+      canonicalUrl="https://skillfade.website/reset-password"
       noIndex
     />
   );

@@ -68,7 +68,7 @@ export interface ArticleSchema {
 }
 
 // Generator functions
-export const generateOrganizationSchema = (baseUrl: string = "https://skillfade.app"): OrganizationSchema => ({
+export const generateOrganizationSchema = (baseUrl: string = "https://skillfade.website"): OrganizationSchema => ({
   "@context": "https://schema.org",
   "@type": "Organization",
   name: "SkillFade",
@@ -101,7 +101,7 @@ export const generateSoftwareApplicationSchema = (): SoftwareApplicationSchema =
   ]
 });
 
-export const generateWebSiteSchema = (baseUrl: string = "https://skillfade.app"): WebSiteSchema => ({
+export const generateWebSiteSchema = (baseUrl: string = "https://skillfade.website"): WebSiteSchema => ({
   "@context": "https://schema.org",
   "@type": "WebSite",
   name: "SkillFade",
@@ -126,7 +126,7 @@ export const generateArticleSchema = (
   headline: string,
   description: string,
   datePublished: string = "2024-01-01",
-  baseUrl: string = "https://skillfade.app"
+  baseUrl: string = "https://skillfade.website"
 ): ArticleSchema => ({
   "@context": "https://schema.org",
   "@type": "Article",

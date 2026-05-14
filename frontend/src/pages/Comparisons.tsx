@@ -1,9 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Shield, Palette, Zap, Check, X, Minus } from 'lucide-react';
+import { ArrowRight, Check, X, Minus } from 'lucide-react';
 import LogoIcon from '../components/LogoIcon';
 import { SEO } from '../components/SEO';
 import { generateArticleSchema } from '../utils/seo';
+import PublicFooter from '../components/PublicFooter';
 
 interface Comparison {
   competitor: string;
@@ -88,7 +89,7 @@ const Comparisons: React.FC = () => {
       <SEO
         title="SkillFade vs Anki, Notion, Obsidian — Compared"
         description="How SkillFade compares to flashcard apps (Anki), note-taking tools (Notion, Obsidian), knowledge graphs, and spaced repetition apps. A calm mirror versus gamified coaches and memorization tools."
-        canonicalUrl="https://skillfade.app/comparisons"
+        canonicalUrl="https://skillfade.website/comparisons"
         ogType="article"
         structuredData={generateArticleSchema(
           'SkillFade vs Anki, Notion, Obsidian — Compared',
@@ -267,6 +268,62 @@ const Comparisons: React.FC = () => {
             </div>
           </section>
 
+          {/* Dedicated comparison pages */}
+          <section className="mt-16 animate-slide-up">
+            <div className="text-center mb-10">
+              <h2 className="text-2xl font-bold text-txt-primary mb-3">
+                Dedicated Comparisons
+              </h2>
+              <p className="text-txt-secondary max-w-2xl mx-auto">
+                Deep dives on the most-asked head-to-heads. Each page includes a feature table, when-to-use guidance, and how the tools complement each other.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Link
+                to="/compare/anki"
+                className="card-interactive p-6 group"
+              >
+                <h3 className="text-lg font-semibold text-txt-primary mb-2 group-hover:text-accent-400 transition-colors">
+                  SkillFade vs Anki
+                </h3>
+                <p className="text-sm text-txt-secondary mb-4 leading-relaxed">
+                  Spaced repetition for facts versus skill decay tracking for competencies. When to use each.
+                </p>
+                <span className="inline-flex items-center gap-1 text-sm text-accent-400 group-hover:gap-2 transition-all">
+                  Read comparison <ArrowRight className="w-4 h-4" />
+                </span>
+              </Link>
+              <Link
+                to="/compare/notion"
+                className="card-interactive p-6 group"
+              >
+                <h3 className="text-lg font-semibold text-txt-primary mb-2 group-hover:text-accent-400 transition-colors">
+                  SkillFade vs Notion
+                </h3>
+                <p className="text-sm text-txt-secondary mb-4 leading-relaxed">
+                  An all-in-one workspace versus a purpose-built skill decay tracker. Why a Notion template stalls.
+                </p>
+                <span className="inline-flex items-center gap-1 text-sm text-accent-400 group-hover:gap-2 transition-all">
+                  Read comparison <ArrowRight className="w-4 h-4" />
+                </span>
+              </Link>
+              <Link
+                to="/compare/obsidian"
+                className="card-interactive p-6 group"
+              >
+                <h3 className="text-lg font-semibold text-txt-primary mb-2 group-hover:text-accent-400 transition-colors">
+                  SkillFade vs Obsidian
+                </h3>
+                <p className="text-sm text-txt-secondary mb-4 leading-relaxed">
+                  A knowledge graph for connected notes versus a freshness algorithm for time-based decay.
+                </p>
+                <span className="inline-flex items-center gap-1 text-sm text-accent-400 group-hover:gap-2 transition-all">
+                  Read comparison <ArrowRight className="w-4 h-4" />
+                </span>
+              </Link>
+            </div>
+          </section>
+
           {/* CTA Section */}
           <div className="mt-16 text-center">
             <h2 className="text-2xl font-bold text-txt-primary mb-4">
@@ -294,56 +351,7 @@ const Comparisons: React.FC = () => {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="py-12 px-4 sm:px-6 lg:px-8 bg-surface-50 border-t border-border-subtle">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <h4 className="text-txt-primary font-semibold mb-4">Product</h4>
-              <ul className="space-y-2 text-sm text-txt-muted">
-                <li><Link to="/features" className="hover:text-txt-primary transition-colors">Features</Link></li>
-                <li><Link to="/use-cases" className="hover:text-txt-primary transition-colors">Use Cases</Link></li>
-                <li><Link to="/comparisons" className="hover:text-txt-primary transition-colors">Comparisons</Link></li>
-                <li><Link to="/faq" className="hover:text-txt-primary transition-colors">FAQ</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-txt-primary font-semibold mb-4">Learn</h4>
-              <ul className="space-y-2 text-sm text-txt-muted">
-                <li><Link to="/what-is-learning-decay" className="hover:text-txt-primary transition-colors">What is Learning Decay?</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-txt-primary font-semibold mb-4">Philosophy</h4>
-              <ul className="space-y-2 text-sm text-txt-muted">
-                <li className="flex items-center gap-2">
-                  <Zap className="w-3 h-3 text-accent-400" />
-                  No Gamification
-                </li>
-                <li className="flex items-center gap-2">
-                  <Shield className="w-3 h-3 text-accent-400" />
-                  Privacy First
-                </li>
-                <li className="flex items-center gap-2">
-                  <Palette className="w-3 h-3 text-accent-400" />
-                  Calm Design
-                </li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-txt-primary font-semibold mb-4">Legal</h4>
-              <ul className="space-y-2 text-sm text-txt-muted">
-                <li>Self-Hosted</li>
-                <li>Open Source</li>
-                <li>MIT License</li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-border-subtle pt-8 text-center text-sm text-txt-muted">
-            <p>2026 SkillFade. A mirror, not a coach.</p>
-          </div>
-        </div>
-      </footer>
+      <PublicFooter />
     </div>
   );
 };

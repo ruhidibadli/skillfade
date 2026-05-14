@@ -44,7 +44,7 @@ const Register: React.FC = () => {
       <SEO
         title="Create Account"
         description="Create a free SkillFade account to start tracking skill decay, learning balance, and practice gaps. No credit card, no gamification."
-        canonicalUrl="https://skillfade.app/register"
+        canonicalUrl="https://skillfade.website/register"
         noIndex
       />
       {/* Background Effects */}

@@ -1337,7 +1337,7 @@ Full implementation plan lives in `SEO_AND_ANALYTICS_PLAN.md` at the project roo
 
 #### SEO infrastructure files
 - `frontend/public/robots.txt` — Allows public marketing pages, disallows authenticated routes (`/dashboard`, `/skills`, `/analytics`, `/settings`, `/support`, `/admin`, auth pages), links to sitemap.
-- `frontend/public/sitemap.xml` — Static sitemap covering 7 URLs: `/`, `/features`, `/what-is-learning-decay`, `/use-cases`, `/comparisons`, `/faq`, `/privacy`.
+- `frontend/public/sitemap.xml` — Static sitemap covering 12 URLs: `/`, `/features`, `/what-is-learning-decay`, `/learning-vs-practice`, `/skill-decay-formula`, `/use-cases`, `/comparisons`, `/compare/anki`, `/compare/notion`, `/compare/obsidian`, `/faq`, `/privacy`.
 
 #### Per-page SEO updates
 All public pages use the `<SEO />` component (`frontend/src/components/SEO.tsx`) with `react-helmet-async`. Each sets unique title, description, canonical URL, and page-appropriate structured data.
@@ -1369,3 +1369,39 @@ Auth pages (`Login`, `Register`, `ForgotPassword`, `ResetPassword`) use `<SEO no
 #### Files modified summary
 - Created: `RouteTracker.tsx`, `CookieBanner.tsx`, `Privacy.tsx`, `robots.txt`, `sitemap.xml`
 - Modified: `index.html`, `App.tsx`, `vite-env.d.ts`, `Settings.tsx`, `Landing.tsx`, `Features.tsx`, `Comparisons.tsx`, `UseCases.tsx`, `Login.tsx`, `Register.tsx`, `ForgotPassword.tsx`, `ResetPassword.tsx`
+
+### Production Domain (Confirmed 2026-05-14)
+- **Production domain:** `https://skillfade.website`
+- All canonical URLs, structured data `url` fields, Open Graph URLs, sitemap entries, and meta tags reference `skillfade.website`. An earlier draft mistakenly used `skillfade.app`; that's been fully replaced.
+
+### Additional SEO Pages (Added 2026-05-14)
+Five new public marketing pages added to expand keyword coverage and indexable surface area.
+
+#### Comparison pages (`/compare/*`)
+Each is a dedicated landing page targeting a specific competitor keyword. They include TL;DR tables, side-by-side feature breakdowns, honest "when to choose each" sections, and "use them together" guidance to build trust.
+- `frontend/src/pages/compare/Anki.tsx` (`/compare/anki`) — SkillFade vs Anki (flashcards / spaced repetition for facts)
+- `frontend/src/pages/compare/Notion.tsx` (`/compare/notion`) — SkillFade vs Notion (all-in-one workspace)
+- `frontend/src/pages/compare/Obsidian.tsx` (`/compare/obsidian`) — SkillFade vs Obsidian (knowledge graph)
+
+Each uses `<SEO />` with Article schema, sets a canonical URL, and links back to `/comparisons` and `/register`.
+
+#### Pillar content pages
+- `frontend/src/pages/LearningVsPractice.tsx` (`/learning-vs-practice`) — Pillar page on the input/output balance. Covers the ratio formula (`practice_events ÷ learning_events`), interpretation bands (< 0.2, 0.2–0.5, 0.5–1.0, > 1.0), when learning-heavy is fine, and how to fix a low ratio.
+- `frontend/src/pages/SkillDecayFormula.tsx` (`/skill-decay-formula`) — Technical deep dive on the freshness algorithm. Shows the exact formula (`100 × (1 − decay_rate) ^ days_since_practice + learning_boost`), a worked example, decay rate recommendations, and rationale for the exponential model.
+
+#### Route + SEO wiring
+- 5 new routes added in `App.tsx`.
+- All 5 added to `PUBLIC_ROUTES` whitelists in `RouteTracker.tsx` and `CookieBanner.tsx` so GA fires page views on them.
+- All 5 added to `sitemap.xml`.
+
+#### Shared public footer (`PublicFooter.tsx`)
+A single 5-column footer used on every public marketing page so internal link equity flows uniformly to all indexable pages. Columns: Brand + BMC | Product | Learn | Compare | Account + Philosophy.
+
+- `frontend/src/components/PublicFooter.tsx` — the shared component.
+- Used on 12 pages: `Landing`, `Features`, `FAQ`, `WhatIsLearningDecay`, `UseCases`, `Comparisons`, `Privacy`, `LearningVsPractice`, `SkillDecayFormula`, `compare/Anki`, `compare/Notion`, `compare/Obsidian`.
+- Auth pages (`Login`, `Register`, `ForgotPassword`, `ResetPassword`) intentionally do not use it — they're noindex and don't need the footer.
+- In-app pages use the existing `<Layout />` (with its own header/footer for authenticated users).
+
+#### Internal cross-links
+- `Comparisons.tsx` includes a "Dedicated Comparisons" section linking to `/compare/anki`, `/compare/notion`, `/compare/obsidian` to keep the per-competitor pages discoverable from the index.
+- `WhatIsLearningDecay.tsx` includes a "Related Reading" section linking to `/skill-decay-formula` and `/learning-vs-practice` so the new pillar/technical pages are not SEO orphans.

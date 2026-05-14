@@ -31,7 +31,7 @@ const ForgotPassword: React.FC = () => {
       <SEO
         title="Forgot Password"
         description="Reset your SkillFade password. Enter your email and we'll send you a secure reset link."
-        canonicalUrl="https://skillfade.app/forgot-password"
+        canonicalUrl="https://skillfade.website/forgot-password"
         noIndex
       />
       {/* Background Effects */}
