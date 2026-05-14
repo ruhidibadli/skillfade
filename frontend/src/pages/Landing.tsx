@@ -11,9 +11,7 @@ import {
   TrendingUp,
   Bell,
   Shield,
-  Palette,
-  Zap,
-  ArrowUpRight
+  Palette
 } from 'lucide-react';
 import LogoIcon from '../components/LogoIcon';
 import { SEO } from '../components/SEO';
