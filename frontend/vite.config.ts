@@ -46,6 +46,9 @@ export default defineConfig({
           /^\/google[\w-]*\.html$/,
           /^\/api\//
         ],
+        skipWaiting: true,
+        clientsClaim: true,
+        cleanupOutdatedCaches: true,
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,

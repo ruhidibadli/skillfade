@@ -210,9 +210,12 @@ deploy_docker() {
     cd "$PROJECT_DIR"
 
     if [ "$SKIP_BUILD" = false ]; then
-        print_step "Building Docker images..."
-        docker compose -f "$DOCKER_COMPOSE_FILE" build --no-cache
+        print_step "Building Docker images (no cache, latest base images)..."
+        docker compose -f "$DOCKER_COMPOSE_FILE" build --no-cache --pull
         print_success "Images built"
+
+        print_step "Pruning dangling images..."
+        docker image prune -f > /dev/null 2>&1 || true
     fi
 
     print_step "Stopping existing containers..."

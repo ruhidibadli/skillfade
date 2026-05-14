@@ -1,0 +1,16 @@
+node_modules
+dist
+.vite
+.cache
+coverage
+*.log
+.env
+.env.local
+.env.*.local
+.git
+.gitignore
+.DS_Store
+.idea
+.vscode
+*.swp
+README.md
