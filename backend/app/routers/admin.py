@@ -15,6 +15,7 @@ from app.models.category import Category
 from app.models.event import LearningEvent, PracticeEvent
 from app.models.event_template import EventTemplate
 from app.models.ticket import Ticket, TicketReply
+from app.models.subscription import Subscription
 from app.schemas.admin import (
     AdminUserCreate, AdminUserUpdate, AdminUserResponse,
     AdminCategoryCreate, AdminCategoryUpdate, AdminCategoryResponse,
@@ -23,8 +24,11 @@ from app.schemas.admin import (
     AdminPracticeEventCreate, AdminPracticeEventUpdate, AdminPracticeEventResponse,
     AdminEventTemplateCreate, AdminEventTemplateUpdate, AdminEventTemplateResponse,
     AdminTicketUpdate, AdminTicketResponse, AdminTicketDetailResponse, AdminTicketReplyCreate, AdminTicketReplyResponse,
+    AdminPricingResponse, AdminPricingUpdate,
+    AdminSubscriptionResponse,
     AdminDashboardStats
 )
+from app.services import site_settings as ss
 
 router = APIRouter(prefix="/api/admin", tags=["Admin"])
 
@@ -1487,3 +1491,117 @@ def delete_ticket(
 
     db.delete(ticket)
     db.commit()
+
+
+# ==================== Pricing (admin-editable site settings) ====================
+
+
+@router.get("/pricing", response_model=AdminPricingResponse)
+def get_pricing(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_admin_user),
+):
+    """Current lifetime + early-bird AZN prices. `source` indicates whether the
+    value came from the `app_settings` table or the env-var fallback."""
+    lifetime_db = ss.get_setting(db, ss.KEY_LIFETIME_PRICE_AZN)
+    early_db = ss.get_setting(db, ss.KEY_EARLY_BIRD_PRICE_AZN)
+    return AdminPricingResponse(
+        lifetime_price_azn=ss.get_effective_value(db, ss.KEY_LIFETIME_PRICE_AZN),
+        early_bird_price_azn=ss.get_effective_value(db, ss.KEY_EARLY_BIRD_PRICE_AZN),
+        lifetime_source="db" if lifetime_db is not None else "env",
+        early_bird_source="db" if early_db is not None else "env",
+    )
+
+
+@router.patch("/pricing", response_model=AdminPricingResponse)
+def update_pricing(
+    payload: AdminPricingUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_admin_user),
+):
+    """Update lifetime and/or early-bird prices. Validates AZN format (non-negative, ≤2 decimals)."""
+    if payload.lifetime_price_azn is not None:
+        try:
+            value = ss.parse_price(payload.lifetime_price_azn)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=f"lifetime_price_azn: {exc}")
+        ss.set_setting(db, ss.KEY_LIFETIME_PRICE_AZN, format(value, "f"), current_user.id)
+
+    if payload.early_bird_price_azn is not None:
+        try:
+            value = ss.parse_price(payload.early_bird_price_azn)
+        except ValueError as exc:
+            raise HTTPException(status_code=400, detail=f"early_bird_price_azn: {exc}")
+        ss.set_setting(db, ss.KEY_EARLY_BIRD_PRICE_AZN, format(value, "f"), current_user.id)
+
+    db.commit()
+    return get_pricing(db=db, current_user=current_user)
+
+
+# ==================== Subscriptions (Purchasers) — read-only ====================
+
+
+@router.get("/subscriptions", response_model=dict)
+def list_subscriptions(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=100),
+    status_filter: Optional[str] = Query(None, alias="status"),
+    plan: Optional[str] = Query(None),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_admin_user),
+):
+    """List subscription rows for the admin purchasers view.
+
+    Filters by `status` and/or `plan`. Ordered by `purchased_at` desc, then `created_at` desc.
+    Read-only — refunds and edits live in the not-yet-shipped 7.8/7.9 endpoints.
+    """
+    query = (
+        db.query(Subscription, User.email.label("user_email"))
+        .outerjoin(User, Subscription.user_id == User.id)
+    )
+    if status_filter:
+        query = query.filter(Subscription.status == status_filter)
+    if plan:
+        query = query.filter(Subscription.plan == plan)
+
+    total = query.count()
+    offset = (page - 1) * page_size
+    rows = (
+        query.order_by(Subscription.purchased_at.desc().nullslast(), Subscription.created_at.desc())
+        .offset(offset)
+        .limit(page_size)
+        .all()
+    )
+
+    items = []
+    for sub, user_email in rows:
+        items.append({
+            "id": sub.id,
+            "user_id": sub.user_id,
+            "user_email": user_email,
+            "plan": sub.plan,
+            "status": sub.status,
+            "provider": sub.provider,
+            "order_id": sub.order_id,
+            "epoint_transaction": sub.epoint_transaction,
+            "epoint_bank_transaction": sub.epoint_bank_transaction,
+            "epoint_rrn": sub.epoint_rrn,
+            "epoint_code": sub.epoint_code,
+            "card_mask": sub.card_mask,
+            "card_name": sub.card_name,
+            "amount": format(sub.amount, "f") if sub.amount is not None else None,
+            "currency": sub.currency,
+            "purchased_at": sub.purchased_at,
+            "refunded_at": sub.refunded_at,
+            "notes": sub.notes,
+            "created_at": sub.created_at,
+            "updated_at": sub.updated_at,
+        })
+
+    return {
+        "items": items,
+        "total": total,
+        "page": page,
+        "page_size": page_size,
+        "total_pages": (total + page_size - 1) // page_size if total else 0,
+    }

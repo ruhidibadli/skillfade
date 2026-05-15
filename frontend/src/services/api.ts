@@ -34,7 +34,10 @@ import type {
   ActivityLog,
   ActivityLogCreate,
   AdminActivityLog,
-  ActivityLogStats
+  ActivityLogStats,
+  PlanResponse,
+  AdminPricing,
+  AdminSubscription
 } from '../types';
 
 const API_URL = import.meta.env.VITE_API_URL || '/api';
@@ -357,6 +360,17 @@ export const admin = {
 
   deleteTicket: (id: string) =>
     api.delete(`/admin/tickets/${id}`),
+
+  // Pricing (site-wide editable settings)
+  getPricing: () =>
+    api.get<AdminPricing>('/admin/pricing'),
+
+  updatePricing: (data: { lifetime_price_azn?: string; early_bird_price_azn?: string }) =>
+    api.patch<AdminPricing>('/admin/pricing', data),
+
+  // Subscriptions / Purchasers (read-only)
+  listSubscriptions: (params?: { page?: number; page_size?: number; status?: string; plan?: string }) =>
+    api.get<PaginatedResponse<AdminSubscription>>('/admin/subscriptions', { params }),
 };
 
 // Tickets (User)
@@ -372,6 +386,11 @@ export const tickets = {
 
   addReply: (id: string, data: { message: string }) =>
     api.post<TicketReply>(`/tickets/${id}/replies`, data),
+};
+
+// Billing
+export const billing = {
+  me: () => api.get<PlanResponse>('/billing/me'),
 };
 
 // Activity Logs (Public endpoint for creating logs)

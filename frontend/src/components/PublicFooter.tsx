@@ -82,6 +82,12 @@ const PublicFooter: React.FC = () => {
                 <Link to="/login" className="hover:text-accent-400 transition-colors">Sign In</Link>
               </li>
               <li>
+                <Link to="/about" className="hover:text-accent-400 transition-colors">About</Link>
+              </li>
+              <li>
+                <Link to="/contact" className="hover:text-accent-400 transition-colors">Contact</Link>
+              </li>
+              <li>
                 <Link to="/privacy" className="hover:text-accent-400 transition-colors">Privacy</Link>
               </li>
             </ul>

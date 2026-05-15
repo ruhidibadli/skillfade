@@ -247,6 +247,46 @@ class AdminTicketDetailResponse(AdminTicketResponse):
     replies: List[AdminTicketReplyResponse] = []
 
 
+# ==================== Pricing Schemas ====================
+class AdminPricingResponse(BaseModel):
+    lifetime_price_azn: str
+    early_bird_price_azn: str
+    lifetime_source: str  # 'db' or 'env'
+    early_bird_source: str  # 'db' or 'env'
+
+
+class AdminPricingUpdate(BaseModel):
+    lifetime_price_azn: Optional[str] = Field(None, max_length=20)
+    early_bird_price_azn: Optional[str] = Field(None, max_length=20)
+
+
+# ==================== Subscription (Purchaser) Schemas ====================
+class AdminSubscriptionResponse(BaseModel):
+    id: UUID
+    user_id: UUID
+    user_email: Optional[str] = None
+    plan: str
+    status: str
+    provider: str
+    order_id: Optional[str] = None
+    epoint_transaction: Optional[str] = None
+    epoint_bank_transaction: Optional[str] = None
+    epoint_rrn: Optional[str] = None
+    epoint_code: Optional[str] = None
+    card_mask: Optional[str] = None
+    card_name: Optional[str] = None
+    amount: Optional[str] = None  # serialized to string to avoid Decimal/JSON ambiguity
+    currency: str
+    purchased_at: Optional[datetime] = None
+    refunded_at: Optional[datetime] = None
+    notes: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
 # ==================== Stats Schemas ====================
 class AdminDashboardStats(BaseModel):
     total_users: int

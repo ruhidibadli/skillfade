@@ -25,3 +25,4 @@ class User(Base):
     categories = relationship("Category", back_populates="user", cascade="all, delete-orphan")
     tickets = relationship("Ticket", back_populates="user", cascade="all, delete-orphan")
     ticket_replies = relationship("TicketReply", back_populates="user", cascade="all, delete-orphan")
+    subscriptions = relationship("Subscription", back_populates="user", cascade="all, delete-orphan")
