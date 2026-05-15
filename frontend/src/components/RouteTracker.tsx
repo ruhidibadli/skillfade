@@ -19,6 +19,8 @@ const PUBLIC_ROUTES = new Set<string>([
   '/forgot-password',
   '/reset-password',
   '/privacy',
+  '/about',
+  '/contact',
 ]);
 
 const RouteTracker: React.FC = () => {

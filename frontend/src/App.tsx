@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { PlanProvider } from './context/PlanContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { OnboardingProvider } from './context/OnboardingContext';
 import Layout from './components/Layout';
@@ -19,6 +20,8 @@ import CompareAnki from './pages/compare/Anki';
 import CompareNotion from './pages/compare/Notion';
 import CompareObsidian from './pages/compare/Obsidian';
 import Privacy from './pages/Privacy';
+import About from './pages/About';
+import Contact from './pages/Contact';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
@@ -41,7 +44,9 @@ import {
   AdminTemplates,
   AdminTickets,
   AdminTicketDetail,
-  AdminActivityLogs
+  AdminActivityLogs,
+  AdminPricing,
+  AdminPurchasers
 } from './pages/admin';
 import { ActivityLoggerWrapper } from './hooks/useActivityLogger';
 import RouteTracker from './components/RouteTracker';
@@ -57,6 +62,7 @@ function App() {
     <HelmetProvider>
       <ThemeProvider>
         <AuthProvider>
+          <PlanProvider>
           <OnboardingProvider>
             <BrowserRouter>
               <RouteTracker />
@@ -76,6 +82,8 @@ function App() {
               <Route path="/learning-vs-practice" element={<LearningVsPractice />} />
               <Route path="/skill-decay-formula" element={<SkillDecayFormula />} />
               <Route path="/privacy" element={<Privacy />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/contact" element={<Contact />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -228,12 +236,29 @@ function App() {
                     </AdminProtectedRoute>
                   }
                 />
+                <Route
+                  path="/admin/pricing"
+                  element={
+                    <AdminProtectedRoute>
+                      <AdminPricing />
+                    </AdminProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/purchasers"
+                  element={
+                    <AdminProtectedRoute>
+                      <AdminPurchasers />
+                    </AdminProtectedRoute>
+                  }
+                />
               </Route>
               <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
               </ActivityLoggerWrapper>
             </BrowserRouter>
           </OnboardingProvider>
+          </PlanProvider>
         </AuthProvider>
       </ThemeProvider>
     </HelmetProvider>

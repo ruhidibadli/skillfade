@@ -85,7 +85,7 @@ const Privacy: React.FC = () => {
                 Pages where analytics fires:
               </p>
               <p className="text-txt-muted text-sm font-mono leading-relaxed">
-                / · /features · /faq · /what-is-learning-decay · /use-cases · /comparisons · /login · /register · /forgot-password · /reset-password · /privacy
+                / · /features · /faq · /what-is-learning-decay · /use-cases · /comparisons · /login · /register · /forgot-password · /reset-password · /privacy · /about · /contact
               </p>
             </section>
 

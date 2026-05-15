@@ -5,5 +5,7 @@ from app.models.event_template import EventTemplate
 from app.models.category import Category
 from app.models.ticket import Ticket, TicketReply
 from app.models.activity_log import ActivityLog
+from app.models.subscription import Subscription
+from app.models.app_setting import AppSetting
 
-__all__ = ["User", "Skill", "LearningEvent", "PracticeEvent", "EventTemplate", "Category", "Ticket", "TicketReply", "ActivityLog"]
+__all__ = ["User", "Skill", "LearningEvent", "PracticeEvent", "EventTemplate", "Category", "Ticket", "TicketReply", "ActivityLog", "Subscription", "AppSetting"]

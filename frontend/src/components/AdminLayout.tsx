@@ -12,7 +12,9 @@ import {
   LogOut,
   ArrowLeft,
   MessageSquare,
-  Activity
+  Activity,
+  Tag,
+  CreditCard
 } from 'lucide-react';
 import LogoIcon from './LogoIcon';
 
@@ -36,6 +38,8 @@ const AdminLayout: React.FC = () => {
     { path: '/admin/templates', label: 'Templates', icon: FileText },
     { path: '/admin/tickets', label: 'Tickets', icon: MessageSquare },
     { path: '/admin/activity-logs', label: 'Activity', icon: Activity },
+    { path: '/admin/pricing', label: 'Pricing', icon: Tag },
+    { path: '/admin/purchasers', label: 'Purchasers', icon: CreditCard },
   ];
 
   const isActive = (path: string, exact?: boolean) => {

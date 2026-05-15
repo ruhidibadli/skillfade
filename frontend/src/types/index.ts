@@ -6,6 +6,56 @@ export interface User {
   created_at: string;
 }
 
+export type Plan = 'free' | 'lifetime' | 'grandfathered';
+
+export interface PlanLimits {
+  skills: number | null;
+  categories: number | null;
+  templates: number | null;
+  history_days: number | null;
+}
+
+export interface PlanResponse {
+  plan: Plan;
+  is_pro: boolean;
+  status: 'active' | null;
+  purchased_at: string | null;
+  refunded_at: string | null;
+  amount: number | null;
+  currency: string;
+  limits: PlanLimits;
+}
+
+export interface AdminPricing {
+  lifetime_price_azn: string;
+  early_bird_price_azn: string;
+  lifetime_source: 'db' | 'env';
+  early_bird_source: 'db' | 'env';
+}
+
+export interface AdminSubscription {
+  id: string;
+  user_id: string;
+  user_email: string | null;
+  plan: string;
+  status: string;
+  provider: string;
+  order_id: string | null;
+  epoint_transaction: string | null;
+  epoint_bank_transaction: string | null;
+  epoint_rrn: string | null;
+  epoint_code: string | null;
+  card_mask: string | null;
+  card_name: string | null;
+  amount: string | null;
+  currency: string;
+  purchased_at: string | null;
+  refunded_at: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 // Admin Types
 export interface AdminUser {
   id: string;

@@ -158,6 +158,7 @@ updated_at      TIMESTAMP DEFAULT NOW()
 - Has many categories (cascade delete)
 - Has many tickets (cascade delete)
 - Has many ticket_replies (cascade delete)
+- Has many subscriptions (cascade delete)
 
 ### Categories Table
 ```sql
@@ -289,6 +290,57 @@ INDEX(ticket_id)
 - Belongs to ticket
 - Belongs to user
 
+### Subscriptions Table (Phase 7 - Payment Foundation)
+```sql
+id                      UUID PRIMARY KEY DEFAULT gen_random_uuid()
+user_id                 UUID REFERENCES users(id) ON DELETE CASCADE
+plan                    VARCHAR(20) NOT NULL          -- 'free', 'lifetime', 'grandfathered'
+status                  VARCHAR(20) NOT NULL          -- 'pending', 'active', 'refunded', 'revoked', 'failed'
+provider                VARCHAR(20) NOT NULL DEFAULT 'epoint'  -- 'epoint', 'manual'
+order_id                VARCHAR(64) UNIQUE
+epoint_transaction      VARCHAR(64)
+epoint_bank_transaction VARCHAR(64)
+epoint_rrn              VARCHAR(32)
+epoint_code             VARCHAR(8)
+card_mask               VARCHAR(20)
+card_name               VARCHAR(100)
+purchased_at            TIMESTAMP
+refunded_at             TIMESTAMP
+amount                  NUMERIC(10, 2)
+currency                VARCHAR(3) NOT NULL DEFAULT 'AZN'
+raw_callback            JSONB DEFAULT '{}'
+notes                   TEXT
+created_at              TIMESTAMP DEFAULT NOW()
+updated_at              TIMESTAMP DEFAULT NOW()
+INDEX(user_id)
+INDEX(status)
+UNIQUE INDEX(order_id)
+```
+
+**Relationships:**
+- Belongs to user
+
+**Entitlement rule:** a user is PRO when any subscription row has `status='active'` AND `plan IN ('lifetime', 'grandfathered')`. Implemented in `app/services/entitlements.py`.
+
+**Grandfather migration (0010):** every pre-existing user receives one row with `plan='grandfathered'`, `status='active'`, `provider='manual'`, `notes='Auto-granted: registered before payment launch'`. Idempotent — re-running is safe.
+
+### App Settings Table (Phase 7 - Admin-editable site settings)
+```sql
+id                  UUID PRIMARY KEY DEFAULT gen_random_uuid()
+key                 VARCHAR(64) NOT NULL UNIQUE
+value               TEXT NOT NULL
+updated_by_user_id  UUID REFERENCES users(id) ON DELETE SET NULL
+created_at          TIMESTAMP DEFAULT NOW()
+updated_at          TIMESTAMP DEFAULT NOW()
+UNIQUE INDEX(key)
+```
+
+**Purpose:** generic key/value store for site-wide settings that admins can edit at runtime without redeploying. Reads go through `app/services/site_settings.py:get_effective_value(...)`, which falls back to the matching `EPOINT_*` env var when no row exists.
+
+**Recognized keys (current):**
+- `lifetime_price_azn` — overrides `EPOINT_LIFETIME_PRICE_AZN`
+- `early_bird_price_azn` — overrides `EPOINT_EARLY_BIRD_PRICE_AZN`
+
 ---
 
 ## Core Algorithms
@@ -408,6 +460,16 @@ Interpretation:
 - `POST /tickets` - Create new support ticket
 - `GET /tickets/:id` - Get ticket with replies
 - `POST /tickets/:id/replies` - Add reply to ticket
+
+### Billing (`/billing/*`) - Phase 7
+- `GET /billing/me` - Current user's plan + entitlements (used by frontend `PlanContext`). Response: `{plan, is_pro, status, purchased_at, refunded_at, amount, currency, limits}`.
+
+### Admin Pricing (`/admin/pricing`) - Phase 7
+- `GET /admin/pricing` - Current AZN prices for lifetime + early-bird, with a `source` field per value (`db` if overridden, `env` if falling back to the env var).
+- `PATCH /admin/pricing` - Update one or both prices. Validates AZN format (non-negative, ≤2 decimals). Persisted to `app_settings`.
+
+### Admin Subscriptions / Purchasers (`/admin/subscriptions`) - Phase 7
+- `GET /admin/subscriptions?page=N&page_size=20&status=active&plan=lifetime` - Read-only paginated list of subscription rows, joined with `user.email`. Ordered by `purchased_at` desc, then `created_at` desc. Refund and edit endpoints come with 7.8 / 7.9.
 
 ### Health
 - `GET /health` - Health check endpoint
@@ -547,9 +609,10 @@ d:\skillfade/
 ├── backend/
 │   ├── app/
 │   │   ├── core/
-│   │   │   ├── config.py          # Settings (Pydantic BaseSettings)
+│   │   │   ├── config.py          # Settings (Pydantic BaseSettings) — incl. EPOINT_* keys
 │   │   │   ├── database.py        # SQLAlchemy engine, session factory
 │   │   │   ├── security.py        # JWT, password hashing
+│   │   │   ├── epoint.py          # Epoint.az signature builder/verifier + stub HTTP methods (Phase 7)
 │   │   │   └── __init__.py
 │   │   ├── models/
 │   │   │   ├── user.py            # User model
@@ -558,6 +621,9 @@ d:\skillfade/
 │   │   │   ├── event.py           # LearningEvent, PracticeEvent models
 │   │   │   ├── event_template.py  # EventTemplate model (Phase 1)
 │   │   │   ├── ticket.py          # Ticket, TicketReply models
+│   │   │   ├── activity_log.py    # ActivityLog model
+│   │   │   ├── subscription.py    # Subscription model (Phase 7)
+│   │   │   ├── app_setting.py     # AppSetting key/value model (Phase 7)
 │   │   │   └── __init__.py
 │   │   ├── routers/
 │   │   │   ├── auth.py            # Auth endpoints
@@ -568,6 +634,8 @@ d:\skillfade/
 │   │   │   ├── settings.py        # Settings endpoints
 │   │   │   ├── templates.py       # Event template CRUD endpoints (Phase 1)
 │   │   │   ├── tickets.py         # User ticket endpoints
+│   │   │   ├── logs.py            # Activity log endpoints
+│   │   │   ├── billing.py         # GET /api/billing/me (Phase 7)
 │   │   │   ├── admin.py           # Admin panel CRUD endpoints for all tables (includes tickets)
 │   │   │   └── __init__.py
 │   │   ├── schemas/
@@ -577,12 +645,16 @@ d:\skillfade/
 │   │   │   ├── event.py           # Pydantic schemas for events
 │   │   │   ├── event_template.py  # Pydantic schemas for templates (Phase 1)
 │   │   │   ├── ticket.py          # Pydantic schemas for tickets
+│   │   │   ├── activity_log.py    # Pydantic schemas for activity logs
+│   │   │   ├── subscription.py    # SubscriptionSummary + SubscriptionResponse (Phase 7)
 │   │   │   ├── admin.py           # Admin-specific Pydantic schemas (includes tickets)
 │   │   │   └── __init__.py
 │   │   ├── services/
 │   │   │   ├── auth.py            # Auth business logic
 │   │   │   ├── freshness.py       # Freshness calculation algorithms (includes history + personal records)
 │   │   │   ├── alerts.py          # Alert checking and sending
+│   │   │   ├── entitlements.py    # PlanInfo, get_user_plan, can_use_feature, require_pro (Phase 7)
+│   │   │   ├── site_settings.py   # Admin-editable key/value settings with env-var fallback (Phase 7)
 │   │   │   └── __init__.py
 │   │   └── main.py                # FastAPI app, CORS, router includes
 │   ├── alembic/
@@ -593,11 +665,20 @@ d:\skillfade/
 │   │   │   ├── 20260110_0004-phase6_features.py  # Notes + skill dependencies
 │   │   │   ├── 20260112_0005-category_as_object.py  # Categories as objects with FK
 │   │   │   ├── 20260113_0006-admin_panel.py      # Admin panel - is_admin field
-│   │   │   └── 20260115_0007-tickets_system.py   # Tickets and ticket replies tables
+│   │   │   ├── 20260115_0007-tickets_system.py   # Tickets and ticket replies tables
+│   │   │   ├── 20260120_0008-activity_logs.py    # Activity log tracking
+│   │   │   ├── 20260515_0009-subscriptions.py    # Subscriptions table (Phase 7)
+│   │   │   ├── 20260515_0010-grandfather_users.py # Grandfather all existing users to PRO (Phase 7)
+│   │   │   └── 20260515_0011-app_settings.py     # Admin-editable key/value settings (Phase 7)
 │   │   └── env.py
 │   ├── tests/
+│   │   ├── conftest.py            # Shared SQLite session + TestClient fixtures (Phase 7) — uses StaticPool so commits don't drop the in-memory schema
 │   │   ├── test_auth.py
 │   │   ├── test_freshness.py
+│   │   ├── test_epoint.py         # Epoint signature tests incl. byte-exact doc fixture (Phase 7)
+│   │   ├── test_entitlements.py   # Entitlement service + /api/billing/me tests (Phase 7)
+│   │   ├── test_pricing.py        # site_settings service + /api/admin/pricing tests (Phase 7)
+│   │   ├── test_admin_subscriptions.py # /api/admin/subscriptions (purchasers) tests (Phase 7)
 │   │   └── __init__.py
 │   ├── alembic.ini               # Alembic config
 │   ├── Dockerfile
@@ -618,11 +699,13 @@ d:\skillfade/
 │   │   │   ├── QuickLogWidget.tsx   # Floating quick log button (Phase 1)
 │   │   │   ├── OnboardingWizard.tsx # 13-step onboarding wizard for first-time users
 │   │   │   ├── BuyMeACoffee.tsx     # Subtle support button component (link/button/card variants)
+│   │   │   ├── ProGate.tsx          # Inline PRO gate — renders children if isPro, else placeholder (Phase 7)
 │   │   │   └── admin/
 │   │   │       └── Pagination.tsx   # Reusable pagination for admin tables
 │   │   ├── context/
 │   │   │   ├── AuthContext.tsx
-│   │   │   ├── ThemeContext.tsx     # Dark/Light theme management
+│   │   │   ├── PlanContext.tsx       # Current user plan + entitlements (Phase 7)
+│   │   │   ├── ThemeContext.tsx      # Dark/Light theme management
 │   │   │   └── OnboardingContext.tsx # Onboarding wizard state management
 │   │   ├── pages/
 │   │   │   ├── Landing.tsx          # Marketing homepage + BuyMeACoffee footer link
@@ -649,11 +732,16 @@ d:\skillfade/
 │   │   │       ├── AdminPracticeEvents.tsx
 │   │   │       ├── AdminTemplates.tsx
 │   │   │       ├── AdminTickets.tsx     # Admin ticket list and management
-│   │   │       └── AdminTicketDetail.tsx # Admin ticket detail with status updates
+│   │   │       ├── AdminTicketDetail.tsx # Admin ticket detail with status updates
+│   │   │       ├── AdminPricing.tsx     # Edit lifetime + early-bird AZN prices (Phase 7)
+│   │   │       └── AdminPurchasers.tsx  # Read-only list of subscription rows (Phase 7)
+│   │   ├── hooks/
+│   │   │   ├── useActivityLogger.tsx # Activity log tracking wrapper
+│   │   │   └── usePlan.ts            # usePlan / useIsPro / useFeatureLimit (Phase 7)
 │   │   ├── services/
-│   │   │   └── api.ts            # Axios client, all API calls (includes categories)
+│   │   │   └── api.ts            # Axios client, all API calls (incl. billing.me())
 │   │   ├── types/
-│   │   │   └── index.ts          # TypeScript interfaces (includes Category, CategoryInfo)
+│   │   │   └── index.ts          # TypeScript interfaces (incl. Plan, PlanLimits, PlanResponse)
 │   │   ├── tests/
 │   │   │   └── App.test.tsx
 │   │   ├── App.tsx               # Routes, AuthContext provider
@@ -719,6 +807,18 @@ MAX_ALERTS_PER_WEEK=1
 
 # Environment
 ENVIRONMENT=development
+
+# Epoint.az Payment Provider (Phase 7)
+# Public/private keys are issued by Epoint after merchant verification.
+# Leave blank for foundation work; checkout flow requires real values.
+EPOINT_PUBLIC_KEY=
+EPOINT_PRIVATE_KEY=
+EPOINT_BASE_URL=https://epoint.az/api/1
+EPOINT_RESULT_URL=https://skillfade.website/api/webhooks/epoint
+EPOINT_SUCCESS_URL=https://skillfade.website/billing/success
+EPOINT_ERROR_URL=https://skillfade.website/billing/error
+EPOINT_LIFETIME_PRICE_AZN=49.00
+EPOINT_EARLY_BIRD_PRICE_AZN=35.00
 ```
 
 ### Docker Compose Setup
@@ -1405,3 +1505,36 @@ A single 5-column footer used on every public marketing page so internal link eq
 #### Internal cross-links
 - `Comparisons.tsx` includes a "Dedicated Comparisons" section linking to `/compare/anki`, `/compare/notion`, `/compare/obsidian` to keep the per-competitor pages discoverable from the index.
 - `WhatIsLearningDecay.tsx` includes a "Related Reading" section linking to `/skill-decay-formula` and `/learning-vs-practice` so the new pillar/technical pages are not SEO orphans.
+
+### PWA + Deployment Hardening (Added 2026-05-14)
+Three issues surfaced after the SEO deploy and were addressed:
+
+1. **Service worker was shadowing `/sitemap.xml` and `/robots.txt`.** The PWA service worker's `navigateFallback` was returning `index.html` for any path it didn't recognize, so SEO-critical static files redirected to the React app (which then bounced authenticated users to `/dashboard`). Fixed by adding `navigateFallbackDenylist` in `frontend/vite.config.ts`:
+   ```ts
+   navigateFallbackDenylist: [
+     /^\/sitemap\.xml$/,
+     /^\/robots\.txt$/,
+     /^\/google[\w-]*\.html$/,
+     /^\/api\//
+   ]
+   ```
+   Note: Googlebot doesn't run service workers, so production indexing wasn't affected — but human verification in a browser was broken until this fix.
+
+2. **Service worker updates didn't propagate without manual unregister.** By default, a new SW waits in the "waiting" state until every tab on the domain closes. Added three workbox flags so the new SW activates immediately on next page load:
+   ```ts
+   skipWaiting: true,
+   clientsClaim: true,
+   cleanupOutdatedCaches: true
+   ```
+   This means future deploys auto-propagate on hard-refresh without user intervention.
+
+3. **Frontend build was missing `.dockerignore`.** `COPY . .` in `Dockerfile.prod` was pulling the host's `node_modules`, `dist`, and Vite cache into the build context — potentially masking source changes and slowing builds. Created `frontend/.dockerignore` excluding `node_modules`, `dist`, `.vite`, `.cache`, `.env*`, `.git`, IDE files, etc.
+
+4. **`scripts/deploy.sh` hardened.** Added `--pull` to refresh base image metadata and `docker image prune -f` after build to keep disk usage in check. The pre-existing `--no-cache` flag was already correct — "CACHED" lines users see in build output for base-image metadata loads are normal.
+
+#### Files modified
+- Created: `frontend/.dockerignore`
+- Modified: `frontend/vite.config.ts` (workbox config), `scripts/deploy.sh` (build step)
+
+#### Note for future deploys
+The PWA service worker is enabled in production. If a deploy makes static-file routing changes or adds new client-side routes, also check that the new paths aren't shadowed by `navigateFallback` (workbox returns `index.html` for unknown paths by default). Add explicit denylist entries when in doubt.
