@@ -1538,3 +1538,18 @@ Three issues surfaced after the SEO deploy and were addressed:
 
 #### Note for future deploys
 The PWA service worker is enabled in production. If a deploy makes static-file routing changes or adds new client-side routes, also check that the new paths aren't shadowed by `navigateFallback` (workbox returns `index.html` for unknown paths by default). Add explicit denylist entries when in doubt.
+
+### Cache-Header Hardening (Added 2026-05-15)
+Follow-up to the 2026-05-14 PWA section. Users reported that UI updates weren't visible in production for returning visitors on any route — incognito always saw the new build, normal browser sessions stayed on the old one indefinitely.
+
+**Root cause:** `frontend/nginx.prod.conf` had a regex location `~* \.(js|css|...)$` applying `expires 1y; immutable` to every JavaScript file, and a separate plain-prefix `location /sw.js` block intended to opt the service worker out. Nginx evaluates regex locations **before** plain-prefix locations, so the regex won and `sw.js` was served with `Cache-Control: public, immutable; expires 1y`. The SW was frozen on the user's first visit and never updated — silently invalidating the `skipWaiting + clientsClaim + cleanupOutdatedCaches` flags from 2026-05-14, because the new SW was never fetched in the first place. HTML responses (every SPA route falls back to `/index.html` via `try_files`) also had no explicit cache directive, so browsers were free to serve stale `index.html` heuristically — pointing at outdated hashed bundle filenames.
+
+**Fix:** In `frontend/nginx.prod.conf`, replaced the SW location with exact-match (`=`) blocks for `/sw.js`, `/registerSW.js`, and `/manifest.webmanifest`, all set to `Cache-Control: no-cache, no-store, must-revalidate`. Exact `=` locations win over regex in nginx, so these reliably override the static-asset block. Added the same headers to `location /` so every HTML response (i.e. every SPA route) is revalidated and picks up the latest hashed bundle names. Hashed static assets (`/assets/index-abc123.js`) keep `immutable, 1y` — safe because Vite changes the hash on every build.
+
+**One-time impact on existing users:** Users who visited before this fix have a frozen SW in their browser. After this deploy they need to hard-refresh twice (first refresh fetches and installs the new SW, second serves fresh content) or unregister the SW via DevTools → Application → Service Workers. From the next deploy onward, updates propagate automatically on the next page load.
+
+#### Files modified
+- Modified: `frontend/nginx.prod.conf`
+
+#### Note for future deploys
+When adding an nginx `location` block intended to override the static-asset regex `~* \.(js|css|...)$`, always use exact-match (`location = /path`). Plain-prefix `location /path` is evaluated **after** regex and will be silently overridden — this is the nginx location-precedence gotcha that froze `sw.js` for months.
