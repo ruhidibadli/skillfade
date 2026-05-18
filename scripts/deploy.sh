@@ -218,29 +218,8 @@ deploy_docker() {
         docker image prune -f > /dev/null 2>&1 || true
     fi
 
-    print_step "Stopping existing containers..."
-    docker compose -f "$DOCKER_COMPOSE_FILE" down
-
-    print_step "Starting containers..."
-    docker compose -f "$DOCKER_COMPOSE_FILE" up -d
-
-    # Wait for services to be ready
-    print_step "Waiting for services to start..."
-    sleep 10
-
-    # Check if backend is healthy
-    local retries=30
-    while [ $retries -gt 0 ]; do
-        if docker exec skillfade_backend curl -s http://localhost:8000/health > /dev/null 2>&1; then
-            break
-        fi
-        retries=$((retries - 1))
-        sleep 2
-    done
-
-    if [ $retries -eq 0 ]; then
-        print_warning "Backend may not be fully ready"
-    fi
+    print_step "Recreating containers in-place (nginx stays up)..."
+    docker compose -f "$DOCKER_COMPOSE_FILE" up -d --wait --remove-orphans
 
     print_success "Containers started"
 }
