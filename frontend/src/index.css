@@ -89,6 +89,48 @@
            active:scale-[0.98];
   }
 
+  /* Header nav links (public) — quiet text links with an ink-rule underline
+     when active, echoing an almanac index rather than app pills. */
+  .nav-link-public {
+    @apply relative px-3 py-2 text-sm font-medium text-txt-secondary rounded-lg
+           transition-colors duration-200
+           hover:text-txt-primary hover:bg-surface-300
+           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/60;
+  }
+
+  .nav-link-public-active {
+    @apply text-accent-400;
+  }
+
+  /* The active rule fades sage → transparent: the product motif in 2px. */
+  .nav-link-public-active::after {
+    content: '';
+    position: absolute;
+    left: 0.75rem;
+    right: 0.75rem;
+    bottom: 0.125rem;
+    height: 2px;
+    border-radius: 9999px;
+    background: linear-gradient(90deg, #8FB382 0%, rgba(143, 179, 130, 0.25) 100%);
+  }
+
+  /* Disclosure menus — the mobile slide-down panels and the desktop account
+     dropdown share the same row styling. */
+  .menu-panel {
+    @apply border-t border-b border-border-subtle bg-surface-200/95 backdrop-blur-xl shadow-card;
+  }
+
+  .menu-item {
+    @apply flex items-center gap-3 px-3 py-3 rounded-lg text-[15px] font-medium
+           text-txt-secondary transition-colors duration-200
+           hover:text-txt-primary hover:bg-surface-300
+           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-400/60;
+  }
+
+  .menu-item-active {
+    @apply text-accent-400 bg-accent-400/10;
+  }
+
   /* Input Styles */
   .input {
     @apply w-full px-4 py-3 bg-surface-300 border border-border rounded-lg

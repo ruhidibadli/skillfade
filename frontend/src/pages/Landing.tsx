@@ -15,13 +15,13 @@ import {
 } from 'lucide-react';
 import LogoIcon from '../components/LogoIcon';
 import { SEO } from '../components/SEO';
-import BuyMeACoffee from '../components/BuyMeACoffee';
 import PublicFooter from '../components/PublicFooter';
 import {
   generateOrganizationSchema,
   generateSoftwareApplicationSchema,
   generateWebSiteSchema
 } from '../utils/seo';
+import PublicHeader from '../components/PublicHeader';
 
 // Freshness Indicator Component
 const FreshnessIndicator: React.FC<{ level: 'fresh' | 'aging' | 'decayed'; size?: 'sm' | 'md' | 'lg' }> = ({
@@ -62,43 +62,10 @@ const Landing: React.FC = () => {
       />
 
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-surface-200/80 backdrop-blur-xl border-b border-border-subtle">
-        <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-accent-400 to-secondary-400 flex items-center justify-center shadow-glow-accent">
-                <LogoIcon className="w-5 h-5 text-surface-50" />
-              </div>
-              <span className="font-display text-xl font-semibold tracking-tight text-txt-primary">SkillFade</span>
-              <span className="tag-accent text-[10px] uppercase tracking-wider">Beta</span>
-            </div>
-            <div className="hidden md:flex items-center gap-6 text-sm">
-              <Link to="/what-is-learning-decay" className="text-txt-secondary hover:text-txt-primary transition-colors">What is Learning Decay?</Link>
-              <Link to="/use-cases" className="text-txt-secondary hover:text-txt-primary transition-colors">Use Cases</Link>
-              <Link to="/faq" className="text-txt-secondary hover:text-txt-primary transition-colors">FAQ</Link>
-            </div>
-            <div className="flex items-center gap-4">
-              <BuyMeACoffee variant="button" className="hidden sm:inline-flex" />
-              <Link
-                to="/login"
-                className="btn-ghost"
-              >
-                Sign In
-              </Link>
-              <Link
-                to="/register"
-                className="btn-primary flex items-center gap-2"
-              >
-                Get Started
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
-          </div>
-        </nav>
-      </header>
+      <PublicHeader />
 
       {/* Hero Section - AI-Optimized */}
-      <section className="relative pt-32 pb-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
+      <section id="main" className="relative pt-32 pb-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
         {/* Background Effects */}
         <div className="absolute top-20 left-1/4 w-96 h-96 bg-accent-400/5 rounded-full blur-3xl" />
         <div className="absolute bottom-20 right-1/4 w-96 h-96 bg-secondary-400/5 rounded-full blur-3xl" />

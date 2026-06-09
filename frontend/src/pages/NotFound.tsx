@@ -22,7 +22,7 @@ const NotFound: React.FC = () => {
       />
       <PublicHeader />
 
-      <main className="flex-1 pt-32 pb-24 px-4 sm:px-6 lg:px-8">
+      <main id="main" className="flex-1 pt-32 pb-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-2xl mx-auto text-center animate-fade-in">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-accent-400/10 mb-8">
             <Compass className="w-8 h-8 text-accent-400" />

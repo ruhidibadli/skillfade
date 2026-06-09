@@ -11,8 +11,9 @@ interface BuyMeACoffeeProps {
  * - button: Small button style (for more prominent placement)
  * - card: Card with description (for settings page)
  */
+export const coffeeUrl = 'https://buymeacoffee.com/astoicone';
+
 export default function BuyMeACoffee({ variant = 'link', className = '' }: BuyMeACoffeeProps) {
-  const coffeeUrl = 'https://buymeacoffee.com/astoicone';
 
   if (variant === 'card') {
     return (

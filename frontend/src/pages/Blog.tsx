@@ -33,7 +33,7 @@ const Blog: React.FC = () => {
       />
       <PublicHeader />
 
-      <main className="pt-32 pb-24 px-4 sm:px-6 lg:px-8">
+      <main id="main" className="pt-32 pb-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mx-auto">
           <header className="text-center mb-16 animate-fade-in">
             <p className="label-caps text-txt-muted mb-3">The SkillFade Blog</p>
