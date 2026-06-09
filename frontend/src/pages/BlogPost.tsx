@@ -8,7 +8,7 @@ import { SEO } from '../components/SEO';
 import PublicHeader from '../components/PublicHeader';
 import PublicFooter from '../components/PublicFooter';
 import NotFound from './NotFound';
-import { getPost, getPostBody } from '../lib/blog';
+import { getPost, getPostBody } from '../utils/blog';
 import { generateBlogPostingSchema, generateBreadcrumbSchema } from '../utils/seo';
 
 const formatDate = (iso: string) =>

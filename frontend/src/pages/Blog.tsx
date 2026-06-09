@@ -4,7 +4,7 @@ import { ArrowRight, Clock } from 'lucide-react';
 import { SEO } from '../components/SEO';
 import PublicHeader from '../components/PublicHeader';
 import PublicFooter from '../components/PublicFooter';
-import { posts } from '../lib/blog';
+import { posts } from '../utils/blog';
 import { generateBlogSchema, generateBreadcrumbSchema } from '../utils/seo';
 
 const formatDate = (iso: string) =>
