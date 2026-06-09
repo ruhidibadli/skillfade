@@ -189,6 +189,77 @@
   .fade-fill-neutral {
     @apply bg-txt-muted;
   }
+
+  /* Rendered markdown (blog posts) — warm editorial prose on the espresso
+     surface. Themed by hand to the design tokens rather than pulling in
+     @tailwindcss/typography, matching the rest of the bespoke component layer. */
+  .prose-content {
+    @apply text-txt-secondary;
+  }
+  .prose-content p {
+    @apply text-txt-secondary leading-relaxed mb-6;
+  }
+  .prose-content h2 {
+    @apply text-2xl font-semibold text-txt-primary mt-12 mb-5;
+  }
+  .prose-content h3 {
+    @apply text-xl font-semibold text-txt-primary mt-10 mb-4;
+  }
+  .prose-content h4 {
+    @apply text-lg font-semibold text-txt-primary mt-8 mb-3;
+  }
+  .prose-content strong {
+    @apply text-txt-primary font-semibold;
+  }
+  .prose-content a {
+    @apply text-accent-400 underline underline-offset-2 decoration-accent-400/40
+           hover:decoration-accent-400 transition-colors;
+  }
+  .prose-content ul {
+    @apply list-disc pl-6 mb-6 space-y-2;
+  }
+  .prose-content ol {
+    @apply list-decimal pl-6 mb-6 space-y-2;
+  }
+  .prose-content li {
+    @apply leading-relaxed;
+  }
+  .prose-content li::marker {
+    @apply text-txt-muted;
+  }
+  .prose-content blockquote {
+    @apply border-l-2 border-accent-400/40 pl-5 my-8 italic text-txt-primary;
+  }
+  .prose-content blockquote p {
+    @apply mb-0;
+  }
+  /* Inline code */
+  .prose-content code {
+    @apply font-mono text-[0.85em] bg-surface-300 text-secondary-300
+           px-1.5 py-0.5 rounded border border-border-subtle;
+  }
+  /* Fenced code block — reset the inline-code chrome inside <pre> */
+  .prose-content pre {
+    @apply bg-surface-200 border border-border rounded-xl p-5 my-8 overflow-x-auto;
+  }
+  .prose-content pre code {
+    @apply bg-transparent border-0 p-0 text-sm text-txt-primary;
+  }
+  .prose-content table {
+    @apply w-full text-sm my-8 border-collapse;
+  }
+  .prose-content th {
+    @apply text-left font-semibold text-txt-primary border-b border-border px-3 py-2;
+  }
+  .prose-content td {
+    @apply text-txt-secondary border-b border-border-subtle px-3 py-2;
+  }
+  .prose-content hr {
+    @apply border-border-subtle my-12;
+  }
+  .prose-content img {
+    @apply rounded-xl my-8 max-w-full h-auto;
+  }
 }
 
 @layer utilities {
@@ -297,3 +368,31 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Syntax highlighting (rehype-highlight / highlight.js) — a warm "Ember &
+   Almanac" theme tuned to the palette, not a stock neon one. Tokens stay
+   legible and calm on the surface-200 code panel. */
+.prose-content .hljs { color: #F4ECDD; }
+.prose-content .hljs-comment,
+.prose-content .hljs-quote { color: #9C8E76; font-style: italic; }
+.prose-content .hljs-keyword,
+.prose-content .hljs-selector-tag,
+.prose-content .hljs-literal,
+.prose-content .hljs-type,
+.prose-content .hljs-built_in { color: #A6C79A; }
+.prose-content .hljs-string,
+.prose-content .hljs-regexp,
+.prose-content .hljs-addition { color: #C9A24E; }
+.prose-content .hljs-number,
+.prose-content .hljs-symbol,
+.prose-content .hljs-bullet,
+.prose-content .hljs-link { color: #D58E6C; }
+.prose-content .hljs-title,
+.prose-content .hljs-section,
+.prose-content .hljs-name,
+.prose-content .hljs-attr,
+.prose-content .hljs-attribute { color: #8FB382; }
+.prose-content .hljs-meta,
+.prose-content .hljs-deletion { color: #9C8E76; }
+.prose-content .hljs-emphasis { font-style: italic; }
+.prose-content .hljs-strong { font-weight: 700; }

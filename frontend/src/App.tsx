@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -22,6 +23,11 @@ import CompareObsidian from './pages/compare/Obsidian';
 import Privacy from './pages/Privacy';
 import About from './pages/About';
 import Contact from './pages/Contact';
+import NotFound from './pages/NotFound';
+// Code-split the blog: react-markdown + highlight.js only load on /blog routes,
+// keeping them out of the main bundle that every marketing/app page pays for.
+const Blog = lazy(() => import('./pages/Blog'));
+const BlogPost = lazy(() => import('./pages/BlogPost'));
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
@@ -57,6 +63,13 @@ const RootRedirect = () => {
   return isAuthenticated ? <Navigate to="/dashboard" replace /> : <Landing />;
 };
 
+// Shown briefly while a lazy route chunk (the blog) loads.
+const PageFallback = () => (
+  <div className="min-h-screen bg-mesh flex items-center justify-center">
+    <div className="status-fresh animate-pulse-slow" aria-label="Loading" />
+  </div>
+);
+
 function App() {
   return (
     <HelmetProvider>
@@ -68,6 +81,7 @@ function App() {
               <RouteTracker />
               <CookieBanner />
               <ActivityLoggerWrapper>
+              <Suspense fallback={<PageFallback />}>
               <Routes>
               <Route path="/" element={<RootRedirect />} />
               <Route path="/home" element={<Landing />} />
@@ -84,6 +98,8 @@ function App() {
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/blog" element={<Blog />} />
+              <Route path="/blog/:slug" element={<BlogPost />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -253,8 +269,9 @@ function App() {
                   }
                 />
               </Route>
-              <Route path="*" element={<Navigate to="/" replace />} />
+              <Route path="*" element={<NotFound />} />
               </Routes>
+              </Suspense>
               </ActivityLoggerWrapper>
             </BrowserRouter>
           </OnboardingProvider>

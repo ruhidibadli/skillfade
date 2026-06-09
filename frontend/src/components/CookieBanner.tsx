@@ -31,7 +31,8 @@ const CookieBanner: React.FC = () => {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    if (!PUBLIC_ROUTES.has(pathname)) {
+    const isPublic = PUBLIC_ROUTES.has(pathname) || pathname === '/blog' || pathname.startsWith('/blog/');
+    if (!isPublic) {
       setVisible(false);
       return;
     }
