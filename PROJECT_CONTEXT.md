@@ -1581,3 +1581,111 @@ to sage/clay when convenient.
 **Design intent for future agents:** keep it calm and warm. No neon, no alarm-red
 (decayed is clay, not red), no gamification. Reach for the semantic tokens; never
 hardcode hex or use bare/`dark:` Tailwind color classes (see "Theme Model" above).
+
+### Blog System + SEO Expansion (Added 2026-06-09)
+A markdown-driven blog plus a set of targeted SEO improvements. The blog is
+**client-rendered** (consistent with the rest of the SPA), with content **bundled at
+build time** — no SSR/prerender. This was a deliberate choice for simplicity; per-post
+social-share previews can be added later as a separate prerender step (see the closing
+note below).
+
+#### Authoring a post
+Drop a markdown file in `frontend/src/content/blog/<slug>.md` with front-matter:
+```markdown
+---
+title: "Post Title"                          # required
+description: "~150-char meta/OG/RSS summary" # required
+date: "2026-06-09"                           # required, quoted YYYY-MM-DD
+updated: "2026-06-10"                        # optional
+tags: ["tag-a", "tag-b"]                     # optional
+hero: "/blog/my-image.png"                   # optional, per-post OG image
+draft: false                                 # optional; true = excluded from build
+---
+Markdown body — GFM tables, lists, and fenced code blocks (syntax-highlighted).
+```
+The slug is the filename with any leading `YYYY-MM-DD-` stripped (override with a
+`slug:` field). A post missing a required field **fails the build** with a clear error.
+
+#### Build-time content pipeline
+- `frontend/scripts/build-content.mjs` runs via the `prebuild` / `predev` / `pretest`
+  npm hooks, so it fires on `npm run build`, `npm run dev`, and `npm test` — and in
+  **both** deploy paths, since `Dockerfile.prod` and `scripts/deploy.sh` call
+  `npm run build`. Pure Node (no TS imports) so it runs on the `node:18-alpine` image.
+- It parses front-matter (`gray-matter`), validates, computes reading time, drops
+  drafts, sorts newest-first, and writes three artifacts (all committed; regenerated
+  every build):
+  - `src/content/blog/manifest.generated.ts` — typed `BlogPostMeta[]`. Header marks it
+    auto-generated; do not hand-edit.
+  - `public/sitemap.xml` — **now generated** from a `STATIC_ROUTES` table in the script
+    plus every post. The script is the single source of truth for the sitemap; add new
+    static marketing pages to that table (no more hand-editing the XML).
+  - `public/rss.xml` — new RSS 2.0 feed served at `/rss.xml` (autodiscovery `<link>`
+    added to `index.html`).
+- Post bodies are bundled via `import.meta.glob('../content/blog/*.md', {query:'?raw',eager:true})`
+  in `src/lib/blog.ts` and rendered with `react-markdown` + `remark-gfm` + `rehype-highlight`.
+  Pure helpers live in `src/lib/markdown.ts`.
+
+#### Routes + pages
+- `/blog` → `src/pages/Blog.tsx` (index; `Blog` + `BreadcrumbList` schema).
+- `/blog/:slug` → `src/pages/BlogPost.tsx` (`BlogPosting` + `BreadcrumbList` schema,
+  `og:type=article`). An unknown slug renders `<NotFound />`, **not** a redirect.
+- Both are **lazy-loaded** (`React.lazy` + `Suspense` in `App.tsx`) so `react-markdown`
+  + highlight.js (~102 KB gzip) load only on blog routes. Main bundle dropped from
+  ~365 KB to ~261 KB gzip as a result.
+- `src/components/PublicHeader.tsx` — shared header extracted for the new public pages.
+
+#### Soft-404 fix
+`App.tsx` previously routed every unknown path (`*`) to `/` via `<Navigate>` — a
+soft-404 that hurts SEO. Replaced with a real `src/pages/NotFound.tsx` (noindex,
+helpful links). Bad blog slugs render it too.
+
+#### Two production asset bugs fixed (were broken before the blog)
+`index.html` and the Organization/Article JSON-LD referenced `og-image.png` and
+`logo.svg`, but **neither existed** in `public/` — so every social share preview and the
+structured-data logo were broken. Both created:
+- `public/logo.svg` — sage→clay brand chip + the fading-bars mark.
+- `public/og-image.png` — branded 1200×630 card. Regenerate it from
+  `frontend/scripts/og-template.html` via headless Chrome
+  (`--headless=new --window-size=1200,630 --screenshot=...`).
+
+#### GA / consent scope
+`RouteTracker.tsx` and `CookieBanner.tsx` matched routes with an exact-list `Set`,
+which can't match dynamic `/blog/:slug`. Both now also treat any `/blog…` path as
+public, so page views fire and the consent banner shows on posts.
+
+#### Structured-data builders (`src/utils/seo.ts`)
+Added `generateBlogPostingSchema`, `generateBreadcrumbSchema`, `generateBlogSchema`.
+
+#### Styling
+New `.prose-content` block in `index.css` (themed to Ember & Almanac tokens — Fraunces
+headings, IBM Plex Mono code panels, sage links) plus a warm highlight.js token theme.
+**No `@tailwindcss/typography` dependency** (consistent with the bespoke component-class
+convention). Note: the pre-existing `.prose-custom` class referenced on
+`WhatIsLearningDecay.tsx` was always undefined (a no-op) — unrelated to this.
+
+#### Files
+- **Created:** `src/content/blog/2026-06-09-the-forgetting-curve-for-developers.md`
+  (starter post), `scripts/build-content.mjs`, `scripts/og-template.html`,
+  `src/lib/markdown.ts`, `src/lib/blog.ts`, `src/content/blog/manifest.generated.ts`
+  (generated), `src/pages/Blog.tsx`, `src/pages/BlogPost.tsx`, `src/pages/NotFound.tsx`,
+  `src/components/PublicHeader.tsx`, `public/logo.svg`, `public/og-image.png`,
+  `public/rss.xml` (generated), `src/tests/blog.test.ts`.
+- **Modified:** `package.json` (deps + `generate:content`/`pre*` hooks), `src/App.tsx`
+  (lazy blog routes + real 404 + `Suspense`), `src/components/RouteTracker.tsx`,
+  `src/components/CookieBanner.tsx`, `src/components/PublicFooter.tsx` (Blog link in the
+  Learn column), `src/utils/seo.ts`, `src/index.css`, `index.html` (RSS `<link>`),
+  `public/robots.txt` (allow `/blog`), `public/sitemap.xml` (now generated).
+- **Dependencies added:** `react-markdown`, `remark-gfm`, `rehype-highlight` (runtime),
+  `gray-matter` (dev/build).
+
+#### Post-deploy SEO checklist (manual)
+- Re-submit `sitemap.xml` in Google Search Console (it now auto-includes `/blog` + posts).
+- Request indexing for `/blog` and the first post URL.
+- Validate a post on the Rich Results test (BlogPosting + BreadcrumbList).
+- Verify the OG card via a social-share debugger (now that `og-image.png` exists).
+
+#### Still client-rendered (note for future agents)
+Posts are client-rendered, so social-share crawlers (Twitter/LinkedIn/Slack) see the
+**default** `og-image.png`, not a per-post hero, until a per-post prerender step is added.
+Google indexes posts fine (it executes JS). If you add a new top-level static page, also
+add it to `STATIC_ROUTES` in `scripts/build-content.mjs` so it stays in the sitemap.

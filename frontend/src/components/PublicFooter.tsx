@@ -49,6 +49,9 @@ const PublicFooter: React.FC = () => {
               <li>
                 <Link to="/skill-decay-formula" className="hover:text-accent-400 transition-colors">Skill Decay Formula</Link>
               </li>
+              <li>
+                <Link to="/blog" className="hover:text-accent-400 transition-colors">Blog</Link>
+              </li>
             </ul>
           </div>
 

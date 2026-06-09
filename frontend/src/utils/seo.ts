@@ -147,3 +147,106 @@ export const generateArticleSchema = (
   datePublished,
   dateModified: new Date().toISOString().split('T')[0]
 });
+
+// ── Blog schemas ────────────────────────────────────────────────────────────
+
+export interface BlogPostingSchema {
+  "@context": "https://schema.org";
+  "@type": "BlogPosting";
+  headline: string;
+  description: string;
+  url: string;
+  mainEntityOfPage: { "@type": "WebPage"; "@id": string };
+  image: string;
+  author: { "@type": "Organization"; name: string; url: string };
+  publisher: {
+    "@type": "Organization";
+    name: string;
+    logo: { "@type": "ImageObject"; url: string };
+  };
+  datePublished: string;
+  dateModified: string;
+  keywords?: string;
+}
+
+export interface BreadcrumbListSchema {
+  "@context": "https://schema.org";
+  "@type": "BreadcrumbList";
+  itemListElement: Array<{
+    "@type": "ListItem";
+    position: number;
+    name: string;
+    item: string;
+  }>;
+}
+
+export interface BlogSchema {
+  "@context": "https://schema.org";
+  "@type": "Blog";
+  name: string;
+  url: string;
+  description: string;
+  publisher: { "@type": "Organization"; name: string; logo: { "@type": "ImageObject"; url: string } };
+}
+
+export const generateBlogPostingSchema = (
+  opts: {
+    title: string;
+    description: string;
+    slug: string;
+    datePublished: string;
+    dateModified?: string;
+    image?: string;
+    tags?: string[];
+  },
+  baseUrl: string = "https://skillfade.website"
+): BlogPostingSchema => {
+  const url = `${baseUrl}/blog/${opts.slug}`;
+  const image = opts.image
+    ? (opts.image.startsWith("http") ? opts.image : `${baseUrl}${opts.image}`)
+    : `${baseUrl}/og-image.png`;
+  return {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: opts.title,
+    description: opts.description,
+    url,
+    mainEntityOfPage: { "@type": "WebPage", "@id": url },
+    image,
+    author: { "@type": "Organization", name: "SkillFade", url: baseUrl },
+    publisher: {
+      "@type": "Organization",
+      name: "SkillFade",
+      logo: { "@type": "ImageObject", url: `${baseUrl}/logo.svg` }
+    },
+    datePublished: opts.datePublished,
+    dateModified: opts.dateModified || opts.datePublished,
+    ...(opts.tags && opts.tags.length ? { keywords: opts.tags.join(", ") } : {})
+  };
+};
+
+export const generateBreadcrumbSchema = (
+  crumbs: Array<{ name: string; url: string }>
+): BreadcrumbListSchema => ({
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: crumbs.map((c, i) => ({
+    "@type": "ListItem",
+    position: i + 1,
+    name: c.name,
+    item: c.url
+  }))
+});
+
+export const generateBlogSchema = (baseUrl: string = "https://skillfade.website"): BlogSchema => ({
+  "@context": "https://schema.org",
+  "@type": "Blog",
+  name: "SkillFade Blog",
+  url: `${baseUrl}/blog`,
+  description: "Essays on skill decay, retention, and calm, deliberate learning for developers and self-directed learners.",
+  publisher: {
+    "@type": "Organization",
+    name: "SkillFade",
+    logo: { "@type": "ImageObject", url: `${baseUrl}/logo.svg` }
+  }
+});

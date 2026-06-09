@@ -5,6 +5,7 @@ Allow: /faq
 Allow: /what-is-learning-decay
 Allow: /use-cases
 Allow: /comparisons
+Allow: /blog
 Allow: /privacy
 
 Disallow: /dashboard

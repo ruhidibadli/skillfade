@@ -27,7 +27,8 @@ const RouteTracker: React.FC = () => {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    if (!PUBLIC_ROUTES.has(pathname)) return;
+    const isPublic = PUBLIC_ROUTES.has(pathname) || pathname === '/blog' || pathname.startsWith('/blog/');
+    if (!isPublic) return;
     if (typeof window === 'undefined' || typeof window.gtag !== 'function') return;
     window.gtag('event', 'page_view', {
       page_path: pathname,
