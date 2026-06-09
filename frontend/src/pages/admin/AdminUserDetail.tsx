@@ -180,14 +180,14 @@ const AdminUserDetail: React.FC = () => {
               </div>
               <div className="card-elevated p-4">
                 <div className="text-txt-muted text-sm">Total Learning</div>
-                <div className="text-2xl font-bold text-blue-500 mt-1">{data.summary.total_learning_events}</div>
+                <div className="text-2xl font-bold text-accent-400 mt-1">{data.summary.total_learning_events}</div>
                 <div className="text-txt-muted text-xs mt-1">
                   {formatDuration(data.summary.total_learning_minutes)} total
                 </div>
               </div>
               <div className="card-elevated p-4">
                 <div className="text-txt-muted text-sm">Total Practice</div>
-                <div className="text-2xl font-bold text-green-500 mt-1">{data.summary.total_practice_events}</div>
+                <div className="text-2xl font-bold text-fresh-base mt-1">{data.summary.total_practice_events}</div>
                 <div className="text-txt-muted text-xs mt-1">
                   {formatDuration(data.summary.total_practice_minutes)} total
                 </div>
@@ -199,11 +199,11 @@ const AdminUserDetail: React.FC = () => {
               <h3 className="font-semibold text-txt-primary mb-3">Last 30 Days Activity</h3>
               <div className="flex gap-8">
                 <div>
-                  <span className="text-blue-500 font-bold text-xl">{data.summary.recent_learning_events}</span>
+                  <span className="text-accent-400 font-bold text-xl">{data.summary.recent_learning_events}</span>
                   <span className="text-txt-muted text-sm ml-2">learning events</span>
                 </div>
                 <div>
-                  <span className="text-green-500 font-bold text-xl">{data.summary.recent_practice_events}</span>
+                  <span className="text-fresh-base font-bold text-xl">{data.summary.recent_practice_events}</span>
                   <span className="text-txt-muted text-sm ml-2">practice events</span>
                 </div>
               </div>
@@ -297,8 +297,8 @@ const AdminUserDetail: React.FC = () => {
                             {skill.freshness.toFixed(0)}%
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-sm text-blue-500">{skill.learning_events_count}</td>
-                        <td className="px-4 py-3 text-sm text-green-500">{skill.practice_events_count}</td>
+                        <td className="px-4 py-3 text-sm text-accent-400">{skill.learning_events_count}</td>
+                        <td className="px-4 py-3 text-sm text-fresh-base">{skill.practice_events_count}</td>
                         <td className="px-4 py-3 text-sm text-txt-muted">
                           {new Date(skill.created_at).toLocaleDateString()}
                         </td>
@@ -348,7 +348,7 @@ const AdminUserDetail: React.FC = () => {
                           {event.skill_name || '-'}
                         </td>
                         <td className="px-4 py-3">
-                          <span className="px-2 py-1 bg-blue-500/10 text-blue-500 rounded text-xs capitalize">
+                          <span className="px-2 py-1 bg-accent-400/10 text-accent-400 rounded text-xs capitalize">
                             {event.type}
                           </span>
                         </td>
@@ -395,7 +395,7 @@ const AdminUserDetail: React.FC = () => {
                           {event.skill_name || '-'}
                         </td>
                         <td className="px-4 py-3">
-                          <span className="px-2 py-1 bg-green-500/10 text-green-500 rounded text-xs capitalize">
+                          <span className="px-2 py-1 bg-fresh-base/10 text-fresh-base rounded text-xs capitalize">
                             {event.type}
                           </span>
                         </td>
@@ -455,8 +455,8 @@ const AdminUserDetail: React.FC = () => {
                       <h3 className="font-medium text-txt-primary">{template.name}</h3>
                       <span className={`px-2 py-1 rounded text-xs ${
                         template.event_type === 'learning'
-                          ? 'bg-blue-500/10 text-blue-500'
-                          : 'bg-green-500/10 text-green-500'
+                          ? 'bg-accent-400/10 text-accent-400'
+                          : 'bg-fresh-base/10 text-fresh-base'
                       }`}>
                         {template.event_type}
                       </span>

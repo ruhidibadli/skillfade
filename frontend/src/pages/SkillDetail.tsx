@@ -325,13 +325,13 @@ const SkillDetail: React.FC = () => {
           <div className="h-64 ml-8">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={freshnessHistory}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
-                <XAxis dataKey="date" tickFormatter={(date) => format(new Date(date), 'MMM d')} stroke="#71717a" tick={{ fontSize: 11, fill: '#71717a' }} axisLine={{ stroke: '#27272a' }} />
-                <YAxis domain={[0, 100]} stroke="#71717a" tick={{ fontSize: 11, fill: '#71717a' }} tickFormatter={(value) => `${value}%`} axisLine={{ stroke: '#27272a' }} />
-                <Tooltip labelFormatter={(date) => format(new Date(date as string), 'MMM d, yyyy')} formatter={(value: number) => [`${value.toFixed(1)}%`, 'Freshness']} contentStyle={{ backgroundColor: '#16161d', border: '1px solid #3f3f46', borderRadius: '8px' }} labelStyle={{ color: '#a1a1aa' }} itemStyle={{ color: '#f4f4f5' }} />
-                <ReferenceLine y={70} stroke="#10b981" strokeDasharray="5 5" strokeOpacity={0.5} />
-                <ReferenceLine y={40} stroke="#f59e0b" strokeDasharray="5 5" strokeOpacity={0.5} />
-                <Line type="monotone" dataKey="freshness" stroke="#00fff0" strokeWidth={2} dot={false} activeDot={{ r: 4, fill: '#00fff0', stroke: '#0a0a0f', strokeWidth: 2 }} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#2A2318" vertical={false} />
+                <XAxis dataKey="date" tickFormatter={(date) => format(new Date(date), 'MMM d')} stroke="#9C8E76" tick={{ fontSize: 11, fill: '#9C8E76' }} axisLine={{ stroke: '#2A2318' }} />
+                <YAxis domain={[0, 100]} stroke="#9C8E76" tick={{ fontSize: 11, fill: '#9C8E76' }} tickFormatter={(value) => `${value}%`} axisLine={{ stroke: '#2A2318' }} />
+                <Tooltip labelFormatter={(date) => format(new Date(date as string), 'MMM d, yyyy')} formatter={(value: number) => [`${value.toFixed(1)}%`, 'Freshness']} contentStyle={{ backgroundColor: '#221C13', border: '1px solid #392F20', borderRadius: '8px' }} labelStyle={{ color: '#C7B9A2' }} itemStyle={{ color: '#F4ECDD' }} />
+                <ReferenceLine y={70} stroke="#7DA86A" strokeDasharray="5 5" strokeOpacity={0.5} />
+                <ReferenceLine y={40} stroke="#C9A24E" strokeDasharray="5 5" strokeOpacity={0.5} />
+                <Line type="monotone" dataKey="freshness" stroke="#8FB382" strokeWidth={2} dot={false} activeDot={{ r: 4, fill: '#8FB382', stroke: '#14100A', strokeWidth: 2 }} />
               </LineChart>
             </ResponsiveContainer>
           </div>

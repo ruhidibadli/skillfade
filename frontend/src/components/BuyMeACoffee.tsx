@@ -18,8 +18,8 @@ export default function BuyMeACoffee({ variant = 'link', className = '' }: BuyMe
     return (
       <div className={`card-elevated p-6 ${className}`}>
         <div className="flex items-start gap-4">
-          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-400 to-orange-400 flex items-center justify-center flex-shrink-0">
-            <Coffee className="w-5 h-5 text-white" />
+          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-aging-base to-secondary-400 flex items-center justify-center flex-shrink-0">
+            <Coffee className="w-5 h-5 text-surface-50" />
           </div>
           <div className="flex-1">
             <h3 className="text-lg font-semibold text-txt-primary mb-1">Support SkillFade</h3>
@@ -31,11 +31,9 @@ export default function BuyMeACoffee({ variant = 'link', className = '' }: BuyMe
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-4 py-2
-                         bg-gradient-to-r from-amber-400 to-orange-400
-                         text-white font-medium rounded-lg
+                         bg-aging-base text-surface-50 font-semibold rounded-lg
                          transition-all duration-200
-                         hover:from-amber-500 hover:to-orange-500
-                         hover:shadow-lg active:scale-[0.98]"
+                         hover:bg-aging-glow hover:shadow-glow-aging active:scale-[0.98]"
             >
               <Coffee className="w-4 h-4" />
               Buy me a coffee
@@ -53,12 +51,10 @@ export default function BuyMeACoffee({ variant = 'link', className = '' }: BuyMe
         target="_blank"
         rel="noopener noreferrer"
         className={`inline-flex items-center gap-2 px-3 py-1.5
-                   text-sm font-medium text-amber-600 dark:text-amber-400
-                   bg-amber-50 dark:bg-amber-900/20
-                   border border-amber-200 dark:border-amber-800
+                   text-sm font-medium text-aging-base
+                   bg-aging-base/10 border border-aging-base/25
                    rounded-lg transition-all duration-200
-                   hover:bg-amber-100 dark:hover:bg-amber-900/30
-                   hover:border-amber-300 dark:hover:border-amber-700
+                   hover:bg-aging-base/20 hover:border-aging-base/40
                    ${className}`}
       >
         <Coffee className="w-4 h-4" />
@@ -74,7 +70,7 @@ export default function BuyMeACoffee({ variant = 'link', className = '' }: BuyMe
       target="_blank"
       rel="noopener noreferrer"
       className={`inline-flex items-center gap-1.5 text-txt-muted
-                 hover:text-amber-500 dark:hover:text-amber-400
+                 hover:text-aging-base
                  transition-colors duration-200 ${className}`}
     >
       <Coffee className="w-3.5 h-3.5" />

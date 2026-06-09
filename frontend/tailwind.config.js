@@ -8,84 +8,94 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Dark surface colors
+        // Warm "espresso & parchment" surfaces — a candlelit reading room,
+        // not a cold blue-black dashboard. surface-50 is the darkest tone and
+        // doubles as the foreground on bright accent fills (logo chip, buttons).
         surface: {
-          50: '#0a0a0f',
-          100: '#0f0f14',
-          200: '#16161d',
-          300: '#1c1c26',
-          400: '#24242f',
-          500: '#2d2d3a',
+          50: '#14100A',
+          100: '#1A150E',
+          200: '#221C13',
+          300: '#2B2419',
+          400: '#3A3122',
+          500: '#4C4130',
         },
-        // Primary accent - Cyan/Teal
+        // Primary accent — Sage / living green (a fresh, growing skill).
+        // Light enough at 400 to carry near-black foreground text (8:1).
         accent: {
-          50: '#e0fffe',
-          100: '#b3fffc',
-          200: '#66fff9',
-          300: '#33fff5',
-          400: '#00fff0',
-          500: '#00d4c8',
-          600: '#00a89f',
-          700: '#007d77',
+          50: '#EAF1E6',
+          100: '#D3E2CC',
+          200: '#B3CDA8',
+          300: '#A6C79A',
+          400: '#8FB382',
+          500: '#7BA06E',
+          600: '#5F8454',
+          700: '#496B40',
         },
-        // Secondary accent - Violet/Purple
+        // Secondary accent — Clay / terracotta (warmth, the fade toward dusk).
         secondary: {
-          50: '#f3e8ff',
-          100: '#e9d5ff',
-          200: '#d8b4fe',
-          300: '#c084fc',
-          400: '#a855f7',
-          500: '#9333ea',
-          600: '#7e22ce',
+          50: '#F7E7DE',
+          100: '#ECCAB8',
+          200: '#DFA98E',
+          300: '#D58E6C',
+          400: '#C8795A',
+          500: '#B0654A',
+          600: '#8F4F3A',
         },
-        // Freshness indicators
+        // Freshness scale — earthy, never alarming. Sage → honey → clay,
+        // like ink fading in sunlight. Deliberately no alarm-red.
         fresh: {
-          glow: '#00ffa3',
-          base: '#10b981',
-          muted: '#059669',
+          glow: '#A7D08C',
+          base: '#7DA86A',
+          muted: '#5F8454',
         },
         aging: {
-          glow: '#fbbf24',
-          base: '#f59e0b',
-          muted: '#d97706',
+          glow: '#E4C173',
+          base: '#C9A24E',
+          muted: '#A07E33',
         },
         decayed: {
-          glow: '#f472b6',
-          base: '#ec4899',
-          muted: '#db2777',
+          glow: '#DDA08C',
+          base: '#C87B64',
+          muted: '#A85C46',
         },
-        // Text colors
+        // Warm parchment text — all AA+ on the surface scale.
         txt: {
-          primary: '#f4f4f5',
-          secondary: '#a1a1aa',
-          muted: '#71717a',
+          primary: '#F4ECDD',
+          secondary: '#C7B9A2',
+          muted: '#9C8E76',
         },
-        // Border colors
+        // Hairline rules, like a ledger.
         border: {
-          subtle: '#27272a',
-          DEFAULT: '#3f3f46',
-          emphasis: '#52525b',
+          subtle: '#2A2318',
+          DEFAULT: '#392F20',
+          emphasis: '#4E4231',
         },
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-        display: ['Inter', 'system-ui', 'sans-serif'],
-        mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
+        // Hanken Grotesk — warm humanist sans for body & UI (not Inter).
+        sans: ['Hanken Grotesk', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        // Fraunces — a soft, characterful serif for headings & the wordmark.
+        display: ['Fraunces', 'Georgia', 'Cambria', 'serif'],
+        // IBM Plex Mono — instrument-panel numerals, dates, metadata.
+        mono: ['IBM Plex Mono', 'ui-monospace', 'SFMono-Regular', 'monospace'],
       },
       fontSize: {
-        'display-xl': ['4.5rem', { lineHeight: '1', letterSpacing: '-0.02em', fontWeight: '700' }],
-        'display-lg': ['3.5rem', { lineHeight: '1.1', letterSpacing: '-0.02em', fontWeight: '700' }],
-        'display-md': ['2.5rem', { lineHeight: '1.2', letterSpacing: '-0.01em', fontWeight: '600' }],
-        'display-sm': ['1.75rem', { lineHeight: '1.3', letterSpacing: '-0.01em', fontWeight: '600' }],
+        'display-xl': ['4.5rem', { lineHeight: '1', letterSpacing: '-0.02em', fontWeight: '600' }],
+        'display-lg': ['3.5rem', { lineHeight: '1.05', letterSpacing: '-0.02em', fontWeight: '600' }],
+        'display-md': ['2.5rem', { lineHeight: '1.15', letterSpacing: '-0.015em', fontWeight: '600' }],
+        'display-sm': ['1.75rem', { lineHeight: '1.25', letterSpacing: '-0.01em', fontWeight: '600' }],
+      },
+      letterSpacing: {
+        label: '0.12em',
       },
       animation: {
-        'fade-in': 'fadeIn 0.5s ease-out',
-        'slide-up': 'slideUp 0.5s ease-out',
-        'slide-down': 'slideDown 0.3s ease-out',
-        'scale-in': 'scaleIn 0.3s ease-out',
-        'glow-pulse': 'glowPulse 2s ease-in-out infinite',
-        'shimmer': 'shimmer 2s linear infinite',
-        'float': 'float 6s ease-in-out infinite',
+        'fade-in': 'fadeIn 0.6s ease-out both',
+        'slide-up': 'slideUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) both',
+        'slide-down': 'slideDown 0.3s ease-out both',
+        'scale-in': 'scaleIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both',
+        'glow-pulse': 'glowPulse 4s ease-in-out infinite',
+        'shimmer': 'shimmer 2.4s linear infinite',
+        'float': 'float 8s ease-in-out infinite',
       },
       keyframes: {
         fadeIn: {
@@ -93,20 +103,21 @@ export default {
           '100%': { opacity: '1' },
         },
         slideUp: {
-          '0%': { transform: 'translateY(16px)', opacity: '0' },
+          '0%': { transform: 'translateY(18px)', opacity: '0' },
           '100%': { transform: 'translateY(0)', opacity: '1' },
         },
         slideDown: {
-          '0%': { transform: 'translateY(-16px)', opacity: '0' },
+          '0%': { transform: 'translateY(-14px)', opacity: '0' },
           '100%': { transform: 'translateY(0)', opacity: '1' },
         },
         scaleIn: {
-          '0%': { transform: 'scale(0.96)', opacity: '0' },
+          '0%': { transform: 'scale(0.97)', opacity: '0' },
           '100%': { transform: 'scale(1)', opacity: '1' },
         },
+        // A gentle breath, not a neon strobe.
         glowPulse: {
-          '0%, 100%': { opacity: '0.4' },
-          '50%': { opacity: '1' },
+          '0%, 100%': { opacity: '0.6' },
+          '50%': { opacity: '0.95' },
         },
         shimmer: {
           '0%': { backgroundPosition: '-200% 0' },
@@ -114,22 +125,24 @@ export default {
         },
         float: {
           '0%, 100%': { transform: 'translateY(0)' },
-          '50%': { transform: 'translateY(-10px)' },
+          '50%': { transform: 'translateY(-8px)' },
         },
       },
       boxShadow: {
-        'glow-accent': '0 0 20px rgba(0, 255, 240, 0.15)',
-        'glow-accent-lg': '0 0 40px rgba(0, 255, 240, 0.25)',
-        'glow-secondary': '0 0 20px rgba(168, 85, 247, 0.15)',
-        'glow-fresh': '0 0 20px rgba(0, 255, 163, 0.2)',
-        'glow-aging': '0 0 20px rgba(251, 191, 36, 0.2)',
-        'glow-decayed': '0 0 20px rgba(244, 114, 182, 0.2)',
-        'card': '0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2)',
-        'card-hover': '0 4px 20px rgba(0, 0, 0, 0.4)',
+        // Soft, warm, candlelit ambient — replaces the old neon glows.
+        'glow-accent': '0 0 24px rgba(143, 179, 130, 0.10)',
+        'glow-accent-lg': '0 0 48px rgba(143, 179, 130, 0.16)',
+        'glow-secondary': '0 0 24px rgba(200, 121, 90, 0.10)',
+        'glow-fresh': '0 0 18px rgba(125, 168, 106, 0.16)',
+        'glow-aging': '0 0 18px rgba(201, 162, 78, 0.16)',
+        'glow-decayed': '0 0 18px rgba(200, 123, 100, 0.16)',
+        'card': '0 1px 2px rgba(0, 0, 0, 0.40), 0 2px 8px rgba(0, 0, 0, 0.24)',
+        'card-hover': '0 10px 34px rgba(0, 0, 0, 0.42)',
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'gradient-mesh': 'radial-gradient(at 40% 20%, rgba(0, 255, 240, 0.03) 0px, transparent 50%), radial-gradient(at 80% 0%, rgba(168, 85, 247, 0.03) 0px, transparent 50%), radial-gradient(at 0% 50%, rgba(0, 255, 240, 0.02) 0px, transparent 50%)',
+        // Warm earthen wash — sage, clay, honey at a whisper.
+        'gradient-mesh': 'radial-gradient(at 14% 8%, rgba(143, 179, 130, 0.05) 0px, transparent 46%), radial-gradient(at 86% 6%, rgba(200, 121, 90, 0.045) 0px, transparent 46%), radial-gradient(at 50% 96%, rgba(201, 162, 78, 0.035) 0px, transparent 52%)',
       },
     },
   },

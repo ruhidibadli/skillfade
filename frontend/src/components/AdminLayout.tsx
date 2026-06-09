@@ -58,10 +58,10 @@ const AdminLayout: React.FC = () => {
             {/* Logo */}
             <div className="flex items-center gap-4">
               <Link to="/admin" className="flex items-center gap-3 group">
-                <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center shadow-glow-accent group-hover:shadow-glow-accent-lg transition-shadow">
+                <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-decayed-base to-secondary-400 flex items-center justify-center shadow-glow-decayed group-hover:shadow-glow-aging transition-shadow">
                   <LogoIcon className="w-5 h-5 text-surface-50" />
                 </div>
-                <span className="text-xl font-bold text-txt-primary">
+                <span className="font-display text-xl font-semibold tracking-tight text-txt-primary">
                   SkillFade
                 </span>
                 <span className="tag-decayed text-[10px] uppercase tracking-wider">Admin</span>

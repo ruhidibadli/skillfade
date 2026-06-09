@@ -82,10 +82,10 @@ const Dashboard: React.FC = () => {
   };
 
   const getFreshnessBarColor = (freshness?: number) => {
-    if (!freshness) return 'bg-txt-muted';
-    if (freshness > 70) return 'bg-fresh-base';
-    if (freshness >= 40) return 'bg-aging-base';
-    return 'bg-decayed-base';
+    if (!freshness) return 'fade-fill-neutral';
+    if (freshness > 70) return 'fade-fill-fresh';
+    if (freshness >= 40) return 'fade-fill-aging';
+    return 'fade-fill-decayed';
   };
 
   return (
@@ -103,8 +103,8 @@ const Dashboard: React.FC = () => {
           <div className="col-span-12 md:col-span-5 card-elevated p-6">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-txt-secondary text-sm mb-1">Active Skills</p>
-                <p className="text-display-md text-gradient-accent">{data.total_skills}</p>
+                <p className="label-caps mb-2">Active Skills</p>
+                <p className="font-display text-display-md text-gradient-accent">{data.total_skills}</p>
               </div>
               <div className="p-3 rounded-xl bg-accent-400/10">
                 <Target className="w-6 h-6 text-accent-400" />
@@ -199,20 +199,20 @@ const Dashboard: React.FC = () => {
                     )}
                   </div>
                   <div className="text-right ml-4 flex-shrink-0">
-                    <p className={`text-lg font-semibold ${getFreshnessColor(skill.freshness)}`}>
+                    <p className={`font-mono text-lg font-semibold tabular-nums ${getFreshnessColor(skill.freshness)}`}>
                       {skill.freshness?.toFixed(0)}%
                     </p>
-                    <p className="text-xs text-txt-muted mt-1">
+                    <p className="font-mono text-xs text-txt-muted mt-1 tabular-nums">
                       {skill.days_since_practice}d ago
                     </p>
                   </div>
                 </div>
 
-                {/* Freshness Bar */}
+                {/* Freshness "fade" bar */}
                 <div className="mt-3 ml-5">
-                  <div className="h-1 bg-surface-400 rounded-full overflow-hidden">
+                  <div className="fade-track">
                     <div
-                      className={`h-full rounded-full transition-all duration-500 ${getFreshnessBarColor(skill.freshness)}`}
+                      className={`fade-fill ${getFreshnessBarColor(skill.freshness)}`}
                       style={{ width: `${skill.freshness || 0}%` }}
                     />
                   </div>
