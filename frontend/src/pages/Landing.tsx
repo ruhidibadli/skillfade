@@ -41,7 +41,7 @@ const FreshnessIndicator: React.FC<{ level: 'fresh' | 'aging' | 'decayed'; size?
   };
 
   return (
-    <div className={`${sizeClasses[size]} rounded-full ${styles[level]} animate-glow-pulse`} />
+    <div className={`${sizeClasses[size]} rounded-full ${styles[level]}`} />
   );
 };
 
@@ -69,7 +69,7 @@ const Landing: React.FC = () => {
               <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-accent-400 to-secondary-400 flex items-center justify-center shadow-glow-accent">
                 <LogoIcon className="w-5 h-5 text-surface-50" />
               </div>
-              <span className="text-xl font-bold text-txt-primary">SkillFade</span>
+              <span className="font-display text-xl font-semibold tracking-tight text-txt-primary">SkillFade</span>
               <span className="tag-accent text-[10px] uppercase tracking-wider">Beta</span>
             </div>
             <div className="hidden md:flex items-center gap-6 text-sm">

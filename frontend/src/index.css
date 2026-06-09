@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Hanken+Grotesk:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -14,24 +14,39 @@
     @apply bg-surface-100 text-txt-primary font-sans antialiased;
     margin: 0;
     font-size: 16px;
-    line-height: 1.6;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
   }
 
+  /* Fraunces display serif on every heading — editorial, warm, deliberate. */
   h1, h2, h3, h4, h5, h6 {
-    @apply font-display font-semibold tracking-tight;
+    @apply font-display font-semibold tracking-tight text-txt-primary;
   }
 
   ::selection {
-    @apply bg-accent-400/30;
+    @apply bg-accent-400/25 text-txt-primary;
   }
 
   * {
     box-sizing: border-box;
   }
+
+  /* Faint paper grain — a single fixed overlay, sits above the canvas
+     and below all content. Gives the whole app a printed, calm texture. */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.04;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
 }
 
 @layer components {
-  /* Card Styles */
+  /* Card Styles — soft warm panels with hairline rules. */
   .card {
     @apply bg-surface-200 border border-border-subtle rounded-xl;
   }
@@ -43,14 +58,14 @@
   .card-interactive {
     @apply bg-surface-200 border border-border-subtle rounded-xl
            transition-all duration-300 ease-out
-           hover:border-accent-400/30 hover:shadow-glow-accent hover:bg-surface-300;
+           hover:border-accent-400/30 hover:shadow-card-hover hover:-translate-y-0.5 hover:bg-surface-300;
   }
 
   /* Button Styles */
   .btn-primary {
-    @apply px-5 py-2.5 bg-accent-400 text-surface-50 font-medium rounded-lg
+    @apply px-5 py-2.5 bg-accent-400 text-surface-50 font-semibold rounded-lg
            transition-all duration-200 ease-out
-           hover:bg-accent-500 hover:shadow-glow-accent
+           hover:bg-accent-300 hover:shadow-glow-accent
            active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
@@ -96,7 +111,7 @@
            transition-all duration-200
            focus:outline-none focus:border-accent-400/50 focus:ring-2 focus:ring-accent-400/20
            appearance-none cursor-pointer;
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2371717a' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239C8E76' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
     background-position: right 0.75rem center;
     background-repeat: no-repeat;
     background-size: 1.25em 1.25em;
@@ -118,13 +133,18 @@
            bg-secondary-400/10 text-secondary-400 border border-secondary-400/20;
   }
 
+  .tag-decayed {
+    @apply inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-md
+           bg-decayed-base/10 text-decayed-base border border-decayed-base/25;
+  }
+
   /* Modal Backdrop */
   .modal-backdrop {
-    @apply fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4;
+    @apply fixed inset-0 bg-surface-50/70 backdrop-blur-sm z-50 flex items-center justify-center p-4;
   }
 
   .modal-content {
-    @apply bg-surface-200 border border-border rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto;
+    @apply bg-surface-200 border border-border rounded-2xl shadow-card-hover max-w-lg w-full max-h-[90vh] overflow-y-auto;
   }
 
   /* Status Indicators */
@@ -143,12 +163,43 @@
   .status-neutral {
     @apply w-2.5 h-2.5 rounded-full bg-txt-muted;
   }
+
+  /* Freshness "fade" bars — the signature motif. The fill is inked at the
+     left and fades toward its leading edge, echoing the SkillFade mark. */
+  .fade-track {
+    @apply h-1.5 rounded-full bg-surface-400/80 overflow-hidden;
+  }
+
+  .fade-fill {
+    @apply h-full rounded-full transition-all duration-700 ease-out;
+  }
+
+  .fade-fill-fresh {
+    background-image: linear-gradient(90deg, #5F8454 0%, #7DA86A 70%, #A7D08C 100%);
+  }
+
+  .fade-fill-aging {
+    background-image: linear-gradient(90deg, #A07E33 0%, #C9A24E 70%, #E4C173 100%);
+  }
+
+  .fade-fill-decayed {
+    background-image: linear-gradient(90deg, #A85C46 0%, #C87B64 70%, #DDA08C 100%);
+  }
+
+  .fade-fill-neutral {
+    @apply bg-txt-muted;
+  }
 }
 
 @layer utilities {
-  /* Text Gradient */
+  /* Sage → clay text gradient: the product name made visible — fresh fading warm. */
   .text-gradient-accent {
     @apply bg-gradient-to-r from-accent-400 to-secondary-400 bg-clip-text text-transparent;
+  }
+
+  /* Small-caps ledger label */
+  .label-caps {
+    @apply text-xs font-medium uppercase tracking-label text-txt-muted;
   }
 
   /* Mesh Background */
@@ -159,32 +210,22 @@
   /* Animation Delays */
   .animation-delay-100 { animation-delay: 0.1s; }
   .animation-delay-200 { animation-delay: 0.2s; }
+  .animation-delay-250 { animation-delay: 0.25s; }
   .animation-delay-300 { animation-delay: 0.3s; }
   .animation-delay-400 { animation-delay: 0.4s; }
   .animation-delay-500 { animation-delay: 0.5s; }
 
   /* Glow Effects */
-  .glow-accent {
-    @apply shadow-glow-accent;
-  }
-
-  .glow-fresh {
-    @apply shadow-glow-fresh;
-  }
-
-  .glow-aging {
-    @apply shadow-glow-aging;
-  }
-
-  .glow-decayed {
-    @apply shadow-glow-decayed;
-  }
+  .glow-accent { @apply shadow-glow-accent; }
+  .glow-fresh { @apply shadow-glow-fresh; }
+  .glow-aging { @apply shadow-glow-aging; }
+  .glow-decayed { @apply shadow-glow-decayed; }
 }
 
-/* Custom Scrollbar - Dark Theme */
+/* Custom Scrollbar — Warm */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 9px;
+  height: 9px;
 }
 
 ::-webkit-scrollbar-track {
@@ -193,84 +234,66 @@
 
 ::-webkit-scrollbar-thumb {
   @apply bg-surface-400 rounded-full;
+  border: 2px solid #1A150E;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   @apply bg-surface-500;
 }
 
-/* Recharts Overrides for Dark Theme */
+/* Recharts Overrides — Warm Theme */
 .recharts-cartesian-grid-horizontal line,
 .recharts-cartesian-grid-vertical line {
-  stroke: #27272a;
+  stroke: #2A2318;
+}
+
+.recharts-text {
+  fill: #9C8E76;
 }
 
 .recharts-tooltip-wrapper .recharts-default-tooltip {
-  background-color: #16161d !important;
-  border: 1px solid #3f3f46 !important;
-  border-radius: 8px !important;
+  background-color: #221C13 !important;
+  border: 1px solid #392F20 !important;
+  border-radius: 10px !important;
+  color: #F4ECDD !important;
 }
 
 /* Onboarding Wizard Animations */
 @keyframes slideUpFade {
-  0% {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes slideLeftFade {
-  0% {
-    opacity: 0;
-    transform: translateX(20px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(0);
-  }
+  0% { opacity: 0; transform: translateX(20px); }
+  100% { opacity: 1; transform: translateX(0); }
 }
 
 @keyframes slideRightFade {
-  0% {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(0);
-  }
+  0% { opacity: 0; transform: translateX(-20px); }
+  100% { opacity: 1; transform: translateX(0); }
 }
 
 @keyframes pulseSlow {
-  0%, 100% {
-    opacity: 1;
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.animate-slide-up { animation: slideUpFade 0.4s ease-out forwards; }
+.animate-slide-left { animation: slideLeftFade 0.4s ease-out forwards; }
+.animate-slide-right { animation: slideRightFade 0.4s ease-out forwards; }
+.animate-pulse-slow { animation: pulseSlow 3s ease-in-out infinite; }
+
+.onboarding-step-content { animation: slideUpFade 0.4s ease-out; }
+
+/* Respect users who prefer reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
-  50% {
-    opacity: 0.7;
-  }
-}
-
-.animate-slide-up {
-  animation: slideUpFade 0.4s ease-out forwards;
-}
-
-.animate-slide-left {
-  animation: slideLeftFade 0.4s ease-out forwards;
-}
-
-.animate-slide-right {
-  animation: slideRightFade 0.4s ease-out forwards;
-}
-
-.animate-pulse-slow {
-  animation: pulseSlow 3s ease-in-out infinite;
-}
-
-/* Onboarding step content transitions */
-.onboarding-step-content {
-  animation: slideUpFade 0.4s ease-out;
 }

@@ -179,13 +179,13 @@ const Analytics: React.FC = () => {
           </div>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={balanceData.data}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
-              <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#71717a' }} tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} stroke="#27272a" />
-              <YAxis tick={{ fontSize: 11, fill: '#71717a' }} stroke="#27272a" />
-              <Tooltip contentStyle={{ backgroundColor: '#16161d', border: '1px solid #3f3f46', borderRadius: '8px' }} labelStyle={{ color: '#a1a1aa' }} itemStyle={{ color: '#f4f4f5' }} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#2A2318" vertical={false} />
+              <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#9C8E76' }} tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} stroke="#2A2318" />
+              <YAxis tick={{ fontSize: 11, fill: '#9C8E76' }} stroke="#2A2318" />
+              <Tooltip contentStyle={{ backgroundColor: '#221C13', border: '1px solid #392F20', borderRadius: '8px' }} labelStyle={{ color: '#C7B9A2' }} itemStyle={{ color: '#F4ECDD' }} />
               <Legend wrapperStyle={{ paddingTop: '20px' }} />
-              <Line type="monotone" dataKey="learning" stroke="#00fff0" name="Learning" strokeWidth={2} dot={false} />
-              <Line type="monotone" dataKey="practice" stroke="#10b981" name="Practice" strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey="learning" stroke="#8FB382" name="Learning" strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey="practice" stroke="#5F8454" name="Practice" strokeWidth={2} strokeDasharray="5 4" dot={false} />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -197,11 +197,11 @@ const Analytics: React.FC = () => {
           <div className="flex items-center gap-3 mb-6"><BarChart3 className="w-5 h-5 text-aging-base" /><h2 className="text-lg font-semibold text-txt-primary">Skills by Freshness</h2></div>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={freshnessData.data}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#27272a" vertical={false} />
-              <XAxis dataKey="range" tick={{ fontSize: 11, fill: '#71717a' }} stroke="#27272a" />
-              <YAxis tick={{ fontSize: 11, fill: '#71717a' }} stroke="#27272a" />
-              <Tooltip contentStyle={{ backgroundColor: '#16161d', border: '1px solid #3f3f46', borderRadius: '8px' }} labelStyle={{ color: '#a1a1aa' }} itemStyle={{ color: '#f4f4f5' }} />
-              <Bar dataKey="count" fill="#00fff0" radius={[4, 4, 0, 0]} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#2A2318" vertical={false} />
+              <XAxis dataKey="range" tick={{ fontSize: 11, fill: '#9C8E76' }} stroke="#2A2318" />
+              <YAxis tick={{ fontSize: 11, fill: '#9C8E76' }} stroke="#2A2318" />
+              <Tooltip contentStyle={{ backgroundColor: '#221C13', border: '1px solid #392F20', borderRadius: '8px' }} labelStyle={{ color: '#C7B9A2' }} itemStyle={{ color: '#F4ECDD' }} />
+              <Bar dataKey="count" fill="#8FB382" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>

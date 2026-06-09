@@ -64,12 +64,13 @@
 4. **Long-term Maintainability** - Type safety, clear separation of concerns, comprehensive documentation
 5. **Boring Tech** - Proven, reliable solutions over trendy ones
 
-### Color Palette
-- Background: #FAFAFA (off-white)
-- Text: #2C3E50 (dark blue-gray)
-- Accent: #4A90E2 (calm blue)
-- Warning: #F39C12 (amber, not red)
-- Freshness indicators: 🟢 (>70%), 🟡 (40-70%), 🔴 (<40%)
+### Color Palette ("Ember & Almanac" — warm editorial dark, see UI/UX Design)
+- Background: #1A150E (warm espresso) on a #14100A–#4C4130 surface scale
+- Text: #F4ECDD (warm parchment), #C7B9A2 (secondary), #9C8E76 (muted) — all AA+ on surfaces
+- Primary accent: #8FB382 (sage / living green)
+- Secondary accent: #C8795A (clay / terracotta)
+- Warning: amber/honey #C9A24E (never alarm-red)
+- Freshness scale (earthy, calm): sage #7DA86A (>70%) → honey #C9A24E (40-70%) → clay #C87B64 (<40%)
 
 ---
 
@@ -1084,25 +1085,35 @@ npm test
 
 ### Visual Design System
 
+> **Design language: "Ember & Almanac" (redesigned 2026-06-09).** A warm, calm,
+> editorial **dark** theme — a candlelit reading room / personal almanac, not a
+> cold neon dashboard. It replaces an earlier generic dark-neon (cyan/purple/glow,
+> Inter) theme that read as default "AI slop" and contradicted the calm-mirror
+> brand. The whole system is driven by semantic Tailwind tokens + `@layer components`
+> classes in `tailwind.config.js` and `src/index.css`, so the look is changed there
+> and cascades across all pages — individual pages rarely hardcode colors.
+
 **Brand Identity:**
 - **Name:** SkillFade
 - **Tagline:** "A mirror, not a coach"
-- **Logo:** Gradient text (blue to indigo) with "Beta" badge
-- **Color Scheme:**
-  - Primary Gradient: Blue (#4A90E2) to Indigo (#6366F1)
-  - Secondary Gradient: Amber (#F39C12) to Orange (#F97316) to Red (#EF4444) (for fade effect)
-  - Background: Gradient from Slate-50 via Blue-50 to Indigo-50
-  - Cards: White with 80% opacity + backdrop blur
-  - Text: Gray-900 for headings, Gray-600 for body
+- **Logo mark:** `LogoIcon` — three descending bars at full → 0.7 → 0.4 opacity (a skill fading). Sits in a sage→clay gradient chip with near-black (`surface-50`) glyph.
+- **Wordmark:** "SkillFade" set in Fraunces (serif) with a `Beta` tag.
+- **Color Scheme (warm, earthy, muted — never neon):**
+  - Surfaces (espresso scale): `surface-50` #14100A (darkest; also the foreground glyph/text color on bright accent fills) → `surface-100` #1A150E (page bg) → `200` #221C13 (cards) → `300` #2B2419 (elevated/inputs) → `400` #3A3122 → `500` #4C4130.
+  - Primary accent — **sage** (#8FB382 at 400): links, primary buttons, focus rings, "fresh."
+  - Secondary accent — **clay/terracotta** (#C8795A at 400): logo-gradient end, balance figures, accents.
+  - Freshness — **sage → honey (#C9A24E) → clay (#C87B64)**, earthy and calm; deliberately no alarm-red.
+  - Text — warm parchment: `txt-primary` #F4ECDD, `txt-secondary` #C7B9A2, `txt-muted` #9C8E76 (all ≥ AA on cards).
+  - Borders — warm hairline rules: `border-subtle` #2A2318, `border` #392F20, `border-emphasis` #4E4231.
+  - Atmosphere — a fixed faint paper-grain overlay (SVG fractal noise, `body::after`, ~4% opacity), a whisper-soft warm `gradient-mesh`, and low-opacity warm "candlelit" ambient shadows (`shadow-glow-*`) that replaced the old neon glows.
 
-**Typography:**
-- **Font Family:** Inter (Google Fonts)
-- **Weights:** 300, 400, 500, 600, 700, 800
-- **Heading Scale:**
-  - H1: 4xl-5xl (2.25rem-3rem) with gradient text
-  - H2: 3xl-4xl (1.875rem-2.25rem)
-  - H3: 2xl (1.5rem)
-  - Body: Base (1rem, 16px)
+**Typography (distinctive pairing — no Inter):**
+- **Display / headings / wordmark:** **Fraunces** (soft characterful serif, optical sizing). Applied to all `h1–h6` via the base layer and to `.text-display-*` marquee numbers via `font-display`.
+- **Body / UI:** **Hanken Grotesk** (warm humanist sans) — the `font-sans` default.
+- **Numerals / metadata:** **IBM Plex Mono** (`font-mono`) for freshness %, "days ago," dates — an instrument/ledger feel; pair with `tabular-nums`.
+- **Display scale:** `display-xl` 4.5rem → `display-lg` 3.5rem → `display-md` 2.5rem → `display-sm` 1.75rem, tight tracking, weight 600.
+
+**Signature motif — the "fade bar":** freshness bars use `.fade-track` + `.fade-fill` + `.fade-fill-{fresh|aging|decayed}`, an ink→light horizontal gradient that fades toward its leading edge — the product name made literal. Used on Dashboard/Skills.
 
 **Spacing & Layout:**
 - Max Width: 1280px (7xl container)
@@ -1155,11 +1166,11 @@ npm test
 - Freshness color coding (green, yellow, red)
 
 **Common Patterns:**
-- Glassmorphism: White/80 with backdrop blur
-- Rounded corners: xl (0.75rem) to 2xl (1rem)
-- Shadows: lg to 2xl with hover states
-- Transitions: All 200-300ms ease
-- Hover effects: -translate-y-1 (lift), scale-105 (grow)
+- Warm panels: `.card` / `.card-elevated` / `.card-interactive` (espresso surfaces + hairline `border-*` rules + soft `shadow-card`); headers use `surface-200/80` + `backdrop-blur-xl`
+- Reusable component classes (in `src/index.css`): `.btn-primary` (sage), `.btn-secondary`, `.btn-ghost`, `.btn-danger`, `.input`, `.select`, `.tag` / `.tag-accent` / `.tag-secondary` / `.tag-decayed`, `.status-{fresh,aging,decayed,neutral}`, `.fade-track` / `.fade-fill*`, `.label-caps` (small-caps ledger label)
+- Rounded corners: lg (0.5rem) buttons/inputs, xl (0.75rem) cards, 2xl (1rem) modals
+- Transitions: 200-300ms ease; card hover lifts `-translate-y-0.5` + `shadow-card-hover`
+- Motion respects `prefers-reduced-motion` (animations/transitions reduced to ~0)
 
 ### Animations
 
@@ -1201,72 +1212,50 @@ npm test
 
 ### Custom Utilities
 
-**Tailwind Extensions:**
-- `.animation-delay-200/400/600/800`: Staggered animations
-- `.card-shadow`: Standard card elevation
-- `.card-shadow-lg`: Enhanced card elevation
-- `.text-gradient`: Purple-pink gradient text
-- `.bg-glass`: Glassmorphism background
+**Tailwind utilities & component classes** (defined in `src/index.css`):
+- `.text-gradient-accent`: sage→clay gradient text (the "fade")
+- `.bg-mesh`: warm espresso + whisper-soft earthen `gradient-mesh`
+- `.label-caps`: small-caps ledger label (`tracking-label` 0.12em)
+- `.animation-delay-100..500`: staggered reveals
+- `.fade-track` / `.fade-fill` / `.fade-fill-{fresh,aging,decayed,neutral}`: signature freshness bars
+- `.glow-{accent,fresh,aging,decayed}`: soft warm ambient halos (not neon)
 
 **Scrollbar Styling:**
-- Custom webkit scrollbar (10px width)
-- Light gray track (#f1f1f1)
-- Medium gray thumb (#cbd5e0)
-- Rounded corners (5px)
+- Warm webkit scrollbar (9px), `surface-400` thumb on `surface-100` track, rounded
 
 ### Design Tokens
 
-**Border Radius:**
-- sm: 0.25rem
-- md: 0.375rem (default)
-- lg: 0.5rem
-- xl: 0.75rem (cards)
-- 2xl: 1rem (modals, large cards)
-- full: 9999px (badges, pills)
+**Border Radius:** lg 0.5rem (buttons/inputs) · xl 0.75rem (cards) · 2xl 1rem (modals) · full (badges/pills)
 
-**Shadows:**
-- sm: Subtle hover
-- md: Default card
-- lg: Elevated card
-- xl: Modal/overlay
-- 2xl: Maximum elevation
+**Shadows (warm):** `shadow-card` (default panel) · `shadow-card-hover` (lift/modal) · `shadow-glow-{accent,secondary,fresh,aging,decayed}` (soft candlelit ambient, low opacity)
 
 **Icons:**
-- Emoji-based (no icon library)
-- Consistent sizing: 2xl-4xl for featured icons
-- Semantic usage: 🟢 fresh, 🟡 aging, 🔴 decayed
+- **lucide-react** icon set (NOT emoji) throughout the app and admin
+- Freshness state shown via colored `.status-{fresh,aging,decayed}` dots + `.fade-fill` bars
 
-### Dark Mode Implementation
+### Theme Model (single warm-dark)
 
-**Theme System:**
-- **Context:** ThemeContext (`frontend/src/context/ThemeContext.tsx`)
-- **Storage:** localStorage key `theme`
-- **Mode:** Tailwind CSS class-based (`darkMode: 'class'` in config)
-- **Toggle:** Moon/Sun emoji button in Layout header (🌙 for light mode, ☀️ for dark mode)
-- **Default:** System preference detection via `window.matchMedia('(prefers-color-scheme: dark)')`
+The app ships a **single, cohesive warm-dark theme** ("Ember & Almanac"). There is no
+light variant and no per-user light/dark toggle in the product surface — `html` is
+`color-scheme: dark` and the body is always the espresso palette. `darkMode: 'class'`
+remains set in `tailwind.config.js` (harmless; the design does not depend on a `.dark`
+class, and no `.dark` class is added to `html`).
 
-**Color Mappings:**
-- Backgrounds: `bg-white/80` → `dark:bg-gray-800/80`
-- Main backgrounds: `from-slate-50 via-blue-50 to-indigo-50` → `dark:from-gray-900 dark:via-gray-800 dark:to-gray-900`
-- Text colors:
-  - `text-gray-900` → `dark:text-gray-100`
-  - `text-gray-700` → `dark:text-gray-300`
-  - `text-gray-600` → `dark:text-gray-400`
-  - `text-gray-500` → `dark:text-gray-400`
-- Borders: `border-gray-200` → `dark:border-gray-700`
-- Accent colors: `text-blue-600` → `dark:text-blue-400`
-- Cards: Glassmorphism maintained with dark variants
+> **Implementation note for future agents:** because `.dark` is never applied, any
+> Tailwind `dark:` variant classes are dead (they never activate) and any bare
+> light-mode classes (`bg-white`, `text-gray-*`, `amber-50`, etc.) render as-is on the
+> dark theme — both are bugs. Use the semantic tokens (`surface-*`, `txt-*`, `accent-*`,
+> `secondary-*`, `fresh/aging/decayed`, `border-*`) instead. `ThemeContext` may still
+> exist in the tree but is effectively a no-op for styling.
 
-**Integration:**
-- Wrapped entire app in ThemeProvider in `App.tsx`
-- `useTheme()` hook available in all components
-- Theme persists across sessions via localStorage
-- Smooth transitions with `transition-colors duration-300`
+**Contrast:** the palette is tuned to WCAG AA — `txt-muted` ≥ 4.5:1 on the lightest
+card (`surface-300`), and near-black `surface-50` glyphs/labels read ≥ 5.7:1 on every
+accent fill (sage/clay/honey). Re-check these two cases when adjusting any token.
 
 ---
 
-**Last Updated:** 2026-05-14
-**Project Status:** Production-ready MVP with Enhanced UI/UX + Dark Mode + Activity Calendar + Phase 1, 2, 6 & Category Features + Admin Panel + Buy Me a Coffee Integration + Support Ticketing System + Onboarding Wizard + Forgot Password System + Comprehensive VPS Deployment Guide (Ubuntu 22.04 & 24.04 LTS) + Google Search Console + Google Analytics 4 (Consent Mode v2) + Per-page SEO with structured data + robots.txt + sitemap.xml + Privacy Policy page ✅
+**Last Updated:** 2026-06-09
+**Project Status:** Production-ready MVP with "Ember & Almanac" UI redesign (warm editorial dark theme) + Activity Calendar + Phase 1, 2, 6 & Category Features + Admin Panel + Buy Me a Coffee Integration + Support Ticketing System + Onboarding Wizard + Forgot Password System + Comprehensive VPS Deployment Guide (Ubuntu 22.04 & 24.04 LTS) + Google Search Console + Google Analytics 4 (Consent Mode v2) + Per-page SEO with structured data + robots.txt + sitemap.xml + Privacy Policy page ✅
 
 ### Phase 1 Features (Completed 2026-01-09)
 - **Freshness History Graph**: Line chart showing skill freshness over 90 days
@@ -1553,3 +1542,42 @@ Follow-up to the 2026-05-14 PWA section. Users reported that UI updates weren't 
 
 #### Note for future deploys
 When adding an nginx `location` block intended to override the static-asset regex `~* \.(js|css|...)$`, always use exact-match (`location = /path`). Plain-prefix `location /path` is evaluated **after** regex and will be silently overridden — this is the nginx location-precedence gotcha that froze `sw.js` for months.
+
+### UI Redesign — "Ember & Almanac" warm editorial theme (Added 2026-06-09)
+A full visual redesign of the frontend. The previous theme was a generic dark-neon
+look (cyan `#00fff0` + violet `#a855f7` accents, neon `shadow-glow-*` halos, Inter +
+JetBrains Mono) that read as default "AI slop" and openly contradicted the brand's
+calm "a mirror, not a coach" philosophy. It was replaced with a warm, calm, editorial
+**dark** theme — a candlelit almanac/reading room.
+
+**What changed (the design is token-driven, so most of it lives in two files):**
+- **`frontend/tailwind.config.js`** — new color tokens (warm espresso `surface-*`, parchment `txt-*`, **sage** primary `accent-*`, **clay** `secondary-*`, earthy `fresh`/`aging`/`decayed` = sage→honey→clay), new fonts (`display`=Fraunces, `sans`=Hanken Grotesk, `mono`=IBM Plex Mono), soft warm ambient `shadow-glow-*` (replacing neon), warm `gradient-mesh`, calmer animation curves/`glowPulse`.
+- **`frontend/src/index.css`** — swapped the Google-Fonts import; warm base layer; a fixed **paper-grain** overlay (`body::after`, SVG fractal noise ~4%); reworked every component class (`.card*`, `.btn-*`, `.input`, `.select`, `.tag*` incl. new `.tag-decayed`, `.modal-*`, `.status-*`); added the signature **`.fade-track` / `.fade-fill-*`** freshness bars, `.label-caps`; warm scrollbar + Recharts overrides; added a `prefers-reduced-motion` block.
+- **`frontend/index.html`** — `theme-color` → `#1A150E`, iOS status bar → `black-translucent`.
+- **Outlier fixes** (off-token classes that never resolved on a dark theme): `BuyMeACoffee.tsx` (dropped dead `dark:`/amber-50 classes → warm honey), `ProGate.tsx` (gray/`dark:` → tokens), `admin/Pagination.tsx` (`text-white`→`text-surface-50`), `AdminUserDetail.tsx` (`blue-500`/`green-500` → `accent-400`/`fresh-base`), `AdminLayout.tsx` (red→clay logo chip + `.tag-decayed` now defined).
+- **Hero polish:** serif wordmark in `Layout`/`Landing`/`Login`/`Register`/`AdminLayout`; removed neon `animate-glow-pulse` from the Landing hero dots; `Dashboard` now uses the `.fade-fill` bars, `.label-caps`, and `font-mono` tabular numerals.
+
+**Verification performed:** WCAG AA contrast computed for all critical pairs before
+writing (only `decayed`-as-text needed a nudge to #C87B64 for 4.5:1); `npm run build`
+passes (tsc + vite clean — the rollup-native error seen mid-task was the npm
+optional-deps bug, fixed with `npm i @rollup/rollup-darwin-arm64`, not a code issue);
+Landing, Login, and the Dashboard "Recent Skills" card were rendered via headless
+Chrome and visually confirmed (warm palette, Fraunces loading, calm freshness scale,
+legible text, no neon). Only 2 of 60 `.tsx` files needed hand-fixing — the rest
+cascaded from the token layer.
+
+In-app charts (Recharts in `Analytics.tsx` / `SkillDetail.tsx`) take hex strings, not
+token classes, so their colors are hardcoded to the new palette by hand. Convention:
+**Learning = sage `#8FB382` (solid), Practice = green `#5F8454` (dashed)** — Practice
+stays green app-wide (Dashboard, QuickLogWidget); it is separated from Learning by
+dash + darkness, never by switching it to clay (clay ≈ `decayed`, which would read as
+"decay" on an activity chart).
+
+**Known-skipped (future polish):** the static brand icons `frontend/public/favicon.svg`
+and `pwa-192x192.svg` / `pwa-512x512.svg` still use the *old* palette. The in-app
+`LogoIcon` component was re-themed, but these standalone SVGs were not — re-color them
+to sage/clay when convenient.
+
+**Design intent for future agents:** keep it calm and warm. No neon, no alarm-red
+(decayed is clay, not red), no gamification. Reach for the semantic tokens; never
+hardcode hex or use bare/`dark:` Tailwind color classes (see "Theme Model" above).
