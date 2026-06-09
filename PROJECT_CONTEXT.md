@@ -1139,7 +1139,7 @@ npm test
 - Error messages with slide-down animation
 
 **Application Layout:**
-- Sticky header with navigation links
+- Sticky header: brand + 3 primary tabs (Dashboard/Skills/Analytics) + "Account" dropdown (Settings, Support, Admin, Buy me a coffee, Logout); hamburger menu below `md`
 - Logo with Beta badge
 - Main content area with max-width container
 - Footer with tagline and values
@@ -1207,7 +1207,7 @@ npm test
 **Responsive Design:**
 - Mobile-first approach
 - Breakpoints: sm (640px), md (768px), lg (1024px), xl (1280px)
-- Navigation collapses on mobile (future enhancement)
+- Both headers collapse below `md` into a hamburger-triggered slide-down disclosure menu (see "Header & Navigation Redesign")
 - Grid layouts adapt: 1 → 2 → 3 columns
 
 ### Custom Utilities
@@ -1683,6 +1683,56 @@ convention). Note: the pre-existing `.prose-custom` class referenced on
 - Request indexing for `/blog` and the first post URL.
 - Validate a post on the Rich Results test (BlogPosting + BreadcrumbList).
 - Verify the OG card via a social-share debugger (now that `og-image.png` exists).
+
+### Header & Navigation Redesign (Added 2026-06-09)
+A UI/UX redesign of both site headers, plus consolidation of the duplicated public
+headers into the one shared component.
+
+**Problems fixed:** no mobile navigation anywhere (public nav links simply vanished
+below `md`; the app nav collapsed to seven unlabeled icon-only targets), ~14 public
+pages each carrying their own inline `<header>` with inconsistent link sets, Blog
+linked from no header at all, 9+ items crammed into one app-header row, and missing
+a11y attributes (`aria-current`, `aria-expanded`, labels on icon buttons).
+
+**Public header (`PublicHeader.tsx`) — now the single header for ALL public pages:**
+- Curated 4-link nav: Features · Learning Decay · Blog · FAQ. Everything else
+  (use-cases, comparisons, compare/*, pillar pages) is reachable via PublicFooter —
+  deliberate ceiling of 4 for calm wayfinding.
+- Active page = sage text + a 2px sage→transparent "ink-rule" underline
+  (`.nav-link-public-active::after`) — the fade motif in miniature; `/blog/*` prefix-matches.
+- Desktop actions: BuyMeACoffee button (≥`lg`), Sign In, Get Started (the one `btn-primary`).
+- Mobile (<`md`): 44×44 hamburger → slide-down disclosure panel (`.menu-panel`) with the
+  4 links, divider, Sign In, full-width Get Started, BMC link.
+- Used by all 14 former inline-header pages + Blog/BlogPost/NotFound. The inline
+  header blocks were deleted from: Landing, Features, FAQ, WhatIsLearningDecay,
+  UseCases, Comparisons, Privacy, LearningVsPractice, SkillDecayFormula, About,
+  Contact, compare/{Anki,Notion,Obsidian}.
+
+**App header (`Layout.tsx`):**
+- Primary tabs reduced to Dashboard / Skills / Analytics (icon + always-visible label
+  at ≥`md`; the old label-hiding trick is gone).
+- Low-frequency destinations moved into an "Account" dropdown (chevron button →
+  `card-elevated` panel): Settings, Support, Admin (admins only), Buy me a coffee,
+  Logout. Outside-click and Escape close it; no scroll lock for the dropdown.
+- Mobile (<`md`): hamburger → slide-down panel with `label-caps` ledger sections
+  ("Navigate" / "Account"), full-width rows, icons + labels.
+
+**Shared interaction contract (both headers):** menus close on route change; Escape
+closes and returns focus to the trigger; body scroll locks only behind the MOBILE
+panel; all lucide icons `aria-hidden`; triggers have `aria-expanded`/`aria-controls`/
+`aria-label`; active links carry `aria-current="page"`; `focus-visible` sage rings.
+No new dependencies — hand-rolled disclosure pattern, plain `useState`/`useEffect`.
+
+**New `index.css` component classes:** `.nav-link-public` / `.nav-link-public-active`
+(+`::after` fading underline), `.menu-panel` (slide-down/dropdown chrome),
+`.menu-item` / `.menu-item-active` (shared row styling for all menus).
+`coffeeUrl` is now exported from `BuyMeACoffee.tsx` (single source for the BMC URL).
+
+**Verification:** `npm run build` (strict tsc + vite) and 8/8 vitest tests pass;
+headless-Chrome screenshots confirmed desktop public header + active underline (on
+/blog), mobile menu open/closed, app desktop header + Account dropdown, app mobile
+panel, and no overflow at 320px. Adversarially reviewed by a 3-lens agent panel
+(regressions / a11y / design-consistency) with per-finding verification.
 
 #### Still client-rendered (note for future agents)
 Posts are client-rendered, so social-share crawlers (Twitter/LinkedIn/Slack) see the

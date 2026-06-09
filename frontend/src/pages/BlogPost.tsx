@@ -69,7 +69,7 @@ const BlogPost: React.FC = () => {
       />
       <PublicHeader />
 
-      <article className="pt-32 pb-24 px-4 sm:px-6 lg:px-8">
+      <article id="main" className="pt-32 pb-24 px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mx-auto">
           <Link
             to="/blog"
