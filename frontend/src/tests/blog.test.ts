@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { stripFrontmatter, estimateReadingTime } from '../lib/markdown';
-import { posts, getPost, getPostBody } from '../lib/blog';
+import { stripFrontmatter, estimateReadingTime } from '../utils/markdown';
+import { posts, getPost, getPostBody } from '../utils/blog';
 
 describe('markdown helpers', () => {
   it('strips a leading front-matter block', () => {

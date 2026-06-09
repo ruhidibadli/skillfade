@@ -1622,8 +1622,8 @@ The slug is the filename with any leading `YYYY-MM-DD-` stripped (override with 
   - `public/rss.xml` — new RSS 2.0 feed served at `/rss.xml` (autodiscovery `<link>`
     added to `index.html`).
 - Post bodies are bundled via `import.meta.glob('../content/blog/*.md', {query:'?raw',eager:true})`
-  in `src/lib/blog.ts` and rendered with `react-markdown` + `remark-gfm` + `rehype-highlight`.
-  Pure helpers live in `src/lib/markdown.ts`.
+  in `src/utils/blog.ts` and rendered with `react-markdown` + `remark-gfm` + `rehype-highlight`.
+  Pure helpers live in `src/utils/markdown.ts`.
 
 #### Routes + pages
 - `/blog` → `src/pages/Blog.tsx` (index; `Blog` + `BreadcrumbList` schema).
@@ -1666,7 +1666,7 @@ convention). Note: the pre-existing `.prose-custom` class referenced on
 #### Files
 - **Created:** `src/content/blog/2026-06-09-the-forgetting-curve-for-developers.md`
   (starter post), `scripts/build-content.mjs`, `scripts/og-template.html`,
-  `src/lib/markdown.ts`, `src/lib/blog.ts`, `src/content/blog/manifest.generated.ts`
+  `src/utils/markdown.ts`, `src/utils/blog.ts`, `src/content/blog/manifest.generated.ts`
   (generated), `src/pages/Blog.tsx`, `src/pages/BlogPost.tsx`, `src/pages/NotFound.tsx`,
   `src/components/PublicHeader.tsx`, `public/logo.svg`, `public/og-image.png`,
   `public/rss.xml` (generated), `src/tests/blog.test.ts`.
