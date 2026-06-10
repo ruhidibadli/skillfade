@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from typing import List
 from uuid import UUID
 from app.core.database import get_db
@@ -7,6 +8,7 @@ from app.models.user import User
 from app.models.event_template import EventTemplate
 from app.schemas.event_template import EventTemplateCreate, EventTemplateUpdate, EventTemplateResponse
 from app.services.auth import get_current_user
+from app.services.entitlements import get_limit
 
 router = APIRouter(prefix="/api/templates", tags=["Event Templates"])
 
@@ -35,6 +37,18 @@ def create_template(
     """
     Create a new event template.
     """
+    # Free-tier template cap (None = unlimited for PRO / grandfathered)
+    tmpl_limit = get_limit(current_user, db, "templates")
+    if tmpl_limit is not None:
+        count = db.query(func.count(EventTemplate.id)).filter(
+            EventTemplate.user_id == current_user.id
+        ).scalar()
+        if count >= tmpl_limit:
+            raise HTTPException(
+                status_code=status.HTTP_402_PAYMENT_REQUIRED,
+                detail={"error": "pro_required", "upgrade_url": "/pricing", "limit": "templates"},
+            )
+
     new_template = EventTemplate(
         user_id=current_user.id,
         name=template_data.name,

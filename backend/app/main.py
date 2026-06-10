@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import auth, skills, events, analytics, settings, templates, categories, admin, tickets, logs, billing
+from app.routers import auth, skills, events, analytics, settings, templates, categories, admin, tickets, logs, billing, webhooks
 from app.core.config import settings as app_settings
 
 app = FastAPI(
@@ -30,6 +30,7 @@ app.include_router(admin.router)
 app.include_router(tickets.router)
 app.include_router(logs.router)
 app.include_router(billing.router)
+app.include_router(webhooks.router)
 
 
 @app.get("/")

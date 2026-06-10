@@ -12,6 +12,7 @@ import BuyMeACoffee from './BuyMeACoffee';
  */
 const navLinks = [
   { to: '/features', label: 'Features' },
+  { to: '/pricing', label: 'Pricing' },
   { to: '/what-is-learning-decay', label: 'Learning Decay' },
   { to: '/faq', label: 'FAQ' },
   { to: '/blog', label: 'Blog' },

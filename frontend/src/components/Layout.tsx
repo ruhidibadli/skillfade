@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { usePlan } from '../context/PlanContext';
 import {
   LayoutDashboard,
   Layers,
@@ -11,6 +12,7 @@ import {
   MessageSquare,
   ChevronDown,
   Coffee,
+  Sparkles,
   Menu,
   X
 } from 'lucide-react';
@@ -21,6 +23,7 @@ import BuyMeACoffee, { coffeeUrl } from './BuyMeACoffee';
 
 const Layout: React.FC = () => {
   const { logout, isAdmin } = useAuth();
+  const { isPro } = usePlan();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -44,6 +47,7 @@ const Layout: React.FC = () => {
   const accountNav = [
     { path: '/settings', label: 'Settings', icon: Settings },
     { path: '/support', label: 'Support', icon: MessageSquare },
+    ...(isPro ? [] : [{ path: '/pricing', label: 'Upgrade to PRO', icon: Sparkles }]),
     ...(isAdmin ? [{ path: '/admin', label: 'Admin', icon: Shield }] : []),
   ];
 

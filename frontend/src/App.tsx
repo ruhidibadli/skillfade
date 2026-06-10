@@ -23,6 +23,9 @@ import CompareObsidian from './pages/compare/Obsidian';
 import Privacy from './pages/Privacy';
 import About from './pages/About';
 import Contact from './pages/Contact';
+import Pricing from './pages/Pricing';
+import BillingSuccess from './pages/BillingSuccess';
+import BillingError from './pages/BillingError';
 import NotFound from './pages/NotFound';
 // Code-split the blog: react-markdown + highlight.js only load on /blog routes,
 // keeping them out of the main bundle that every marketing/app page pays for.
@@ -98,6 +101,9 @@ function App() {
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/pricing" element={<Pricing />} />
+              <Route path="/billing/success" element={<BillingSuccess />} />
+              <Route path="/billing/error" element={<BillingError />} />
               <Route path="/blog" element={<Blog />} />
               <Route path="/blog/:slug" element={<BlogPost />} />
               <Route path="/login" element={<Login />} />

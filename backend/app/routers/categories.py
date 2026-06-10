@@ -8,6 +8,7 @@ from app.models.category import Category
 from app.models.skill import Skill
 from app.schemas.category import CategoryCreate, CategoryUpdate, CategoryResponse
 from app.services.auth import get_current_user
+from app.services.entitlements import get_limit
 from uuid import UUID
 
 router = APIRouter(prefix="/api/categories", tags=["Categories"])
@@ -53,6 +54,18 @@ def create_category(
     """
     Create a new category.
     """
+    # Free-tier category cap (None = unlimited for PRO / grandfathered)
+    cat_limit = get_limit(current_user, db, "categories")
+    if cat_limit is not None:
+        count = db.query(func.count(Category.id)).filter(
+            Category.user_id == current_user.id
+        ).scalar()
+        if count >= cat_limit:
+            raise HTTPException(
+                status_code=status.HTTP_402_PAYMENT_REQUIRED,
+                detail={"error": "pro_required", "upgrade_url": "/pricing", "limit": "categories"},
+            )
+
     # Check if category name already exists for this user
     existing_category = db.query(Category).filter(
         Category.user_id == current_user.id,

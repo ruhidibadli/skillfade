@@ -9,6 +9,7 @@ from app.models.user import User
 from app.models.skill import Skill
 from app.models.event import LearningEvent, PracticeEvent
 from app.services.auth import get_current_user
+from app.services.entitlements import require_pro
 from app.services.freshness import calculate_balance_ratio, get_balance_interpretation, calculate_freshness_history
 from app.schemas.skill import FreshnessHistoryResponse
 
@@ -305,7 +306,8 @@ def get_skill_freshness_history(
 @router.get("/period-comparison")
 def get_period_comparison(
     current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _pro: User = Depends(require_pro),
 ):
     """
     Compare activity between this month and last month.
@@ -385,7 +387,8 @@ def get_period_comparison(
 @router.get("/category-stats")
 def get_category_stats(
     current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _pro: User = Depends(require_pro),
 ):
     """
     Get average freshness and total activity grouped by category.
@@ -453,7 +456,8 @@ def get_category_stats(
 def get_skill_personal_records(
     skill_id: UUID,
     current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _pro: User = Depends(require_pro),
 ):
     """
     Get personal records for a specific skill.

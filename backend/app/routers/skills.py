@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from typing import List
 from datetime import datetime, timezone
 from app.core.database import get_db
@@ -8,10 +9,21 @@ from app.models.skill import Skill
 from app.models.category import Category
 from app.schemas.skill import SkillCreate, SkillUpdate, SkillResponse, SkillArchive, SkillDependencyUpdate
 from app.services.auth import get_current_user
+from app.services.entitlements import require_pro, get_limit, can_use_feature
 from app.services.freshness import calculate_freshness
 from uuid import UUID
 
 router = APIRouter(prefix="/api/skills", tags=["Skills"])
+
+PRO_REQUIRED_DETAIL = {"error": "pro_required", "upgrade_url": "/pricing"}
+
+
+def _require_feature(user: User, db: Session, feature: str):
+    """402 if the user is not entitled to a PRO-only field/feature."""
+    if not can_use_feature(user, db, feature):
+        raise HTTPException(
+            status_code=status.HTTP_402_PAYMENT_REQUIRED, detail=PRO_REQUIRED_DETAIL
+        )
 
 
 def get_skill_freshness_info(skill: Skill):
@@ -145,6 +157,25 @@ def create_skill(
     """
     Create a new skill.
     """
+    # PRO-only fields
+    if skill_data.target_freshness is not None:
+        _require_feature(current_user, db, "freshness_targets")
+    if skill_data.notes:
+        _require_feature(current_user, db, "skill_notes")
+
+    # Free-tier skill cap (None = unlimited for PRO / grandfathered)
+    skill_limit = get_limit(current_user, db, "skills")
+    if skill_limit is not None:
+        active_count = db.query(func.count(Skill.id)).filter(
+            Skill.user_id == current_user.id,
+            Skill.archived_at.is_(None),
+        ).scalar()
+        if active_count >= skill_limit:
+            raise HTTPException(
+                status_code=status.HTTP_402_PAYMENT_REQUIRED,
+                detail={**PRO_REQUIRED_DETAIL, "limit": "skills"},
+            )
+
     # Check if skill name already exists for this user
     existing_skill = db.query(Skill).filter(
         Skill.user_id == current_user.id,
@@ -302,9 +333,12 @@ def update_skill(
         skill.decay_rate = skill_data.decay_rate
 
     if skill_data.target_freshness is not None:
+        _require_feature(current_user, db, "freshness_targets")
         skill.target_freshness = skill_data.target_freshness
 
     if skill_data.notes is not None:
+        if skill_data.notes:
+            _require_feature(current_user, db, "skill_notes")
         skill.notes = skill_data.notes
 
     db.commit()
@@ -344,7 +378,8 @@ def update_skill_dependencies(
     skill_id: UUID,
     dependency_data: SkillDependencyUpdate,
     current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _pro: User = Depends(require_pro),
 ):
     """
     Update skill dependencies (prerequisites).

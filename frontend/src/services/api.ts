@@ -391,7 +391,19 @@ export const tickets = {
 // Billing
 export const billing = {
   me: () => api.get<PlanResponse>('/billing/me'),
+  pricing: () =>
+    api.get<{ lifetime_price_azn: string; currency: string }>('/billing/pricing'),
+  checkout: () =>
+    api.post<{ redirect_url: string; order_id: string }>('/billing/checkout'),
+  status: (orderId: string) =>
+    api.get<{ order_id: string; status: string; is_pro: boolean }>('/billing/status', {
+      params: { order_id: orderId },
+    }),
 };
+
+// Key used to carry the gateway order_id across the Epoint browser redirect,
+// so the success page can reconcile the payment.
+export const PENDING_ORDER_KEY = 'skillfade_pending_order_id';
 
 // Activity Logs (Public endpoint for creating logs)
 export const logs = {
