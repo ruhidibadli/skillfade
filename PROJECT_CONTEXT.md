@@ -462,8 +462,24 @@ Interpretation:
 - `GET /tickets/:id` - Get ticket with replies
 - `POST /tickets/:id/replies` - Add reply to ticket
 
-### Billing (`/billing/*`) - Phase 7
+### Billing (`/billing/*`) - Phase 7 + Payments LIVE
 - `GET /billing/me` - Current user's plan + entitlements (used by frontend `PlanContext`). Response: `{plan, is_pro, status, purchased_at, refunded_at, amount, currency, limits}`.
+- `GET /billing/pricing` - **Public.** Current lifetime price for the pricing page: `{lifetime_price_azn, currency}` (DB override via `app_settings`, else env default).
+- `POST /billing/checkout` - **Auth.** Starts a Lifetime PRO purchase through the shared gateway. Blocks if already PRO (400). Calls the automakler hub `/gateway/checkout`, persists a `pending` Subscription keyed on the hub `order_id`, returns `{redirect_url, order_id}`. On gateway failure → 502.
+- `GET /billing/status?order_id=...` - **Auth.** Authoritative status of the caller's own order; if still `pending`, reconciles with the hub `/gateway/status` (self-heals to `active`). Returns `{order_id, status, is_pro}`. Used by the success page as a backup to the webhook.
+
+### Webhooks (`/webhooks/*`) - Payments LIVE
+- `POST /webhooks/epoint` - **Unauthenticated** (the gateway hub calls it server-to-server). Form fields `data` + `signature`. Verifies the hub signature with `GATEWAY_WEBHOOK_SECRET` (`base64(sha1(secret+data+secret))`, constant-time), looks up the Subscription by `order_id`, and on `success` activates it (plan=`lifetime`, status=`active`) — **idempotent**; on failure marks it `failed`. Invalid signature → 400, unknown order → 404.
+
+### Payment architecture (shared gateway, Payments LIVE)
+SkillFade does **not** hold the Epoint credentials. Payments go through the **automakler gateway hub**, which owns the single Epoint merchant account + callback and routes each result back by project. SkillFade holds only a **gateway API key** (to call `/gateway/checkout` and `/gateway/status`) and a **webhook secret** (to verify the inbound webhook). New config (`app/core/config.py`): `GATEWAY_URL`, `GATEWAY_API_KEY`, `GATEWAY_WEBHOOK_SECRET`. Client module: `app/core/gateway.py` (signing + httpx calls); flow helpers in `app/services/billing.py`. Frontend: `/pricing`, `/billing/success` (reconcile + `usePlan().refresh()`), `/billing/error` pages; `billing.checkout()/status()/pricing()` in `api.ts`; "Upgrade to PRO" entry points in `PublicHeader` and the app `Layout`.
+
+### Paywall enforcement (ACTIVATED)
+The entitlement layer (`require_pro`, `get_limit`, `can_use_feature`) is now **wired into the routers** (previously defined but unused):
+- **PRO-only endpoints** (`Depends(require_pro)` → 402): `GET /analytics/period-comparison`, `GET /analytics/category-stats`, `GET /analytics/skills/:id/personal-records`, `PUT /skills/:id/dependencies`, `GET /settings/export`.
+- **Free-tier caps** (`get_limit`, 402 when over; `None`=unlimited for PRO/grandfathered): `POST /skills` (skills=3), `POST /categories` (categories=2), `POST /templates` (templates=2).
+- **PRO-only fields** (`can_use_feature`, 402): `target_freshness` (`freshness_targets`) and `notes` (`skill_notes`) on `POST/PATCH /skills`.
+All 402s use detail `{"error":"pro_required","upgrade_url":"/pricing"}`. Grandfathered/lifetime users are never blocked (limits are `None`).
 
 ### Admin Pricing (`/admin/pricing`) - Phase 7
 - `GET /admin/pricing` - Current AZN prices for lifetime + early-bird, with a `source` field per value (`db` if overridden, `env` if falling back to the env var).

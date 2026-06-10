@@ -5,6 +5,7 @@ from typing import Dict, Any
 from app.core.database import get_db
 from app.models.user import User
 from app.services.auth import get_current_user
+from app.services.entitlements import require_pro
 import json
 
 router = APIRouter(prefix="/api/settings", tags=["Settings"])
@@ -52,10 +53,11 @@ def update_settings(
 @router.get("/export")
 def export_data(
     current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    _pro: User = Depends(require_pro),
 ):
     """
-    Export all user data as JSON.
+    Export all user data as JSON. PRO-only (backup/restore).
     """
     from app.models.skill import Skill
     from app.models.event import LearningEvent, PracticeEvent

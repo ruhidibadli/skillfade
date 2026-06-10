@@ -39,6 +39,14 @@ class Settings(BaseSettings):
     EPOINT_LIFETIME_PRICE_AZN: str = "49.00"
     EPOINT_EARLY_BIRD_PRICE_AZN: str = "35.00"
 
+    # Shared payment gateway (automakler hub). The hub owns the Epoint credentials
+    # and the single Epoint callback; skillfade calls it to start a payment and
+    # receives a signed webhook. skillfade holds only the gateway API key + the
+    # webhook secret, never the Epoint private key.
+    GATEWAY_URL: str = "https://automakler.az"
+    GATEWAY_API_KEY: str = ""
+    GATEWAY_WEBHOOK_SECRET: str = ""
+
     class Config:
         env_file = ".env"
         case_sensitive = False

@@ -49,6 +49,14 @@ services:
       ENABLE_ALERTS: ${ENABLE_ALERTS:-true}
       MAX_ALERTS_PER_WEEK: ${MAX_ALERTS_PER_WEEK:-1}
       ENVIRONMENT: production
+      # Payment gateway (automakler hub) — keys issued by the hub admin
+      GATEWAY_URL: ${GATEWAY_URL:-https://automakler.az}
+      GATEWAY_API_KEY: ${GATEWAY_API_KEY:-}
+      GATEWAY_WEBHOOK_SECRET: ${GATEWAY_WEBHOOK_SECRET:-}
+      EPOINT_SUCCESS_URL: ${EPOINT_SUCCESS_URL:-https://skillfade.website/billing/success}
+      EPOINT_ERROR_URL: ${EPOINT_ERROR_URL:-https://skillfade.website/billing/error}
+      EPOINT_LIFETIME_PRICE_AZN: ${EPOINT_LIFETIME_PRICE_AZN:-49.00}
+      EPOINT_EARLY_BIRD_PRICE_AZN: ${EPOINT_EARLY_BIRD_PRICE_AZN:-35.00}
     ports:
       - "127.0.0.1:8100:8000"
     networks:
