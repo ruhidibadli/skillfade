@@ -3,6 +3,8 @@ import base64
 import hashlib
 from decimal import Decimal
 
+import pytest
+
 from app.core import gateway
 from app.core.config import settings
 
@@ -48,8 +50,7 @@ class TestCreateCheckout:
         captured = {}
 
         class FakeResp:
-            def raise_for_status(self):
-                pass
+            is_error = False
 
             def json(self):
                 return {"redirect_url": "https://epoint.az/pay/abc", "order_id": "skillfade_x"}
@@ -85,8 +86,7 @@ class TestGetStatus:
         captured = {}
 
         class FakeResp:
-            def raise_for_status(self):
-                pass
+            is_error = False
 
             def json(self):
                 return {"order_id": "skillfade_x", "status": "success"}
@@ -103,3 +103,28 @@ class TestGetStatus:
         assert captured["url"] == "https://hub.test/gateway/status"
         assert captured["kwargs"]["params"] == {"order_id": "skillfade_x"}
         assert captured["kwargs"]["headers"]["Authorization"] == "Bearer key123"
+
+
+class TestErrorSurfacing:
+    def test_create_checkout_raises_gateway_error_with_hub_body(self, monkeypatch):
+        monkeypatch.setattr(settings, "GATEWAY_URL", "https://hub.test")
+        monkeypatch.setattr(settings, "GATEWAY_API_KEY", "key123")
+
+        class FakeResp:
+            is_error = True
+            status_code = 502
+            text = '{"detail":"Payment provider error"}'
+
+            def json(self):
+                return {}
+
+        monkeypatch.setattr(gateway.httpx, "post", lambda url, **kw: FakeResp())
+
+        with pytest.raises(gateway.GatewayError) as exc:
+            gateway.create_checkout(
+                amount=Decimal("49.00"), client_reference="u",
+                description="d", success_url="s", error_url="e",
+            )
+        msg = str(exc.value)
+        assert "502" in msg
+        assert "Payment provider error" in msg
