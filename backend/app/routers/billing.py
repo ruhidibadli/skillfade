@@ -63,6 +63,10 @@ def create_checkout(
             success_url=settings.EPOINT_SUCCESS_URL,
             error_url=settings.EPOINT_ERROR_URL,
         )
+    except gateway.GatewayError as exc:
+        # The hub returned a non-2xx — log its real status + body, not an opaque failure.
+        logger.error("Gateway checkout rejected by hub for user %s: %s", current_user.id, exc)
+        raise HTTPException(status_code=502, detail={"error": "gateway_unavailable"})
     except Exception:
         logger.exception("Gateway checkout failed for user %s", current_user.id)
         raise HTTPException(status_code=502, detail={"error": "gateway_unavailable"})
@@ -94,7 +98,11 @@ def checkout_status(
     if sub.status == "pending":
         try:
             hub = gateway.get_status(order_id)
+        except gateway.GatewayError as exc:
+            logger.warning("Reconcile for %s: hub error: %s", order_id, exc)
+            hub = None
         except Exception:
+            logger.warning("Reconcile for %s failed to reach hub", order_id)
             hub = None
         if hub:
             if hub.get("status") == "success":

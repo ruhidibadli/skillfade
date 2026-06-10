@@ -20,6 +20,21 @@ from app.core.config import settings
 HTTP_TIMEOUT = 30.0
 
 
+class GatewayError(Exception):
+    """Raised when the gateway hub returns a non-2xx response.
+
+    Carries the hub's status code and body so the caller can log the real reason
+    instead of an opaque failure.
+    """
+
+
+def _result(resp, what: str) -> dict:
+    """Return the JSON body, or raise GatewayError with the hub's status + body."""
+    if resp.is_error:
+        raise GatewayError(f"{what} -> HTTP {resp.status_code}: {resp.text[:500]}")
+    return resp.json()
+
+
 def _webhook_secret() -> str:
     """Read at call time so tests can monkeypatch settings."""
     return settings.GATEWAY_WEBHOOK_SECRET
@@ -70,8 +85,7 @@ def create_checkout(
         headers=_auth_headers(),
         timeout=HTTP_TIMEOUT,
     )
-    resp.raise_for_status()
-    return resp.json()
+    return _result(resp, "POST /gateway/checkout")
 
 
 def get_status(order_id: str) -> dict:
@@ -82,5 +96,4 @@ def get_status(order_id: str) -> dict:
         headers=_auth_headers(),
         timeout=HTTP_TIMEOUT,
     )
-    resp.raise_for_status()
-    return resp.json()
+    return _result(resp, "GET /gateway/status")
