@@ -20,12 +20,22 @@ import QuickLogWidget from './QuickLogWidget';
 import OnboardingWizard from './OnboardingWizard';
 import LogoIcon from './LogoIcon';
 import BuyMeACoffee, { coffeeUrl } from './BuyMeACoffee';
+import PageTitle from './PageTitle';
+
+const APP_PAGE_TITLES: Record<string, string> = {
+  '/dashboard': 'Dashboard',
+  '/skills': 'Skills',
+  '/analytics': 'Analytics',
+  '/settings': 'Settings',
+  '/support': 'Support',
+};
 
 const Layout: React.FC = () => {
   const { logout, isAdmin } = useAuth();
   const { isPro } = usePlan();
   const navigate = useNavigate();
   const location = useLocation();
+  const pageTitle = APP_PAGE_TITLES['/' + (location.pathname.split('/')[1] || '')] ?? null;
 
   const [mobileOpen, setMobileOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -286,6 +296,8 @@ const Layout: React.FC = () => {
           </div>
         )}
       </header>
+
+      {pageTitle && <PageTitle title={pageTitle} />}
 
       {/* Main Content */}
       <main id="main" className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
