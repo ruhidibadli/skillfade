@@ -442,6 +442,8 @@ Interpretation:
 - `GET /analytics/period-comparison` - Compare this month vs last month activity (Phase 2)
 - `GET /analytics/category-stats` - Average freshness and activity grouped by category (Phase 2)
 - `GET /analytics/skills/:id/personal-records` - Personal records for a skill (Phase 2)
+- `GET /analytics/time-summary` - **Free.** Account + per-skill total hours logged, with duration coverage (Time-Invested suite)
+- `GET /analytics/time-report?start=&end=&skill_id=` - **PRO** (`require_pro`). Date-range time breakdown: per-skill/category hours, monthly trend, and the hours-vs-freshness overlay (Time-Invested suite)
 
 ### Settings (`/settings/*`)
 - `GET /settings` - Get user settings
@@ -476,7 +478,8 @@ SkillFade does **not** hold the Epoint credentials. Payments go through the **au
 
 ### Paywall enforcement (ACTIVATED)
 The entitlement layer (`require_pro`, `get_limit`, `can_use_feature`) is now **wired into the routers** (previously defined but unused):
-- **PRO-only endpoints** (`Depends(require_pro)` → 402): `GET /analytics/period-comparison`, `GET /analytics/category-stats`, `GET /analytics/skills/:id/personal-records`, `PUT /skills/:id/dependencies`, `GET /settings/export`.
+- **PRO-only endpoints** (`Depends(require_pro)` → 402): `GET /analytics/period-comparison`, `GET /analytics/category-stats`, `GET /analytics/skills/:id/personal-records`, `GET /analytics/time-report`, `PUT /skills/:id/dependencies`.
+- **Always free (philosophy):** `GET /settings/export` (raw JSON export) and `DELETE /settings/account` are never gated — your data is always yours. *(Export was previously PRO-gated; that contradicted the philosophy and the ROADMAP "Rejected monetization patterns" rule, and was removed 2026-06-13.)* The free `GET /analytics/time-summary` is also ungated.
 - **Free-tier caps** (`get_limit`, 402 when over; `None`=unlimited for PRO/grandfathered): `POST /skills` (skills=3), `POST /categories` (categories=2), `POST /templates` (templates=2).
 - **PRO-only fields** (`can_use_feature`, 402): `target_freshness` (`freshness_targets`) and `notes` (`skill_notes`) on `POST/PATCH /skills`.
 All 402s use detail `{"error":"pro_required","upgrade_url":"/pricing"}`. Grandfathered/lifetime users are never blocked (limits are `None`).
@@ -547,6 +550,7 @@ All 402s use detail `{"error":"pro_required","upgrade_url":"/pricing"}`. Grandfa
 11. **Settings** (`/settings`) - Alert preferences, export, account deletion
 12. **Support** (`/support`) - Support ticket list, create new tickets
 13. **Ticket Detail** (`/support/:id`) - View ticket details and replies, add replies
+14. **Activity Report** (`/reports/activity`) - PRO, print-styled date-range "time invested" report + CSV download; standalone (no app Layout) for clean printing (Time-Invested suite)
 
 ### Admin Pages (Admin only)
 1. **Admin Dashboard** (`/admin`) - System statistics and quick actions
@@ -1270,8 +1274,8 @@ accent fill (sage/clay/honey). Re-check these two cases when adjusting any token
 
 ---
 
-**Last Updated:** 2026-06-09
-**Project Status:** Production-ready MVP with "Ember & Almanac" UI redesign (warm editorial dark theme) + Activity Calendar + Phase 1, 2, 6 & Category Features + Admin Panel + Buy Me a Coffee Integration + Support Ticketing System + Onboarding Wizard + Forgot Password System + Comprehensive VPS Deployment Guide (Ubuntu 22.04 & 24.04 LTS) + Google Search Console + Google Analytics 4 (Consent Mode v2) + Per-page SEO with structured data + robots.txt + sitemap.xml + Privacy Policy page ✅
+**Last Updated:** 2026-06-13
+**Project Status:** Production-ready MVP with "Ember & Almanac" UI redesign (warm editorial dark theme) + Activity Calendar + Phase 1, 2, 6 & Category Features + Admin Panel + Buy Me a Coffee Integration + Support Ticketing System + Onboarding Wizard + Forgot Password System + Comprehensive VPS Deployment Guide (Ubuntu 22.04 & 24.04 LTS) + Google Search Console + Google Analytics 4 (Consent Mode v2) + Per-page SEO with structured data + robots.txt + sitemap.xml + Privacy Policy page + Live Payments (Epoint via gateway hub) + Time-Invested Suite (hours dashboard + Activity Report) ✅
 
 ### Phase 1 Features (Completed 2026-01-09)
 - **Freshness History Graph**: Line chart showing skill freshness over 90 days
@@ -1755,3 +1759,60 @@ Posts are client-rendered, so social-share crawlers (Twitter/LinkedIn/Slack) see
 **default** `og-image.png`, not a per-post hero, until a per-post prerender step is added.
 Google indexes posts fine (it executes JS). If you add a new top-level static page, also
 add it to `STATIC_ROUTES` in `scripts/build-content.mjs` so it stays in the sitemap.
+
+### Time-Invested Suite (Added 2026-06-13)
+Surfaces the `duration_minutes` captured on every event (previously aggregated only in the admin
+panel) as the next PRO value vein, plus an honest fix to the data-export paywall. Design spec:
+`docs/superpowers/specs/2026-06-13-time-invested-suite-design.md`.
+
+**Backend**
+- `app/services/time_stats.py` (new) — pure aggregation. `time_summary(db, user)` (free totals +
+  per-skill hours + duration coverage); `time_report(db, user, start, end, skill_id=None)` (PRO
+  date-range breakdown: totals with learning/practice split + untimed coverage, per-skill,
+  per-category, by-month trend, and an `hours_vs_freshness` overlay computed by reusing
+  `freshness.calculate_freshness(today=min(month_end, end))` at month-ends. The overlay
+  **excludes archived skills** (matching the rest of analytics) and returns `null` for months
+  before a skill existed, so the line shows an honest gap instead of a fake 100%.
+- `app/schemas/analytics.py` (new) — `TimeSummaryResponse`, `TimeReportResponse` (+ nested).
+- `app/routers/analytics.py` — `GET /api/analytics/time-summary` (free) and
+  `GET /api/analytics/time-report?start=&end=&skill_id=` (PRO, `require_pro`; 422 on start>end;
+  defaults to last 12 months; span capped at ~5 years to bound the overlay loop).
+- `app/routers/settings.py` — **`GET /settings/export` un-gated** (removed `require_pro`). Raw data
+  export is now free for every plan, matching the "your data is always yours" philosophy.
+- Tests: `tests/test_time_stats.py` (15 — service aggregation, archived exclusion, overlay null/clamp, endpoint auth/422);
+  `tests/test_paywall.py` `test_export_402_for_free` → `test_export_ok_for_free` (now asserts 200).
+  Full backend suite: **102 passing**.
+
+**Frontend**
+- `src/services/api.ts` — `analytics.timeSummary()`, `analytics.timeReport({start,end,skill_id})`.
+- `src/types/index.ts` — `TimeSummary`, `TimeReport` (+ nested) types.
+- `src/utils/csv.ts` (new) — `toActivityCsv(report)` RFC-4180 serializer (vitest `tests/timeCsv.test.ts`, 6).
+- `src/pages/Analytics.tsx` — new "Time Invested" section: free taste (total hours, sessions,
+  coverage, per-skill top-list) always shown; PRO depth = hours-vs-freshness `ComposedChart`
+  (clay bars + sage freshness line) + per-category roll-up; calm locked panel for free users.
+  Also hardened: the PRO `period-comparison`/`category-stats` calls no longer share one
+  `Promise.all`, so a 402 for a real free user can't blank the free charts.
+- `src/pages/ActivityReport.tsx` (new) at `/reports/activity` — authenticated, **standalone (not
+  inside app `Layout`)** so it prints clean. PRO-gated (calm upsell for free). Date-range presets
+  (Last 12 months / This year / This quarter / Custom) + "Print / Save as PDF" (`window.print()`)
+  + "Download CSV". Honest copy: session counts, first/last activity, untimed-duration count.
+- `src/App.tsx` — `/reports/activity` route (outside the `Layout` group).
+- `src/index.css` — `@media print` block (hides `.no-print`, drops the paper-grain overlay,
+  forces light/ink-friendly `.report-print`).
+- `src/pages/SkillDetail.tsx` — small free "Xh logged · N sessions" stat in the Timeline header.
+- `src/pages/Settings.tsx` — "Data Export & Reports" card links to the Activity Report; notes export is free.
+
+**Free vs PRO:** Free = total-hours figures (account + per-skill) + coverage + SkillDetail stat.
+PRO = monthly trend, per-category roll-up, hours-vs-freshness overlay, and the date-range Activity
+Report (print + CSV). Raw JSON export is free for all.
+
+**Output choice:** print-styled HTML + client-side CSV — **no new backend dependency, no DB
+migration**. (A server-side PDF via WeasyPrint remains a future option.)
+
+**Philosophy:** pure aggregation/formatting of manually-logged data — no AI, no gamification, no
+third-party sharing, no urgency; numbers stay honest about untimed sessions.
+
+**Known follow-ups (logged, not built):** enforce the advertised 30-day free history window (still
+unenforced anywhere); wire `ProGate` to the other PRO features in the UI (most `PRO_FEATURES` flags
+are still dead); refund flow + Terms/Refund pages + receipt email; other shortlist ideas (live
+`.ics` calendar feed, CSV import, saved views).

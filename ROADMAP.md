@@ -47,6 +47,8 @@
 | **Data export (JSON)** | ✅ | ✅ |
 | **PWA / offline mode** | ✅ | ✅ |
 | **Year-in-Review report** | ❌ | ✅ |
+| **Time-invested dashboard** | Total hours only | Monthly trend + per-category + hours-vs-freshness |
+| **Activity Report (print + CSV)** | ❌ | ✅ |
 | **CSV import** | ❌ | ✅ |
 | **Calendar export (.ics)** | ❌ | ✅ |
 | **Personal API keys** | ❌ | ✅ |
@@ -793,6 +795,17 @@ These are the features that justify the lifetime purchase. They must feel like g
 - **Complexity:** Low
 - **Dependencies:** 7.3
 
+### 8.14 Time-Invested Suite ✅ COMPLETED (2026-06-13)
+- [x] **Description:** Surface the `duration_minutes` already logged on every event as PRO value: an in-app "Time Invested" dashboard (total hours, monthly trend, per-category, hours-vs-freshness overlay) + a date-range **Activity Report** (print-styled HTML "Save as PDF" + CSV) for appraisals / CPD / client billing.
+- [x] **Why:** Recurring, deadline-driven willingness-to-pay; reuses data users already enter. Distinct from 8.2 Year-in-Review (calendar-year, reflective) — this is arbitrary-range, hour-centric, audience-facing.
+- [x] **Free vs PRO:** Free = total-hours figures (account + per-skill) + duration coverage + a SkillDetail stat; PRO = monthly trend, per-category roll-up, hours-vs-freshness overlay, and the date-range report (print + CSV).
+- [x] **Also fixed a philosophy violation:** un-gated `GET /settings/export` (was wrongly `Depends(require_pro)`); raw data export is now free for every plan, per "export & deletion always free".
+- **Output:** print-styled HTML + client-side CSV — **no new backend dependency, no DB migration**. (Server-side PDF via WeasyPrint remains a future option.)
+- **Files:** `backend/app/services/time_stats.py`, `backend/app/schemas/analytics.py`, `backend/app/routers/analytics.py` (+ `settings.py` export fix), `backend/tests/test_time_stats.py`; `frontend/src/pages/ActivityReport.tsx`, `Analytics.tsx`, `utils/csv.ts`, `services/api.ts`, `types/index.ts`, `App.tsx`, `index.css`, `SkillDetail.tsx`, `Settings.tsx`. Spec: `docs/superpowers/specs/2026-06-13-time-invested-suite-design.md`.
+- **Tests:** backend 102 passing (15 new in `test_time_stats.py`); frontend 14 passing (6 new in `timeCsv.test.ts`); `npm run build` clean.
+- **Complexity:** Medium
+- **Dependencies:** 7.3
+
 ---
 
 ## Phase 9: Pricing & Conversion (NEW)
@@ -1003,7 +1016,8 @@ Features that violate the project philosophy (documented to avoid re-proposing):
 | 1.3 | 2026-01-10 | Phase 6 features completed (PWA, Skill Dependencies, Skill Notes) |
 | 1.4 | 2026-05-14 | Monetization strategy added; Phases 7-10 for payment infrastructure, PRO features, pricing/conversion, free tier polish |
 | 1.5 | 2026-05-15 | Payment provider locked in: Epoint.az. Phase 7 rewritten with Epoint-specific endpoints, signature scheme, callback handling, refunds. Pricing converted to AZN. Provider constraints documented. |
+| 1.6 | 2026-06-13 | Time-Invested suite shipped (8.14): in-app hours dashboard + hours-vs-freshness overlay + date-range Activity Report (print + CSV). Data export un-gated (free for all). Payments confirmed live via shared gateway hub. |
 
 ---
 
-**Last Updated:** 2026-05-15
+**Last Updated:** 2026-06-13

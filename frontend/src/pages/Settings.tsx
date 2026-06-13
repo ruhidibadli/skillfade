@@ -215,29 +215,35 @@ const Settings: React.FC = () => {
             <Download className="w-5 h-5 text-secondary-400" />
           </div>
           <div>
-            <h2 className="text-lg font-semibold text-txt-primary">Data Export</h2>
+            <h2 className="text-lg font-semibold text-txt-primary">Data Export &amp; Reports</h2>
             <p className="text-sm text-txt-muted mt-1">
-              Export all your data as a JSON file. This includes all skills, learning events, and practice events.
+              Export all your data as a JSON file (free, always). Or open the Activity Report for a printable, date-range summary of the hours you've logged.
             </p>
           </div>
         </div>
-        <button
-          onClick={handleExport}
-          disabled={exporting}
-          className="btn-secondary flex items-center gap-2"
-        >
-          {exporting ? (
-            <>
-              <Loader2 className="w-4 h-4 animate-spin" />
-              Exporting...
-            </>
-          ) : (
-            <>
-              <Download className="w-4 h-4" />
-              Export Data
-            </>
-          )}
-        </button>
+        <div className="flex flex-wrap gap-3">
+          <button
+            onClick={handleExport}
+            disabled={exporting}
+            className="btn-secondary flex items-center gap-2"
+          >
+            {exporting ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Exporting...
+              </>
+            ) : (
+              <>
+                <Download className="w-4 h-4" />
+                Export Data
+              </>
+            )}
+          </button>
+          <Link to="/reports/activity" className="btn-secondary flex items-center gap-2">
+            <Clock className="w-4 h-4" />
+            Activity Report
+          </Link>
+        </div>
       </div>
 
       {/* Privacy Statement */}

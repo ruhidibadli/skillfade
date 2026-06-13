@@ -71,9 +71,10 @@ class TestProEndpointsGated:
         r = client.put(f"/api/skills/{s.id}/dependencies", headers=_auth(u.email), json={"dependency_ids": []})
         assert r.status_code == 200
 
-    def test_export_402_for_free(self, client, db_session):
+    def test_export_ok_for_free(self, client, db_session):
         u = _make_user(db_session)
-        assert client.get("/api/settings/export", headers=_auth(u.email)).status_code == 402
+        # Raw data export must be free for every plan — "your data is always yours".
+        assert client.get("/api/settings/export", headers=_auth(u.email)).status_code == 200
 
     def test_export_ok_for_pro(self, client, db_session):
         u = _make_pro(db_session)

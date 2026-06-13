@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { analytics } from '../services/api';
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import type { BalanceData, FreshnessData, CalendarData, CalendarEvent, PeriodComparison, CategoryStatsData } from '../types';
+import { LineChart, Line, BarChart, Bar, ComposedChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import type { BalanceData, FreshnessData, CalendarData, CalendarEvent, PeriodComparison, CategoryStatsData, TimeSummary, TimeReport } from '../types';
+import { usePlan } from '../hooks/usePlan';
 import {
   BarChart3,
   Calendar,
@@ -14,7 +16,9 @@ import {
   TrendingDown,
   Folder,
   Loader2,
-  Clock
+  Clock,
+  Lock,
+  ArrowRight
 } from 'lucide-react';
 
 const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -26,23 +30,41 @@ const Analytics: React.FC = () => {
   const [calendarData, setCalendarData] = useState<CalendarData | null>(null);
   const [periodComparison, setPeriodComparison] = useState<PeriodComparison | null>(null);
   const [categoryStats, setCategoryStats] = useState<CategoryStatsData | null>(null);
+  const [timeSummary, setTimeSummary] = useState<TimeSummary | null>(null);
+  const [timeReport, setTimeReport] = useState<TimeReport | null>(null);
+  const [timeError, setTimeError] = useState(false);
   const [period, setPeriod] = useState<'week' | 'month' | 'quarter'>('month');
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [calendarMonth, setCalendarMonth] = useState(new Date().getMonth() + 1);
   const [calendarYear, setCalendarYear] = useState(new Date().getFullYear());
+  const { isPro, loading: planLoading } = usePlan();
 
   useEffect(() => { fetchData(); }, [period]);
   useEffect(() => { fetchCalendarData(); }, [calendarMonth, calendarYear]);
+  // Free summary: fetch once (independent of plan, so no refetch/flash on the isPro flip).
+  useEffect(() => {
+    analytics.timeSummary()
+      .then(r => { setTimeSummary(r.data); setTimeError(false); })
+      .catch(() => setTimeError(true));
+  }, []);
+  // PRO report: only when entitled.
+  useEffect(() => {
+    if (!isPro) { setTimeReport(null); return; }
+    analytics.timeReport().then(r => setTimeReport(r.data)).catch(() => setTimeReport(null));
+  }, [isPro]);
 
   const fetchData = async () => {
     try {
-      const [balanceRes, freshnessRes, comparisonRes, categoryRes] = await Promise.all([
-        analytics.balance(period), analytics.skillsByFreshness(), analytics.periodComparison(), analytics.categoryStats()
+      const [balanceRes, freshnessRes] = await Promise.all([
+        analytics.balance(period), analytics.skillsByFreshness()
       ]);
-      setBalanceData(balanceRes.data); setFreshnessData(freshnessRes.data); setPeriodComparison(comparisonRes.data); setCategoryStats(categoryRes.data);
+      setBalanceData(balanceRes.data); setFreshnessData(freshnessRes.data);
     } catch (error) { console.error('Failed to fetch analytics:', error); }
     finally { setLoading(false); }
+    // PRO analytics — tolerate 402 for free-tier users without blanking the page.
+    analytics.periodComparison().then(r => setPeriodComparison(r.data)).catch(() => setPeriodComparison(null));
+    analytics.categoryStats().then(r => setCategoryStats(r.data)).catch(() => setCategoryStats(null));
   };
 
   const fetchCalendarData = async () => {
@@ -150,6 +172,92 @@ const Analytics: React.FC = () => {
         </div>
         {renderSelectedDateEvents()}
       </div>
+
+      {/* Time Invested */}
+      {(timeSummary || timeError) && (
+        <div className="card-elevated p-6">
+          <div className="flex justify-between items-center mb-6">
+            <div className="flex items-center gap-3"><Clock className="w-5 h-5 text-secondary-400" /><h2 className="text-lg font-semibold text-txt-primary">Time Invested</h2></div>
+            {isPro && <Link to="/reports/activity" className="text-sm text-accent-400 hover:underline flex items-center gap-1">Activity report <ArrowRight className="w-4 h-4" /></Link>}
+          </div>
+
+          {timeError && !timeSummary ? (
+            <p className="text-sm text-txt-muted">Couldn't load your time stats — try refreshing.</p>
+          ) : timeSummary && (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="p-4 bg-secondary-400/10 rounded-lg border border-secondary-400/20">
+                  <span className="label-caps text-txt-muted">Total hours</span>
+                  <p className="text-display-sm font-display font-mono tabular-nums text-secondary-400">{timeSummary.total_hours}h</p>
+                </div>
+                <div className="p-4 bg-surface-300 rounded-lg border border-border-subtle">
+                  <span className="label-caps text-txt-muted">Sessions logged</span>
+                  <p className="text-display-sm font-mono tabular-nums text-txt-primary">{timeSummary.total_sessions}</p>
+                </div>
+                <div className="p-4 bg-surface-300 rounded-lg border border-border-subtle">
+                  <span className="label-caps text-txt-muted">With a duration</span>
+                  <p className="text-display-sm font-mono tabular-nums text-txt-primary">{timeSummary.timed_sessions}</p>
+                  <p className="text-xs text-txt-muted mt-1">{timeSummary.coverage_percent}% of sessions are timed</p>
+                </div>
+              </div>
+
+              {timeSummary.per_skill.length > 0 && (
+                <div className="mt-4">
+                  {timeSummary.per_skill.slice(0, 5).map((s) => (
+                    <div key={s.skill_id} className="flex justify-between text-sm py-1.5 border-b border-border-subtle/50">
+                      <span className="text-txt-secondary">{s.skill_name}{s.archived && <span className="text-txt-muted"> (archived)</span>}</span>
+                      <span className="font-mono tabular-nums text-txt-primary">{s.hours}h <span className="text-txt-muted">· {s.sessions} session{s.sessions !== 1 ? 's' : ''}</span></span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+
+          {/* PRO depth / locked — only after the plan resolves, so a PRO user never sees the upsell flash */}
+          {!planLoading && (isPro ? (
+            timeReport && (
+              <div className="mt-6 space-y-6">
+                <div>
+                  <p className="label-caps text-txt-muted mb-3">Hours vs freshness (last 12 months)</p>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <ComposedChart data={timeReport.hours_vs_freshness}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#2A2318" vertical={false} />
+                      <XAxis dataKey="month" tick={{ fontSize: 11, fill: '#9C8E76' }} stroke="#2A2318" />
+                      <YAxis yAxisId="left" tick={{ fontSize: 11, fill: '#9C8E76' }} stroke="#2A2318" />
+                      <YAxis yAxisId="right" orientation="right" domain={[0, 100]} tick={{ fontSize: 11, fill: '#9C8E76' }} stroke="#2A2318" />
+                      <Tooltip contentStyle={{ backgroundColor: '#221C13', border: '1px solid #392F20', borderRadius: '8px' }} labelStyle={{ color: '#C7B9A2' }} itemStyle={{ color: '#F4ECDD' }} />
+                      <Legend wrapperStyle={{ paddingTop: '20px' }} />
+                      <Bar yAxisId="left" dataKey="hours" name="Hours" fill="#C8795A" radius={[4, 4, 0, 0]} />
+                      <Line yAxisId="right" type="monotone" dataKey="avg_freshness" name="Avg freshness %" stroke="#8FB382" strokeWidth={2} dot={false} connectNulls={false} />
+                    </ComposedChart>
+                  </ResponsiveContainer>
+                </div>
+                {timeReport.per_category.length > 0 && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {timeReport.per_category.map((c) => (
+                      <div key={c.category} className="p-4 bg-surface-300 rounded-lg border border-border-subtle">
+                        <p className="text-sm font-medium text-txt-primary">{c.category}</p>
+                        <p className="text-xl font-mono tabular-nums text-secondary-400 mt-1">{c.hours}h</p>
+                        <p className="text-xs text-txt-muted">{c.skill_count} skill{c.skill_count !== 1 ? 's' : ''} · {c.sessions} session{c.sessions !== 1 ? 's' : ''}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )
+          ) : (
+            <div className="mt-6 p-5 rounded-lg border border-border-subtle bg-surface-300 flex items-start gap-3">
+              <Lock className="w-5 h-5 text-secondary-400 mt-0.5 shrink-0" />
+              <div>
+                <p className="text-sm font-medium text-txt-primary">Your time, broken down</p>
+                <p className="text-sm text-txt-muted mt-1">PRO unlocks the monthly hours-vs-freshness trend, a per-category breakdown, and a printable date-range Activity Report for appraisals, CPD logs, or client billing.</p>
+                <Link to="/pricing" className="btn-primary text-sm mt-3 inline-flex">Upgrade to PRO</Link>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Balance Chart */}
       {balanceData && (

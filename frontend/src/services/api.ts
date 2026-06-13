@@ -37,7 +37,9 @@ import type {
   ActivityLogStats,
   PlanResponse,
   AdminPricing,
-  AdminSubscription
+  AdminSubscription,
+  TimeSummary,
+  TimeReport
 } from '../types';
 
 const API_URL = import.meta.env.VITE_API_URL || '/api';
@@ -193,6 +195,12 @@ export const analytics = {
 
   personalRecords: (skillId: string) =>
     api.get<PersonalRecords>(`/analytics/skills/${skillId}/personal-records`),
+
+  timeSummary: () =>
+    api.get<TimeSummary>('/analytics/time-summary'),
+
+  timeReport: (params?: { start?: string; end?: string; skill_id?: string }) =>
+    api.get<TimeReport>('/analytics/time-report', { params }),
 };
 
 // Settings
