@@ -17,6 +17,7 @@ import {
   CreditCard
 } from 'lucide-react';
 import LogoIcon from './LogoIcon';
+import PageTitle from './PageTitle';
 
 const AdminLayout: React.FC = () => {
   const { logout } = useAuth();
@@ -113,6 +114,8 @@ const AdminLayout: React.FC = () => {
           </div>
         </nav>
       </header>
+
+      <PageTitle title="Admin" />
 
       {/* Main Content */}
       <main className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">

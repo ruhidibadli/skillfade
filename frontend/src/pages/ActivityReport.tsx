@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { analytics } from '../services/api';
 import { usePlan } from '../context/PlanContext';
 import { toActivityCsv } from '../utils/csv';
+import PageTitle from '../components/PageTitle';
 import type { TimeReport } from '../types';
 import { ArrowLeft, Printer, Download, Lock, Loader2, Clock } from 'lucide-react';
 
@@ -100,6 +101,7 @@ const ActivityReport: React.FC = () => {
   if (!isPro) {
     return (
       <div className="min-h-screen flex items-center justify-center p-6">
+        <PageTitle title="Activity Report" />
         <div className="card-elevated p-8 max-w-md text-center">
           <Lock className="w-8 h-8 text-secondary-400 mx-auto mb-4" />
           <h1 className="text-display-sm text-txt-primary mb-2">A PRO feature</h1>
@@ -115,6 +117,7 @@ const ActivityReport: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-mesh">
+      <PageTitle title="Activity Report" />
       <div className="max-w-4xl mx-auto p-6">
         {/* Toolbar — hidden when printing */}
         <div className="no-print mb-6 flex flex-wrap items-center justify-between gap-4">

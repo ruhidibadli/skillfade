@@ -1,6 +1,6 @@
 import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { HelmetProvider } from 'react-helmet-async';
+import { HelmetProvider, Helmet } from 'react-helmet-async';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { PlanProvider } from './context/PlanContext';
 import { ThemeProvider } from './context/ThemeContext';
@@ -77,6 +77,9 @@ const PageFallback = () => (
 function App() {
   return (
     <HelmetProvider>
+      {/* Backstop title: any page without its own <title> falls back to this instead of
+          showing the previous page's title (the "Sign In" stuck-tab bug). */}
+      <Helmet defaultTitle="SkillFade — Skill Decay Tracker" />
       <ThemeProvider>
         <AuthProvider>
           <PlanProvider>
