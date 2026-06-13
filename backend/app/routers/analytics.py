@@ -532,7 +532,7 @@ def get_time_report(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail="start must be on or before end",
         )
-    # Bound the span so the per-month freshness loop stays cheap.
+    # Bound the span — the per-month freshness loop is O(months × skills × events).
     if (end - start).days > _MAX_REPORT_DAYS:
         start = end - timedelta(days=_MAX_REPORT_DAYS)
     return time_report(db, current_user, start, end, skill_id)

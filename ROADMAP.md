@@ -802,7 +802,7 @@ These are the features that justify the lifetime purchase. They must feel like g
 - [x] **Also fixed a philosophy violation:** un-gated `GET /settings/export` (was wrongly `Depends(require_pro)`); raw data export is now free for every plan, per "export & deletion always free".
 - **Output:** print-styled HTML + client-side CSV — **no new backend dependency, no DB migration**. (Server-side PDF via WeasyPrint remains a future option.)
 - **Files:** `backend/app/services/time_stats.py`, `backend/app/schemas/analytics.py`, `backend/app/routers/analytics.py` (+ `settings.py` export fix), `backend/tests/test_time_stats.py`; `frontend/src/pages/ActivityReport.tsx`, `Analytics.tsx`, `utils/csv.ts`, `services/api.ts`, `types/index.ts`, `App.tsx`, `index.css`, `SkillDetail.tsx`, `Settings.tsx`. Spec: `docs/superpowers/specs/2026-06-13-time-invested-suite-design.md`.
-- **Tests:** backend 99 passing (12 new in `test_time_stats.py`); frontend 14 passing (6 new in `timeCsv.test.ts`); `npm run build` clean.
+- **Tests:** backend 102 passing (15 new in `test_time_stats.py`); frontend 14 passing (6 new in `timeCsv.test.ts`); `npm run build` clean.
 - **Complexity:** Medium
 - **Dependencies:** 7.3
 

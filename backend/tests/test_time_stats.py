@@ -133,7 +133,8 @@ class TestTimeReport:
         overlay = {o["month"]: o for o in r["hours_vs_freshness"]}
         assert set(overlay) == {"2026-01", "2026-02"}
         for o in r["hours_vs_freshness"]:
-            assert 0.0 <= o["avg_freshness"] <= 100.0
+            # freshness is None for months before any skill existed, else within bounds
+            assert o["avg_freshness"] is None or 0.0 <= o["avg_freshness"] <= 100.0
 
     def test_date_range_filters(self, db_session):
         u = _user(db_session)
@@ -150,6 +151,32 @@ class TestTimeReport:
         assert r["totals"]["hours"] == 0
         assert r["per_skill"] == []
         assert r["per_category"] == []
+
+    def test_excludes_archived_skills(self, db_session):
+        from datetime import datetime
+        u = _user(db_session)
+        _s1, s2 = _seed(db_session, u)
+        s2.archived_at = datetime.utcnow()  # archive SQL
+        db_session.commit()
+        r = time_report(db_session, u, date(2026, 1, 1), date(2026, 2, 28))
+        names = [p["skill_name"] for p in r["per_skill"]]
+        assert "SQL" not in names and "Python" in names
+        assert r["totals"]["hours"] == 2.5  # SQL's 0.5h dropped with the archived skill
+
+    def test_overlay_null_before_skill_existed(self, db_session):
+        u = _user(db_session)
+        _seed(db_session, u)  # skills created at test runtime, after this past range
+        r = time_report(db_session, u, date(2026, 1, 1), date(2026, 2, 28))
+        assert all(o["avg_freshness"] is None for o in r["hours_vs_freshness"])
+
+    def test_overlay_real_freshness_for_current_month(self, db_session):
+        u = _user(db_session)
+        _seed(db_session, u)
+        today = date.today()
+        r = time_report(db_session, u, date(today.year, today.month, 1), today)
+        last = r["hours_vs_freshness"][-1]
+        assert last["avg_freshness"] is not None
+        assert 0.0 <= last["avg_freshness"] <= 100.0
 
 
 # --- endpoints ----------------------------------------------------------------

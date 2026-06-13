@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { analytics } from '../services/api';
 import { LineChart, Line, BarChart, Bar, ComposedChart, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import type { BalanceData, FreshnessData, CalendarData, CalendarEvent, PeriodComparison, CategoryStatsData, TimeSummary, TimeReport } from '../types';
-import { useIsPro } from '../hooks/usePlan';
+import { usePlan } from '../hooks/usePlan';
 import {
   BarChart3,
   Calendar,
@@ -32,16 +32,27 @@ const Analytics: React.FC = () => {
   const [categoryStats, setCategoryStats] = useState<CategoryStatsData | null>(null);
   const [timeSummary, setTimeSummary] = useState<TimeSummary | null>(null);
   const [timeReport, setTimeReport] = useState<TimeReport | null>(null);
+  const [timeError, setTimeError] = useState(false);
   const [period, setPeriod] = useState<'week' | 'month' | 'quarter'>('month');
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [calendarMonth, setCalendarMonth] = useState(new Date().getMonth() + 1);
   const [calendarYear, setCalendarYear] = useState(new Date().getFullYear());
-  const isPro = useIsPro();
+  const { isPro, loading: planLoading } = usePlan();
 
   useEffect(() => { fetchData(); }, [period]);
   useEffect(() => { fetchCalendarData(); }, [calendarMonth, calendarYear]);
-  useEffect(() => { fetchTimeData(); }, [isPro]);
+  // Free summary: fetch once (independent of plan, so no refetch/flash on the isPro flip).
+  useEffect(() => {
+    analytics.timeSummary()
+      .then(r => { setTimeSummary(r.data); setTimeError(false); })
+      .catch(() => setTimeError(true));
+  }, []);
+  // PRO report: only when entitled.
+  useEffect(() => {
+    if (!isPro) { setTimeReport(null); return; }
+    analytics.timeReport().then(r => setTimeReport(r.data)).catch(() => setTimeReport(null));
+  }, [isPro]);
 
   const fetchData = async () => {
     try {
@@ -54,17 +65,6 @@ const Analytics: React.FC = () => {
     // PRO analytics — tolerate 402 for free-tier users without blanking the page.
     analytics.periodComparison().then(r => setPeriodComparison(r.data)).catch(() => setPeriodComparison(null));
     analytics.categoryStats().then(r => setCategoryStats(r.data)).catch(() => setCategoryStats(null));
-  };
-
-  const fetchTimeData = async () => {
-    try { const res = await analytics.timeSummary(); setTimeSummary(res.data); }
-    catch (error) { console.error('Failed to fetch time summary:', error); }
-    if (isPro) {
-      try { const res = await analytics.timeReport(); setTimeReport(res.data); }
-      catch (error) { console.error('Failed to fetch time report:', error); }
-    } else {
-      setTimeReport(null);
-    }
   };
 
   const fetchCalendarData = async () => {
@@ -174,41 +174,48 @@ const Analytics: React.FC = () => {
       </div>
 
       {/* Time Invested */}
-      {timeSummary && (
+      {(timeSummary || timeError) && (
         <div className="card-elevated p-6">
           <div className="flex justify-between items-center mb-6">
             <div className="flex items-center gap-3"><Clock className="w-5 h-5 text-secondary-400" /><h2 className="text-lg font-semibold text-txt-primary">Time Invested</h2></div>
             {isPro && <Link to="/reports/activity" className="text-sm text-accent-400 hover:underline flex items-center gap-1">Activity report <ArrowRight className="w-4 h-4" /></Link>}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 bg-secondary-400/10 rounded-lg border border-secondary-400/20">
-              <span className="label-caps text-txt-muted">Total hours</span>
-              <p className="text-display-sm font-display font-mono tabular-nums text-secondary-400">{timeSummary.total_hours}h</p>
-            </div>
-            <div className="p-4 bg-surface-300 rounded-lg border border-border-subtle">
-              <span className="label-caps text-txt-muted">Sessions logged</span>
-              <p className="text-display-sm font-mono tabular-nums text-txt-primary">{timeSummary.total_sessions}</p>
-            </div>
-            <div className="p-4 bg-surface-300 rounded-lg border border-border-subtle">
-              <span className="label-caps text-txt-muted">With a duration</span>
-              <p className="text-display-sm font-mono tabular-nums text-txt-primary">{timeSummary.timed_sessions}</p>
-              <p className="text-xs text-txt-muted mt-1">{timeSummary.coverage_percent}% of sessions are timed</p>
-            </div>
-          </div>
-
-          {timeSummary.per_skill.length > 0 && (
-            <div className="mt-4">
-              {timeSummary.per_skill.slice(0, 5).map((s) => (
-                <div key={s.skill_id} className="flex justify-between text-sm py-1.5 border-b border-border-subtle/50">
-                  <span className="text-txt-secondary">{s.skill_name}{s.archived && <span className="text-txt-muted"> (archived)</span>}</span>
-                  <span className="font-mono tabular-nums text-txt-primary">{s.hours}h</span>
+          {timeError && !timeSummary ? (
+            <p className="text-sm text-txt-muted">Couldn't load your time stats — try refreshing.</p>
+          ) : timeSummary && (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="p-4 bg-secondary-400/10 rounded-lg border border-secondary-400/20">
+                  <span className="label-caps text-txt-muted">Total hours</span>
+                  <p className="text-display-sm font-display font-mono tabular-nums text-secondary-400">{timeSummary.total_hours}h</p>
                 </div>
-              ))}
-            </div>
+                <div className="p-4 bg-surface-300 rounded-lg border border-border-subtle">
+                  <span className="label-caps text-txt-muted">Sessions logged</span>
+                  <p className="text-display-sm font-mono tabular-nums text-txt-primary">{timeSummary.total_sessions}</p>
+                </div>
+                <div className="p-4 bg-surface-300 rounded-lg border border-border-subtle">
+                  <span className="label-caps text-txt-muted">With a duration</span>
+                  <p className="text-display-sm font-mono tabular-nums text-txt-primary">{timeSummary.timed_sessions}</p>
+                  <p className="text-xs text-txt-muted mt-1">{timeSummary.coverage_percent}% of sessions are timed</p>
+                </div>
+              </div>
+
+              {timeSummary.per_skill.length > 0 && (
+                <div className="mt-4">
+                  {timeSummary.per_skill.slice(0, 5).map((s) => (
+                    <div key={s.skill_id} className="flex justify-between text-sm py-1.5 border-b border-border-subtle/50">
+                      <span className="text-txt-secondary">{s.skill_name}{s.archived && <span className="text-txt-muted"> (archived)</span>}</span>
+                      <span className="font-mono tabular-nums text-txt-primary">{s.hours}h <span className="text-txt-muted">· {s.sessions} session{s.sessions !== 1 ? 's' : ''}</span></span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
           )}
 
-          {isPro ? (
+          {/* PRO depth / locked — only after the plan resolves, so a PRO user never sees the upsell flash */}
+          {!planLoading && (isPro ? (
             timeReport && (
               <div className="mt-6 space-y-6">
                 <div>
@@ -222,7 +229,7 @@ const Analytics: React.FC = () => {
                       <Tooltip contentStyle={{ backgroundColor: '#221C13', border: '1px solid #392F20', borderRadius: '8px' }} labelStyle={{ color: '#C7B9A2' }} itemStyle={{ color: '#F4ECDD' }} />
                       <Legend wrapperStyle={{ paddingTop: '20px' }} />
                       <Bar yAxisId="left" dataKey="hours" name="Hours" fill="#C8795A" radius={[4, 4, 0, 0]} />
-                      <Line yAxisId="right" type="monotone" dataKey="avg_freshness" name="Avg freshness %" stroke="#8FB382" strokeWidth={2} dot={false} />
+                      <Line yAxisId="right" type="monotone" dataKey="avg_freshness" name="Avg freshness %" stroke="#8FB382" strokeWidth={2} dot={false} connectNulls={false} />
                     </ComposedChart>
                   </ResponsiveContainer>
                 </div>
@@ -243,12 +250,12 @@ const Analytics: React.FC = () => {
             <div className="mt-6 p-5 rounded-lg border border-border-subtle bg-surface-300 flex items-start gap-3">
               <Lock className="w-5 h-5 text-secondary-400 mt-0.5 shrink-0" />
               <div>
-                <p className="text-sm font-medium text-txt-primary">See where your time actually goes</p>
+                <p className="text-sm font-medium text-txt-primary">Your time, broken down</p>
                 <p className="text-sm text-txt-muted mt-1">PRO unlocks the monthly hours-vs-freshness trend, a per-category breakdown, and a printable date-range Activity Report for appraisals, CPD logs, or client billing.</p>
                 <Link to="/pricing" className="btn-primary text-sm mt-3 inline-flex">Upgrade to PRO</Link>
               </div>
             </div>
-          )}
+          ))}
         </div>
       )}
 

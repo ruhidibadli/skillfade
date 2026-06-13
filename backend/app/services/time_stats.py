@@ -95,7 +95,10 @@ def time_report(
 ) -> dict:
     """PRO: full breakdown for [start, end] — totals, per-skill, per-category,
     monthly trend, and the hours-vs-freshness overlay."""
-    query = db.query(Skill).filter(Skill.user_id == user.id)
+    query = db.query(Skill).filter(
+        Skill.user_id == user.id,
+        Skill.archived_at.is_(None),  # match the rest of analytics — archived skills excluded
+    )
     if skill_id is not None:
         query = query.filter(Skill.id == skill_id)
     skills = query.all()
@@ -194,10 +197,13 @@ def time_report(
             "learning_hours": _hours(month_learning[key]),
             "practice_hours": _hours(month_practice[key]),
         })
+        # Clamp the freshness as-of to the report end so the final (current) month
+        # isn't decayed into the future past `end`/today.
+        as_of = min(_month_end(year, month), end)
         hours_vs_freshness.append({
             "month": key,
             "hours": _hours(month_minutes[key]),
-            "avg_freshness": _avg_freshness(skills, _month_end(year, month)),
+            "avg_freshness": _avg_freshness(skills, as_of),
         })
 
     return {
@@ -220,11 +226,18 @@ def time_report(
     }
 
 
-def _avg_freshness(skills: list, as_of: date) -> float:
-    """Mean freshness across the given skills as of `as_of` (month-end), using
-    each skill's own events filtered to that date. Reuses the pure freshness engine."""
+def _avg_freshness(skills: list, as_of: date) -> Optional[float]:
+    """Mean freshness across the given skills as of `as_of`, using each skill's own
+    events filtered to that date. Reuses the pure freshness engine.
+
+    Skills created after `as_of` are skipped — they didn't exist yet, so they must not
+    bias the month toward 100%. Returns None when no skill existed yet, so the overlay
+    shows an honest gap rather than a misleading 0 or 100.
+    """
     values = []
     for skill in skills:
+        if skill.created_at.date() > as_of:
+            continue  # skill did not exist yet this month
         learning = [(e.date, e.type) for e in skill.learning_events if e.date <= as_of]
         practice = [(e.date, e.type) for e in skill.practice_events if e.date <= as_of]
         values.append(calculate_freshness(
@@ -234,4 +247,4 @@ def _avg_freshness(skills: list, as_of: date) -> float:
             base_decay_rate=skill.decay_rate or 0.02,
             today=as_of,
         ))
-    return round(sum(values) / len(values), 1) if values else 0.0
+    return round(sum(values) / len(values), 1) if values else None

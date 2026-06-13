@@ -444,6 +444,8 @@
   .no-print { display: none !important; }
   html, body { background: #ffffff !important; }
   body::after { display: none !important; } /* drop the paper-grain overlay */
+  /* reset the page-chrome wrapper so an enabled "Background graphics" can't leak a dark band */
+  .bg-mesh { background: #ffffff !important; background-image: none !important; min-height: 0 !important; }
   .report-print {
     background: #ffffff !important;
     box-shadow: none !important;

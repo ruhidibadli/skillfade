@@ -594,7 +594,7 @@ export interface TimeReportMonth {
 export interface TimeOverlayPoint {
   month: string;
   hours: number;
-  avg_freshness: number;
+  avg_freshness: number | null;
 }
 
 export interface TimeReport {

@@ -36,24 +36,26 @@ const ActivityReport: React.FC = () => {
   const { isPro, loading: planLoading } = usePlan();
   const [preset, setPreset] = useState<PresetKey>('last12');
   const initial = presetRange('last12');
-  const [start, setStart] = useState(initial.start);
+  const [start, setStart] = useState(initial.start); // draft inputs (Custom)
   const [end, setEnd] = useState(initial.end);
+  const [applied, setApplied] = useState(initial);   // the range actually fetched
   const [report, setReport] = useState<TimeReport | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
   const fetchReport = useCallback(async () => {
+    if (!applied.start || !applied.end) return; // never fire a half-cleared range
     setLoading(true);
     setError(false);
     try {
-      const res = await analytics.timeReport({ start, end });
+      const res = await analytics.timeReport(applied);
       setReport(res.data);
     } catch {
       setError(true);
     } finally {
       setLoading(false);
     }
-  }, [start, end]);
+  }, [applied]);
 
   useEffect(() => {
     if (isPro) fetchReport();
@@ -65,7 +67,12 @@ const ActivityReport: React.FC = () => {
       const r = presetRange(key);
       setStart(r.start);
       setEnd(r.end);
+      setApplied(r);
     }
+  };
+
+  const applyCustom = () => {
+    if (start && end) setApplied({ start, end });
   };
 
   const downloadCsv = () => {
@@ -74,9 +81,12 @@ const ActivityReport: React.FC = () => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `skillfade-activity-${start}_to_${end}.csv`;
+    // Use the server-confirmed range so the filename always matches the data.
+    a.download = `skillfade-activity-${report.range.start}_to_${report.range.end}.csv`;
+    document.body.appendChild(a);
     a.click();
-    URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 0);
   };
 
   if (planLoading) {
@@ -130,7 +140,7 @@ const ActivityReport: React.FC = () => {
             <div className="flex flex-wrap items-center gap-3">
               <label className="text-sm text-txt-muted">From <input type="date" value={start} max={end} onChange={(e) => setStart(e.target.value)} className="input ml-1 inline-block w-auto" /></label>
               <label className="text-sm text-txt-muted">To <input type="date" value={end} min={start} onChange={(e) => setEnd(e.target.value)} className="input ml-1 inline-block w-auto" /></label>
-              <button onClick={fetchReport} className="btn-secondary text-sm">Apply</button>
+              <button onClick={applyCustom} className="btn-secondary text-sm">Apply</button>
             </div>
           )}
         </div>
@@ -142,7 +152,7 @@ const ActivityReport: React.FC = () => {
             <h1 className="text-display-sm font-display text-txt-primary">Activity Report</h1>
           </div>
           <p className="text-txt-muted text-sm mb-6">
-            {fmtDate(start)} – {fmtDate(end)} · SkillFade
+            {fmtDate(report?.range.start ?? applied.start)} – {fmtDate(report?.range.end ?? applied.end)} · SkillFade
           </p>
 
           {loading && <div className="flex items-center gap-2 text-txt-muted py-8"><Loader2 className="w-5 h-5 animate-spin" /> Building report…</div>}
@@ -180,7 +190,7 @@ const ActivityReport: React.FC = () => {
                   </thead>
                   <tbody>
                     {report.per_skill.map((s) => (
-                      <tr key={s.skill_id} className="border-b border-border-subtle/60">
+                      <tr key={s.skill_id} className="border-b border-border-subtle/50">
                         <td className="py-2 pr-2 text-txt-primary">{s.skill_name}</td>
                         <td className="py-2 px-2 text-txt-secondary">{s.category}</td>
                         <td className="py-2 px-2 text-right font-mono tabular-nums text-txt-primary">{s.hours}</td>
@@ -208,7 +218,7 @@ const ActivityReport: React.FC = () => {
                     </thead>
                     <tbody>
                       {report.per_category.map((c) => (
-                        <tr key={c.category} className="border-b border-border-subtle/60">
+                        <tr key={c.category} className="border-b border-border-subtle/50">
                           <td className="py-2 pr-2 text-txt-primary">{c.category}</td>
                           <td className="py-2 px-2 text-right font-mono tabular-nums text-txt-primary">{c.hours}</td>
                           <td className="py-2 px-2 text-right font-mono tabular-nums text-txt-secondary">{c.skill_count}</td>

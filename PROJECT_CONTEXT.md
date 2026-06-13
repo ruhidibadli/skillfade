@@ -1770,16 +1770,18 @@ panel) as the next PRO value vein, plus an honest fix to the data-export paywall
   per-skill hours + duration coverage); `time_report(db, user, start, end, skill_id=None)` (PRO
   date-range breakdown: totals with learning/practice split + untimed coverage, per-skill,
   per-category, by-month trend, and an `hours_vs_freshness` overlay computed by reusing
-  `freshness.calculate_freshness(today=month_end)` at month-ends — cheap, no day-by-day replay).
+  `freshness.calculate_freshness(today=min(month_end, end))` at month-ends. The overlay
+  **excludes archived skills** (matching the rest of analytics) and returns `null` for months
+  before a skill existed, so the line shows an honest gap instead of a fake 100%.
 - `app/schemas/analytics.py` (new) — `TimeSummaryResponse`, `TimeReportResponse` (+ nested).
 - `app/routers/analytics.py` — `GET /api/analytics/time-summary` (free) and
   `GET /api/analytics/time-report?start=&end=&skill_id=` (PRO, `require_pro`; 422 on start>end;
   defaults to last 12 months; span capped at ~5 years to bound the overlay loop).
 - `app/routers/settings.py` — **`GET /settings/export` un-gated** (removed `require_pro`). Raw data
   export is now free for every plan, matching the "your data is always yours" philosophy.
-- Tests: `tests/test_time_stats.py` (12 — service aggregation + endpoint auth/422);
+- Tests: `tests/test_time_stats.py` (15 — service aggregation, archived exclusion, overlay null/clamp, endpoint auth/422);
   `tests/test_paywall.py` `test_export_402_for_free` → `test_export_ok_for_free` (now asserts 200).
-  Full backend suite: **99 passing**.
+  Full backend suite: **102 passing**.
 
 **Frontend**
 - `src/services/api.ts` — `analytics.timeSummary()`, `analytics.timeReport({start,end,skill_id})`.

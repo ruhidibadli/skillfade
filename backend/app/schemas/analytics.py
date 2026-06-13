@@ -72,7 +72,7 @@ class TimeMonth(BaseModel):
 class TimeOverlayPoint(BaseModel):
     month: str
     hours: float
-    avg_freshness: float
+    avg_freshness: Optional[float] = None
 
 
 class TimeReportResponse(BaseModel):

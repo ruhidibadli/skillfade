@@ -353,9 +353,10 @@ const SkillDetail: React.FC = () => {
               {(() => {
                 const mins = events.reduce((s, e) => s + (e.duration_minutes || 0), 0);
                 const hrs = Math.round(mins / 6) / 10;
+                const timed = events.filter((e) => e.duration_minutes != null).length;
                 return (
                   <p className="text-xs text-txt-muted font-mono tabular-nums mt-0.5">
-                    {hrs}h logged · {events.length} session{events.length !== 1 ? 's' : ''}
+                    {hrs}h logged · {timed} of {events.length} session{events.length !== 1 ? 's' : ''} timed
                   </p>
                 );
               })()}
