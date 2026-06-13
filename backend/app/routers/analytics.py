@@ -11,7 +11,9 @@ from app.models.event import LearningEvent, PracticeEvent
 from app.services.auth import get_current_user
 from app.services.entitlements import require_pro
 from app.services.freshness import calculate_balance_ratio, get_balance_interpretation, calculate_freshness_history
+from app.services.time_stats import time_summary, time_report
 from app.schemas.skill import FreshnessHistoryResponse
+from app.schemas.analytics import TimeSummaryResponse, TimeReportResponse
 
 router = APIRouter(prefix="/api/analytics", tags=["Analytics"])
 
@@ -490,3 +492,47 @@ def get_skill_personal_records(
         "skill_name": skill.name,
         **records
     }
+
+
+# Maximum span the time-report will compute freshness across (bounds the overlay loop).
+_MAX_REPORT_DAYS = 366 * 5
+
+
+@router.get("/time-summary", response_model=TimeSummaryResponse)
+def get_time_summary(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """FREE: account + per-skill total hours logged, with duration coverage.
+
+    Surfaces the duration_minutes already captured on every event. The full
+    breakdown + date-range report is PRO (see /time-report).
+    """
+    return time_summary(db, current_user)
+
+
+@router.get("/time-report", response_model=TimeReportResponse)
+def get_time_report(
+    start: date = Query(None, description="ISO date; defaults to one year before end"),
+    end: date = Query(None, description="ISO date; defaults to today"),
+    skill_id: UUID = Query(None, description="Restrict the report to a single skill"),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+    _pro: User = Depends(require_pro),
+):
+    """PRO: time-invested breakdown for a date range — per skill/category, monthly
+    trend, and the hours-vs-freshness overlay. Pure aggregation of logged durations."""
+    today = date.today()
+    if end is None:
+        end = today
+    if start is None:
+        start = end - timedelta(days=365)
+    if start > end:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="start must be on or before end",
+        )
+    # Bound the span so the per-month freshness loop stays cheap.
+    if (end - start).days > _MAX_REPORT_DAYS:
+        start = end - timedelta(days=_MAX_REPORT_DAYS)
+    return time_report(db, current_user, start, end, skill_id)

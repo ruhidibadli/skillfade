@@ -533,3 +533,75 @@ export interface BulkDeleteRequest {
   start_date?: string;
   end_date?: string;
 }
+
+// --- Time-Invested suite ---
+
+export interface TimeSummarySkill {
+  skill_id: string;
+  skill_name: string;
+  archived: boolean;
+  hours: number;
+  sessions: number;
+}
+
+export interface TimeSummary {
+  total_hours: number;
+  total_sessions: number;
+  timed_sessions: number;
+  coverage_percent: number;
+  per_skill: TimeSummarySkill[];
+}
+
+export interface TimeReportTotals {
+  hours: number;
+  sessions: number;
+  timed_sessions: number;
+  untimed_sessions: number;
+  coverage_percent: number;
+  learning_hours: number;
+  practice_hours: number;
+  first_activity: string | null;
+  last_activity: string | null;
+}
+
+export interface TimeReportSkill {
+  skill_id: string;
+  skill_name: string;
+  category: string;
+  hours: number;
+  sessions: number;
+  learning_hours: number;
+  practice_hours: number;
+  first_activity: string | null;
+  last_activity: string | null;
+  untimed_sessions: number;
+}
+
+export interface TimeReportCategory {
+  category: string;
+  hours: number;
+  sessions: number;
+  skill_count: number;
+}
+
+export interface TimeReportMonth {
+  month: string;
+  hours: number;
+  learning_hours: number;
+  practice_hours: number;
+}
+
+export interface TimeOverlayPoint {
+  month: string;
+  hours: number;
+  avg_freshness: number;
+}
+
+export interface TimeReport {
+  range: { start: string; end: string };
+  totals: TimeReportTotals;
+  per_skill: TimeReportSkill[];
+  per_category: TimeReportCategory[];
+  by_month: TimeReportMonth[];
+  hours_vs_freshness: TimeOverlayPoint[];
+}

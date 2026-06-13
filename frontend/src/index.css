@@ -438,3 +438,27 @@
 .prose-content .hljs-deletion { color: #9C8E76; }
 .prose-content .hljs-emphasis { font-style: italic; }
 .prose-content .hljs-strong { font-weight: 700; }
+
+/* --- Print: Activity Report (light, ink-friendly) --- */
+@media print {
+  .no-print { display: none !important; }
+  html, body { background: #ffffff !important; }
+  body::after { display: none !important; } /* drop the paper-grain overlay */
+  .report-print {
+    background: #ffffff !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+  }
+  .report-print * {
+    color: #1a1a1a !important;
+    background: transparent !important;
+  }
+  .report-print .report-table th,
+  .report-print .report-table td {
+    border-color: #cccccc !important;
+  }
+  .report-print h1, .report-print h2 { color: #000000 !important; }
+  @page { margin: 1.5cm; }
+}

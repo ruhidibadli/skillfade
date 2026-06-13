@@ -39,6 +39,7 @@ import Dashboard from './pages/Dashboard';
 import Skills from './pages/Skills';
 import SkillDetail from './pages/SkillDetail';
 import Analytics from './pages/Analytics';
+import ActivityReport from './pages/ActivityReport';
 import Settings from './pages/Settings';
 import Support from './pages/Support';
 import TicketDetail from './pages/TicketDetail';
@@ -168,6 +169,15 @@ function App() {
                   }
                 />
               </Route>
+              {/* Standalone authenticated routes (no app chrome — print-friendly) */}
+              <Route
+                path="/reports/activity"
+                element={
+                  <ProtectedRoute>
+                    <ActivityReport />
+                  </ProtectedRoute>
+                }
+              />
               {/* Admin Routes */}
               <Route element={<AdminLayout />}>
                 <Route

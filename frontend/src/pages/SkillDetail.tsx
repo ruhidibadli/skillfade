@@ -348,7 +348,18 @@ const SkillDetail: React.FC = () => {
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-start gap-3">
             <Calendar className="w-5 h-5 text-txt-muted mt-0.5" />
-            <h2 className="text-lg font-semibold text-txt-primary">Timeline</h2>
+            <div>
+              <h2 className="text-lg font-semibold text-txt-primary">Timeline</h2>
+              {(() => {
+                const mins = events.reduce((s, e) => s + (e.duration_minutes || 0), 0);
+                const hrs = Math.round(mins / 6) / 10;
+                return (
+                  <p className="text-xs text-txt-muted font-mono tabular-nums mt-0.5">
+                    {hrs}h logged · {events.length} session{events.length !== 1 ? 's' : ''}
+                  </p>
+                );
+              })()}
+            </div>
           </div>
           <button onClick={() => setShowAddModal(true)} className="btn-primary flex items-center gap-2">
             <Plus className="w-4 h-4" /> Add Event
