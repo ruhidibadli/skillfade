@@ -65,7 +65,7 @@ Scope clarification from the project owner:
 - No `robots.txt` in `frontend/public/`.
 - No `sitemap.xml` (static or generated).
 - No `og-image.png` (referenced in meta tags but file doesn't exist in `public/`).
-- No `logo.svg` at the path referenced by structured data (`https://skillfade.app/logo.svg`).
+- No `logo.svg` at the path referenced by structured data (`https://skillfade.website/logo.svg`).
 - No Google Search Console verification.
 - No Google Analytics / Plausible / Umami integration.
 - No per-page `<SEO />` usage audit — some pages may rely only on the static `<title>`.
@@ -83,7 +83,7 @@ Scope clarification from the project owner:
 ## 2. Phase 1 — Google Search Console Setup
 
 ### 2.1 Prerequisites
-- A live production URL (the meta tags point to `https://skillfade.app/` — confirm DNS resolves and HTTPS is enabled).
+- A live production URL (the meta tags point to `https://skillfade.website/` — confirm DNS resolves and HTTPS is enabled).
 - Access to DNS settings (for domain-level verification — preferred) **OR** ability to upload a file to `public/` (for URL-prefix verification).
 
 ### 2.2 Verification method — Meta tag (confirmed approach) ✅
@@ -93,7 +93,7 @@ This is the chosen method. URL-prefix property is sufficient since SkillFade onl
 #### Step-by-step
 1. Visit https://search.google.com/search-console.
 2. Click **Add Property → URL prefix**.
-3. Enter `https://skillfade.app/` (use exactly the protocol and trailing slash you serve).
+3. Enter `https://skillfade.website/` (use exactly the protocol and trailing slash you serve).
 4. Under verification methods, expand **HTML tag**. Google shows a tag like:
    ```html
    <meta name="google-site-verification" content="ABCdef123XYZ..." />
@@ -107,7 +107,7 @@ This is the chosen method. URL-prefix property is sufficient since SkillFade onl
 7. Commit and deploy to production. The file is static, served by Nginx from `frontend/dist/`.
 8. After deploy, verify the tag is live:
    ```bash
-   curl -s https://skillfade.app/ | grep google-site-verification
+   curl -s https://skillfade.website/ | grep google-site-verification
    ```
 9. Back in Search Console, click **Verify**. Verification is usually instant once Google sees the tag.
 
@@ -121,10 +121,10 @@ This is the chosen method. URL-prefix property is sufficient since SkillFade onl
 - HTML file upload (downloads `google<code>.html` to drop into `frontend/public/`).
 
 ### 2.3 Post-verification actions
-1. **Submit sitemap** at Search Console → Sitemaps → enter `https://skillfade.app/sitemap.xml`. (Create the sitemap first; see §4.2.)
+1. **Submit sitemap** at Search Console → Sitemaps → enter `https://skillfade.website/sitemap.xml`. (Create the sitemap first; see §4.2.)
 2. **URL Inspection** — paste each public URL and click **Request indexing**. Pages to submit:
    - `/`, `/features`, `/faq`, `/what-is-learning-decay`, `/use-cases`, `/comparisons`.
-3. **Set preferred domain** — under Settings, set `https://skillfade.app` as canonical (no `www`).
+3. **Set preferred domain** — under Settings, set `https://skillfade.website` as canonical (no `www`).
 4. **Link Search Console with Google Analytics** — Settings → Associations → link to the GA4 property created in Phase 2.
 5. **Configure email alerts** — Settings → Users and permissions → add an alert email for indexing errors.
 
@@ -142,7 +142,7 @@ This is the chosen method. URL-prefix property is sufficient since SkillFade onl
 1. Visit https://analytics.google.com.
 2. Admin → Create Property → name: `SkillFade`, set time zone + currency.
 3. Add a **Web data stream**:
-   - Website URL: `https://skillfade.app`
+   - Website URL: `https://skillfade.website`
    - Stream name: `SkillFade Web`
    - **Leave "Enhanced measurement" ON** — this automatically tracks page views, scrolls, outbound clicks, and file downloads without any custom code from you. Sufficient for traffic + geography.
 4. Copy the **Measurement ID** (`G-XXXXXXXXXX`).
@@ -238,7 +238,7 @@ GA4 sets cookies, so GDPR/CCPA compliance requires consent. Even with `anonymize
 - `PROJECT_CONTEXT.md` line 893 — update the analytics rule
 
 ### 3.8 Verification after deploy
-1. Open https://skillfade.app/ in an incognito window, accept cookies in the banner.
+1. Open https://skillfade.website/ in an incognito window, accept cookies in the banner.
 2. In GA4, open **Reports → Realtime** — you should appear as a live user within 30 seconds.
 3. Click a few public pages → confirm each appears as a separate page view in the Realtime "Page path" table.
 4. Navigate to `/login` → page view fires. Navigate to `/dashboard` after logging in → **no** page view should fire (verify in Realtime).
@@ -264,7 +264,7 @@ Disallow: /register
 Disallow: /forgot-password
 Disallow: /reset-password
 
-Sitemap: https://skillfade.app/sitemap.xml
+Sitemap: https://skillfade.website/sitemap.xml
 ```
 Rationale: Marketing routes are crawlable; authenticated routes return SPA shell with no meaningful content for indexing.
 
@@ -273,18 +273,18 @@ Create `frontend/public/sitemap.xml` (static for now; switch to generation when 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://skillfade.app/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
-  <url><loc>https://skillfade.app/features</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
-  <url><loc>https://skillfade.app/faq</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://skillfade.app/what-is-learning-decay</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://skillfade.app/use-cases</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://skillfade.app/comparisons</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://skillfade.website/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://skillfade.website/features</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
+  <url><loc>https://skillfade.website/faq</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://skillfade.website/what-is-learning-decay</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://skillfade.website/use-cases</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://skillfade.website/comparisons</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
 </urlset>
 ```
 **Future:** Generate via a Vite plugin or pre-build script (e.g., `vite-plugin-sitemap`) when blog/dynamic pages exist.
 
 ### 4.3 Canonical URLs
-- Every public page must set `<link rel="canonical" href="https://skillfade.app/<path>" />` via the `<SEO />` component.
+- Every public page must set `<link rel="canonical" href="https://skillfade.website/<path>" />` via the `<SEO />` component.
 - Audit all six public pages and ensure `canonicalUrl` prop is passed.
 
 ### 4.4 Open Graph image
@@ -299,7 +299,7 @@ Create `frontend/public/sitemap.xml` (static for now; switch to generation when 
 
 ### 4.6 HTTPS, redirects, and trailing slashes
 - Confirm Nginx config (`/nginx/`) forces HTTPS redirect.
-- Pick one canonical form: `https://skillfade.app/path` (no trailing slash) and 301-redirect alternatives.
+- Pick one canonical form: `https://skillfade.website/path` (no trailing slash) and 301-redirect alternatives.
 - Confirm www → apex redirect (or vice versa).
 
 ### 4.7 404 page
@@ -617,7 +617,7 @@ Use `Product` schema with `review` aggregateRating (your own honest assessment).
 
 ### 10.4 Open source backlinks
 - The GitHub repo itself is a high-authority backlink target.
-- Cross-link from README.md to skillfade.app.
+- Cross-link from README.md to skillfade.website.
 - Submit to GitHub `awesome-*` lists.
 
 ### 10.5 Internal link audit
@@ -707,7 +707,7 @@ Out of scope for v1 but plan for later.
 ### 13.1 i18n
 - React i18next or react-intl.
 - Translate marketing pages first: EN → DE → FR → ES → JA.
-- Add `<link rel="alternate" hreflang="de" href="https://skillfade.app/de/" />` per language.
+- Add `<link rel="alternate" hreflang="de" href="https://skillfade.website/de/" />` per language.
 - Subdirectory routing (`/de/`, `/fr/`) preferred over subdomains.
 
 ### 13.2 Local
@@ -836,24 +836,24 @@ cd frontend && npm run build && npm run preview
 npx lighthouse http://localhost:4173 --view
 
 # Validate sitemap
-curl -s https://skillfade.app/sitemap.xml | xmllint --noout -
+curl -s https://skillfade.website/sitemap.xml | xmllint --noout -
 
 # Check robots.txt
-curl -s https://skillfade.app/robots.txt
+curl -s https://skillfade.website/robots.txt
 ```
 
 ### Verify deployed schemas
 ```bash
 # Test rich results
-open "https://search.google.com/test/rich-results?url=https://skillfade.app/"
+open "https://search.google.com/test/rich-results?url=https://skillfade.website/"
 
 # Test mobile-friendly
-open "https://search.google.com/test/mobile-friendly?url=https://skillfade.app/"
+open "https://search.google.com/test/mobile-friendly?url=https://skillfade.website/"
 ```
 
 ---
 
 **Last Updated:** 2026-05-14
 **Owner:** Ruhid Ibadli
-**Status:** Plan — not yet executed
-**Next Action:** Confirm §0 privacy trade-off decision, then begin Week 1 checklist.
+**Status:** Largely implemented — Weeks 1–3 (GSC, GA4 + consent, robots/sitemap/RSS, SEO component, schema library, marketing/comparison pages) are shipped. This document is retained for historical context.
+**Next Action:** See `SEO_IMPROVEMENT_PLAN.md` for the current audit-driven roadmap and remaining work (prerendering, content build-out, etc.).

@@ -34,7 +34,7 @@ const faqItems: FAQItem[] = [
   },
   {
     question: "Is SkillFade free?",
-    answer: "Yes, SkillFade is free to use. It is open source under the MIT license and can be self-hosted on your own server. There are no premium tiers, no ads, no data monetization, and no hidden costs. The application is designed to be sustainable as a solo project without needing to extract value from users."
+    answer: "SkillFade's core is free to use, with no ads and no data monetization. There is also an optional one-time SkillFade PRO upgrade — a single lifetime payment, not a subscription — that unlocks unlimited skills, full history, skill dependencies, per-skill notes, and advanced analytics. You can also self-host the app for full control over your data. It is designed to stay sustainable as a solo project without extracting value from users."
   },
   {
     question: "Can I self-host SkillFade?",
@@ -63,7 +63,7 @@ const FAQ: React.FC = () => {
     <div className="min-h-screen bg-mesh">
       <SEO
         title="Frequently Asked Questions"
-        description="Common questions about SkillFade, the skill decay tracking application for developers and self-directed learners. Learn how freshness tracking works, how it differs from Anki or Notion, and how to get started."
+        description="Common questions about SkillFade — how skill freshness tracking works, how it differs from Anki, Notion, or spaced repetition apps, and how to get started."
         canonicalUrl="https://skillfade.website/faq"
         structuredData={faqSchema}
       />

@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Code, BookOpen, Briefcase, GraduationCap, Shield, Palette, Zap, CheckCircle } from 'lucide-react';
 import { SEO } from '../components/SEO';
-import { generateArticleSchema } from '../utils/seo';
+import { generateArticleSchema, generateBreadcrumbSchema } from '../utils/seo';
 import PublicFooter from '../components/PublicFooter';
 import PublicHeader from '../components/PublicHeader';
 
@@ -85,13 +85,20 @@ const UseCases: React.FC = () => {
     <div className="min-h-screen bg-mesh">
       <SEO
         title="Use Cases — Who Uses SkillFade and Why"
-        description="From developers maintaining tech stacks to designers, writers, and career switchers — real use cases for tracking skill decay, practice scarcity, and learning balance. A calm tool for self-directed learners."
+        description="Real use cases for SkillFade — developers, designers, writers, and career switchers tracking skill decay, practice scarcity, and learning balance."
         canonicalUrl="https://skillfade.website/use-cases"
         ogType="article"
-        structuredData={generateArticleSchema(
-          'Use Cases — Who Uses SkillFade and Why',
-          'Real-world scenarios showing how developers, designers, writers, career switchers, and knowledge workers use SkillFade to track skill decay and learning balance.'
-        )}
+        structuredData={[
+          generateArticleSchema(
+            'Use Cases — Who Uses SkillFade and Why',
+            'Real-world scenarios showing how developers, designers, writers, career switchers, and knowledge workers use SkillFade to track skill decay and learning balance.',
+            "2026-05-14"
+          ),
+          generateBreadcrumbSchema([
+            { name: 'Home', url: 'https://skillfade.website/' },
+            { name: 'Use Cases', url: 'https://skillfade.website/use-cases' },
+          ]),
+        ]}
       />
 
       {/* Header */}
@@ -233,6 +240,12 @@ const UseCases: React.FC = () => {
                 className="btn-secondary inline-flex items-center gap-2 px-8 py-3"
               >
                 Compare to Other Tools
+              </Link>
+              <Link
+                to="/pricing"
+                className="btn-secondary inline-flex items-center gap-2 px-8 py-3"
+              >
+                See Plans & Pricing
               </Link>
             </div>
           </div>

@@ -45,12 +45,33 @@ const Pricing: React.FC = () => {
     }
   };
 
+  // Product/Offer schema for the paid lifetime tier. Guarded on `price` so we never emit
+  // an empty/invalid Offer while the price is still loading (or failed to load).
+  const offerSchema = price
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'Product',
+        name: 'SkillFade PRO',
+        description:
+          'Lifetime access to SkillFade PRO — unlimited skills, full history, skill dependencies, per-skill notes, and advanced analytics.',
+        brand: { '@type': 'Brand', name: 'SkillFade' },
+        offers: {
+          '@type': 'Offer',
+          price,
+          priceCurrency: 'AZN',
+          availability: 'https://schema.org/InStock',
+          url: 'https://skillfade.website/pricing',
+        },
+      }
+    : undefined;
+
   return (
     <div className="min-h-screen bg-mesh">
       <SEO
-        title="Pricing"
+        title="Pricing — Lifetime PRO, One-Time Payment"
         description="SkillFade PRO is a one-time payment for lifetime access — unlimited skills, advanced analytics, dependencies, notes, and data export. No subscription."
         canonicalUrl="https://skillfade.website/pricing"
+        structuredData={offerSchema}
       />
       <PublicHeader />
 

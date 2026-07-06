@@ -10,8 +10,8 @@ const Features: React.FC = () => {
   return (
     <div className="min-h-screen bg-mesh">
       <SEO
-        title="Features — Skill Freshness, Decay Alerts, Analytics"
-        description="See every SkillFade feature: skill freshness scores, custom decay rates, practice gap alerts, balance ratio analytics, freshness history charts, and event templates. No gamification, no judgment."
+        title="Features — Freshness, Decay Alerts & Analytics"
+        description="SkillFade features: skill freshness scores, custom decay rates, practice-gap alerts, balance-ratio analytics, and freshness history charts. No gamification."
         canonicalUrl="https://skillfade.website/features"
         structuredData={generateSoftwareApplicationSchema()}
       />

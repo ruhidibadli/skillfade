@@ -21,6 +21,7 @@ import CompareAnki from './pages/compare/Anki';
 import CompareNotion from './pages/compare/Notion';
 import CompareObsidian from './pages/compare/Obsidian';
 import Privacy from './pages/Privacy';
+import Terms from './pages/Terms';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import Pricing from './pages/Pricing';
@@ -35,29 +36,30 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
-import Dashboard from './pages/Dashboard';
-import Skills from './pages/Skills';
-import SkillDetail from './pages/SkillDetail';
-import Analytics from './pages/Analytics';
-import ActivityReport from './pages/ActivityReport';
-import Settings from './pages/Settings';
-import Support from './pages/Support';
-import TicketDetail from './pages/TicketDetail';
-import {
-  AdminDashboard,
-  AdminUsers,
-  AdminUserDetail,
-  AdminSkills,
-  AdminCategories,
-  AdminLearningEvents,
-  AdminPracticeEvents,
-  AdminTemplates,
-  AdminTickets,
-  AdminTicketDetail,
-  AdminActivityLogs,
-  AdminPricing,
-  AdminPurchasers
-} from './pages/admin';
+// App + admin pages are lazy-loaded: they carry recharts and authed-only UI that
+// marketing/SEO visitors should never download. Each resolves behind the <Suspense>
+// boundary below, keeping recharts and admin code out of the main bundle.
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Skills = lazy(() => import('./pages/Skills'));
+const SkillDetail = lazy(() => import('./pages/SkillDetail'));
+const Analytics = lazy(() => import('./pages/Analytics'));
+const ActivityReport = lazy(() => import('./pages/ActivityReport'));
+const Settings = lazy(() => import('./pages/Settings'));
+const Support = lazy(() => import('./pages/Support'));
+const TicketDetail = lazy(() => import('./pages/TicketDetail'));
+const AdminDashboard = lazy(() => import('./pages/admin').then((m) => ({ default: m.AdminDashboard })));
+const AdminUsers = lazy(() => import('./pages/admin').then((m) => ({ default: m.AdminUsers })));
+const AdminUserDetail = lazy(() => import('./pages/admin').then((m) => ({ default: m.AdminUserDetail })));
+const AdminSkills = lazy(() => import('./pages/admin').then((m) => ({ default: m.AdminSkills })));
+const AdminCategories = lazy(() => import('./pages/admin').then((m) => ({ default: m.AdminCategories })));
+const AdminLearningEvents = lazy(() => import('./pages/admin').then((m) => ({ default: m.AdminLearningEvents })));
+const AdminPracticeEvents = lazy(() => import('./pages/admin').then((m) => ({ default: m.AdminPracticeEvents })));
+const AdminTemplates = lazy(() => import('./pages/admin').then((m) => ({ default: m.AdminTemplates })));
+const AdminTickets = lazy(() => import('./pages/admin').then((m) => ({ default: m.AdminTickets })));
+const AdminTicketDetail = lazy(() => import('./pages/admin').then((m) => ({ default: m.AdminTicketDetail })));
+const AdminActivityLogs = lazy(() => import('./pages/admin').then((m) => ({ default: m.AdminActivityLogs })));
+const AdminPricing = lazy(() => import('./pages/admin').then((m) => ({ default: m.AdminPricing })));
+const AdminPurchasers = lazy(() => import('./pages/admin').then((m) => ({ default: m.AdminPurchasers })));
 import { ActivityLoggerWrapper } from './hooks/useActivityLogger';
 import RouteTracker from './components/RouteTracker';
 import CookieBanner from './components/CookieBanner';
@@ -103,6 +105,7 @@ function App() {
               <Route path="/learning-vs-practice" element={<LearningVsPractice />} />
               <Route path="/skill-decay-formula" element={<SkillDecayFormula />} />
               <Route path="/privacy" element={<Privacy />} />
+              <Route path="/terms" element={<Terms />} />
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/pricing" element={<Pricing />} />

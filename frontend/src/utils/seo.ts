@@ -54,6 +54,7 @@ export interface ArticleSchema {
   author: {
     "@type": "Organization";
     name: string;
+    url: string;
   };
   publisher: {
     "@type": "Organization";
@@ -125,7 +126,8 @@ export const generateFAQSchema = (faqItems: Array<{ question: string; answer: st
 export const generateArticleSchema = (
   headline: string,
   description: string,
-  datePublished: string = "2024-01-01",
+  datePublished: string,
+  dateModified: string = datePublished,
   baseUrl: string = "https://skillfade.website"
 ): ArticleSchema => ({
   "@context": "https://schema.org",
@@ -134,7 +136,8 @@ export const generateArticleSchema = (
   description,
   author: {
     "@type": "Organization",
-    name: "SkillFade"
+    name: "SkillFade",
+    url: baseUrl
   },
   publisher: {
     "@type": "Organization",
@@ -145,7 +148,7 @@ export const generateArticleSchema = (
     }
   },
   datePublished,
-  dateModified: new Date().toISOString().split('T')[0]
+  dateModified
 });
 
 // ── Blog schemas ────────────────────────────────────────────────────────────

@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, BookOpen, Hammer, Scale } from 'lucide-react';
 import { SEO } from '../components/SEO';
-import { generateArticleSchema } from '../utils/seo';
+import { generateArticleSchema, generateBreadcrumbSchema } from '../utils/seo';
 import PublicFooter from '../components/PublicFooter';
 import PublicHeader from '../components/PublicHeader';
 
@@ -10,14 +10,21 @@ const LearningVsPractice: React.FC = () => {
   return (
     <div className="min-h-screen bg-mesh">
       <SEO
-        title="Learning vs Practice — The Input/Output Balance for Retention"
-        description="Why watching tutorials doesn't make you a developer. The input/output balance separates people who consume knowledge from people who own it. Learn the ratio that actually moves the needle."
+        title="Learning vs Practice — The Input/Output Balance"
+        description="Watching tutorials doesn't make you a developer. The input/output balance separates people who consume knowledge from those who own it. Learn the ratio."
         canonicalUrl="https://skillfade.website/learning-vs-practice"
         ogType="article"
-        structuredData={generateArticleSchema(
-          'Learning vs Practice — The Input/Output Balance for Retention',
-          'A deep dive on the input/output balance: why learning without practice fails, what ratio works, and how to measure your own theory-to-practice ratio.'
-        )}
+        structuredData={[
+          generateArticleSchema(
+            'Learning vs Practice — The Input/Output Balance for Retention',
+            'A deep dive on the input/output balance: why learning without practice fails, what ratio works, and how to measure your own theory-to-practice ratio.',
+            "2026-05-14"
+          ),
+          generateBreadcrumbSchema([
+            { name: 'Home', url: 'https://skillfade.website/' },
+            { name: 'Learning vs Practice', url: 'https://skillfade.website/learning-vs-practice' },
+          ]),
+        ]}
       />
 
       <PublicHeader />

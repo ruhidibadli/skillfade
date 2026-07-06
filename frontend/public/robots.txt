@@ -1,22 +1,45 @@
 User-agent: *
 Allow: /
-Allow: /features
-Allow: /faq
-Allow: /what-is-learning-decay
-Allow: /use-cases
-Allow: /comparisons
-Allow: /blog
-Allow: /privacy
 
 Disallow: /dashboard
 Disallow: /skills
 Disallow: /analytics
 Disallow: /settings
 Disallow: /support
+Disallow: /reports
+Disallow: /billing
 Disallow: /admin
 Disallow: /login
 Disallow: /register
 Disallow: /forgot-password
 Disallow: /reset-password
+
+# AI / answer-engine crawlers are welcome on public content (citation visibility).
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
 
 Sitemap: https://skillfade.website/sitemap.xml

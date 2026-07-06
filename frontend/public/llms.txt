@@ -1,0 +1,29 @@
+# SkillFade
+
+> SkillFade is a skill-decay tracker for developers and self-directed learners.
+> It measures whether your skills are staying fresh or quietly fading — the
+> opposite of a streak counter. A calm mirror, not a coach.
+
+## What it does
+- Tracks a 0–100% freshness score per skill using exponential decay anchored to your last practice.
+- Separates learning events (input: reading, videos, courses) from practice events (output: projects, exercises, work).
+- Surfaces three signals: learning decay, practice scarcity, and input/output imbalance.
+- No gamification: no streaks, badges, points, or leaderboards.
+
+## Key concepts
+- Skill decay / learning decay: the gradual loss of a skill over time without reinforcement (the Ebbinghaus forgetting curve).
+- Freshness score: a 0–100% estimate of how sharp a skill currently is.
+- Input/output balance: the ratio of practice (producing) to learning (consuming); above 1.0 is where retention lives.
+
+## Pricing
+- Free core, plus an optional one-time SkillFade PRO upgrade (lifetime access, no subscription).
+
+## Key pages
+- Home: https://skillfade.website/
+- What is learning decay: https://skillfade.website/what-is-learning-decay
+- The skill decay formula: https://skillfade.website/skill-decay-formula
+- Learning vs practice: https://skillfade.website/learning-vs-practice
+- Features: https://skillfade.website/features
+- Pricing: https://skillfade.website/pricing
+- Comparisons (vs Anki, Notion, Obsidian): https://skillfade.website/comparisons
+- Blog: https://skillfade.website/blog

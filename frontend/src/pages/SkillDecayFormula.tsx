@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, TrendingDown, Calculator } from 'lucide-react';
 import { SEO } from '../components/SEO';
-import { generateArticleSchema } from '../utils/seo';
+import { generateArticleSchema, generateBreadcrumbSchema } from '../utils/seo';
 import PublicFooter from '../components/PublicFooter';
 import PublicHeader from '../components/PublicHeader';
 
@@ -10,14 +10,21 @@ const SkillDecayFormula: React.FC = () => {
   return (
     <div className="min-h-screen bg-mesh">
       <SEO
-        title="The Skill Decay Formula — How Freshness Is Calculated"
-        description="A transparent walkthrough of the SkillFade freshness algorithm. Exponential decay, learning boosts, custom rates per skill, and how to interpret the 0-100% score."
+        title="The Skill Decay Formula — How Freshness Works"
+        description="A transparent walkthrough of the SkillFade freshness algorithm: exponential decay, learning boosts, custom per-skill rates, and how to read the score."
         canonicalUrl="https://skillfade.website/skill-decay-formula"
         ogType="article"
-        structuredData={generateArticleSchema(
-          'The Skill Decay Formula — How Freshness Is Calculated',
-          'A transparent walkthrough of how SkillFade calculates skill freshness: exponential decay, learning boost, and configurable rates.'
-        )}
+        structuredData={[
+          generateArticleSchema(
+            'The Skill Decay Formula — How Freshness Is Calculated',
+            'A transparent walkthrough of how SkillFade calculates skill freshness: exponential decay, learning boost, and configurable rates.',
+            "2026-05-14"
+          ),
+          generateBreadcrumbSchema([
+            { name: 'Home', url: 'https://skillfade.website/' },
+            { name: 'The Skill Decay Formula', url: 'https://skillfade.website/skill-decay-formula' },
+          ]),
+        ]}
       />
 
       <PublicHeader />

@@ -4,6 +4,34 @@ import type { BlogPostMeta } from '../../utils/blog';
 
 export const posts: BlogPostMeta[] = [
   {
+    "slug": "modeling-skill-decay-in-python",
+    "title": "Modeling Skill Decay in ~40 Lines of Python",
+    "description": "The forgetting curve isn't a metaphor. Here's how to model skill decay as data — input vs output, decay from last practice, and a small Python function.",
+    "date": "2026-07-07",
+    "tags": [
+      "python",
+      "skill decay",
+      "forgetting curve",
+      "spaced repetition"
+    ],
+    "readingTimeMinutes": 6,
+    "filename": "2026-07-07-modeling-skill-decay-in-python.md"
+  },
+  {
+    "slug": "streaks-measure-attendance-not-skill",
+    "title": "Streaks Measure Attendance, Not Skill",
+    "description": "A green streak proves you showed up, not that you still know anything. Why engagement metrics hide skill decay — and what to measure instead.",
+    "date": "2026-07-07",
+    "tags": [
+      "streaks",
+      "retention",
+      "skill decay",
+      "learning"
+    ],
+    "readingTimeMinutes": 4,
+    "filename": "2026-07-07-streaks-measure-attendance-not-skill.md"
+  },
+  {
     "slug": "the-forgetting-curve-for-developers",
     "title": "The Ebbinghaus Forgetting Curve, Explained for Developers",
     "description": "The forgetting curve shows how fast unused skills fade. Here's what Ebbinghaus actually found, and how developers can use it to keep skills sharp.",
