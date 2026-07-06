@@ -8,7 +8,7 @@ import { SEO } from '../components/SEO';
 import PublicHeader from '../components/PublicHeader';
 import PublicFooter from '../components/PublicFooter';
 import NotFound from './NotFound';
-import { getPost, getPostBody } from '../utils/blog';
+import { getPost, getPostBody, getRelatedPosts } from '../utils/blog';
 import { generateBlogPostingSchema, generateBreadcrumbSchema } from '../utils/seo';
 
 const formatDate = (iso: string) =>
@@ -39,6 +39,7 @@ const BlogPost: React.FC = () => {
     return <NotFound />;
   }
 
+  const related = getRelatedPosts(post.slug, 2);
   const canonical = `https://skillfade.website/blog/${post.slug}`;
   const schema = [
     generateBlogPostingSchema({
@@ -126,6 +127,28 @@ const BlogPost: React.FC = () => {
               </Link>
             </div>
           </div>
+
+          {related.length > 0 && (
+            <div className="mt-16">
+              <h2 className="text-sm font-mono uppercase tracking-wider text-txt-muted mb-5">
+                Read next
+              </h2>
+              <div className="grid gap-4 sm:grid-cols-2">
+                {related.map((r) => (
+                  <Link
+                    key={r.slug}
+                    to={`/blog/${r.slug}`}
+                    className="card-elevated p-5 group hover:border-accent-400/40 transition-colors"
+                  >
+                    <h3 className="text-base font-semibold text-txt-primary group-hover:text-accent-400 transition-colors mb-1">
+                      {r.title}
+                    </h3>
+                    <p className="text-sm text-txt-muted line-clamp-2">{r.description}</p>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </article>
 

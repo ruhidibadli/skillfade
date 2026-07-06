@@ -30,6 +30,21 @@ export function getPost(slug: string): BlogPostMeta | undefined {
   return posts.find((p) => p.slug === slug);
 }
 
+/**
+ * Posts most related to `slug`, ranked by shared tags (most first), then recency.
+ * Excludes the post itself. Falls back to most-recent posts when nothing shares a tag.
+ */
+export function getRelatedPosts(slug: string, limit = 2): BlogPostMeta[] {
+  const current = getPost(slug);
+  const others = posts.filter((p) => p.slug !== slug);
+  if (!current) return others.slice(0, limit);
+  return others
+    .map((p) => ({ p, shared: p.tags.filter((t) => current.tags.includes(t)).length }))
+    .sort((a, b) => b.shared - a.shared || (a.p.date < b.p.date ? 1 : -1))
+    .slice(0, limit)
+    .map((s) => s.p);
+}
+
 // Bundle every post body at build time as a raw string. Front-matter is stripped
 // at read time because it already lives in the manifest above.
 const rawBodies = import.meta.glob('../content/blog/*.md', {

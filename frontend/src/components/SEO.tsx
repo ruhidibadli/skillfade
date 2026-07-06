@@ -1,6 +1,14 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
 
+const SITE_URL = 'https://skillfade.website';
+
+/** Resolve a possibly-relative image path to an absolute URL (OG/Twitter spec requires absolute). */
+const toAbsoluteUrl = (path: string): string => {
+  if (/^https?:\/\//i.test(path)) return path;
+  return `${SITE_URL}${path.startsWith('/') ? '' : '/'}${path}`;
+};
+
 interface SEOProps {
   title: string;
   description: string;
@@ -20,7 +28,10 @@ export const SEO: React.FC<SEOProps> = ({
   structuredData,
   noIndex = false
 }) => {
-  const fullTitle = title === 'SkillFade' ? title : `${title} | SkillFade`;
+  // Only append the brand when the title doesn't already contain it, so pages like
+  // "SkillFade vs Obsidian …" don't render "… | SkillFade" twice (and overflow 60 chars).
+  const fullTitle = title.includes('SkillFade') ? title : `${title} | SkillFade`;
+  const absoluteImage = toAbsoluteUrl(ogImage);
 
   return (
     <Helmet>
@@ -37,7 +48,7 @@ export const SEO: React.FC<SEOProps> = ({
       <meta property="og:type" content={ogType} />
       <meta property="og:title" content={fullTitle} />
       <meta property="og:description" content={description} />
-      <meta property="og:image" content={ogImage} />
+      <meta property="og:image" content={absoluteImage} />
       {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
       <meta property="og:site_name" content="SkillFade" />
 
@@ -45,7 +56,7 @@ export const SEO: React.FC<SEOProps> = ({
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={fullTitle} />
       <meta name="twitter:description" content={description} />
-      <meta name="twitter:image" content={ogImage} />
+      <meta name="twitter:image" content={absoluteImage} />
 
       {/* Structured Data */}
       {structuredData && (

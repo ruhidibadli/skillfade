@@ -41,7 +41,9 @@ const STATIC_ROUTES = [
   { path: '/faq', lastmod: '2026-05-14', changefreq: 'monthly', priority: '0.7' },
   { path: '/about', lastmod: '2026-05-15', changefreq: 'monthly', priority: '0.6' },
   { path: '/contact', lastmod: '2026-05-15', changefreq: 'monthly', priority: '0.5' },
+  { path: '/pricing', lastmod: '2026-07-07', changefreq: 'monthly', priority: '0.8' },
   { path: '/privacy', lastmod: '2026-05-14', changefreq: 'yearly', priority: '0.3' },
+  { path: '/terms', lastmod: '2026-07-07', changefreq: 'yearly', priority: '0.3' },
 ];
 
 function xmlEscape(value) {
@@ -151,7 +153,7 @@ function writeSitemap(posts) {
   const blogLastmod = posts[0]?.updated || posts[0]?.date || '2026-06-09';
   urls.push(
     `  <url>\n    <loc>${BASE_URL}/blog</loc>\n    <lastmod>${blogLastmod}</lastmod>\n` +
-      `    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n  </url>`
+      `    <changefreq>monthly</changefreq>\n    <priority>0.8</priority>\n  </url>`
   );
   for (const p of posts) {
     urls.push(

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, Outlet, useLocation } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { useAuth } from '../context/AuthContext';
 import { usePlan } from '../context/PlanContext';
 import {
@@ -110,6 +111,11 @@ const Layout: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-mesh flex flex-col">
+      {/* Belt-and-suspenders: app shell is auth-gated + robots.txt-disallowed, but
+          explicitly noindex any authenticated route that somehow gets crawled. */}
+      <Helmet>
+        <meta name="robots" content="noindex, nofollow" />
+      </Helmet>
       {/* Header */}
       <header className="sticky top-0 z-40 bg-surface-200/80 backdrop-blur-xl border-b border-border-subtle">
         <a

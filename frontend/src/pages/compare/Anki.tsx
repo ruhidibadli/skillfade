@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Check, X, Minus } from 'lucide-react';
 import { SEO } from '../../components/SEO';
-import { generateArticleSchema } from '../../utils/seo';
+import { generateArticleSchema, generateBreadcrumbSchema } from '../../utils/seo';
 import PublicFooter from '../../components/PublicFooter';
 import PublicHeader from '../../components/PublicHeader';
 
@@ -11,13 +11,21 @@ const Anki: React.FC = () => {
     <div className="min-h-screen bg-mesh">
       <SEO
         title="SkillFade vs Anki — Skill Tracking vs Flashcards"
-        description="How SkillFade compares to Anki for learning retention. Anki memorizes facts with spaced repetition; SkillFade tracks broader skill decay over time. See which fits your learning goal."
+        description="SkillFade vs Anki for learning retention. Anki memorizes facts with spaced repetition; SkillFade tracks broader skill decay over time. See which fits you."
         canonicalUrl="https://skillfade.website/compare/anki"
         ogType="article"
-        structuredData={generateArticleSchema(
-          'SkillFade vs Anki — Skill Tracking vs Flashcards',
-          'Detailed comparison of SkillFade and Anki: spaced repetition for facts vs skill decay tracking for competencies. When to use each, and how they complement each other.'
-        )}
+        structuredData={[
+          generateArticleSchema(
+            'SkillFade vs Anki — Skill Tracking vs Flashcards',
+            'Detailed comparison of SkillFade and Anki: spaced repetition for facts vs skill decay tracking for competencies. When to use each, and how they complement each other.',
+            "2026-05-14"
+          ),
+          generateBreadcrumbSchema([
+            { name: 'Home', url: 'https://skillfade.website/' },
+            { name: 'Comparisons', url: 'https://skillfade.website/comparisons' },
+            { name: 'SkillFade vs Anki', url: 'https://skillfade.website/compare/anki' },
+          ]),
+        ]}
       />
 
       <PublicHeader />

@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Check, X, Minus } from 'lucide-react';
 import { SEO } from '../../components/SEO';
-import { generateArticleSchema } from '../../utils/seo';
+import { generateArticleSchema, generateBreadcrumbSchema } from '../../utils/seo';
 import PublicFooter from '../../components/PublicFooter';
 import PublicHeader from '../../components/PublicHeader';
 
@@ -14,10 +14,18 @@ const Obsidian: React.FC = () => {
         description="Obsidian links your notes into a knowledge graph. SkillFade measures whether your skills are decaying. See which is the right tool — and how to use both."
         canonicalUrl="https://skillfade.website/compare/obsidian"
         ogType="article"
-        structuredData={generateArticleSchema(
-          'SkillFade vs Obsidian — Skill Decay vs Knowledge Graph',
-          'Obsidian is a markdown-based knowledge graph; SkillFade is a skill decay tracker. They serve complementary needs in a self-directed learning stack.'
-        )}
+        structuredData={[
+          generateArticleSchema(
+            'SkillFade vs Obsidian — Skill Decay vs Knowledge Graph',
+            'Obsidian is a markdown-based knowledge graph; SkillFade is a skill decay tracker. They serve complementary needs in a self-directed learning stack.',
+            "2026-05-14"
+          ),
+          generateBreadcrumbSchema([
+            { name: 'Home', url: 'https://skillfade.website/' },
+            { name: 'Comparisons', url: 'https://skillfade.website/comparisons' },
+            { name: 'SkillFade vs Obsidian', url: 'https://skillfade.website/compare/obsidian' },
+          ]),
+        ]}
       />
 
       <PublicHeader />

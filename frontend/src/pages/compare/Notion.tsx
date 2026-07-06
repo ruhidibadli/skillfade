@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Check, X, Minus } from 'lucide-react';
 import { SEO } from '../../components/SEO';
-import { generateArticleSchema } from '../../utils/seo';
+import { generateArticleSchema, generateBreadcrumbSchema } from '../../utils/seo';
 import PublicFooter from '../../components/PublicFooter';
 import PublicHeader from '../../components/PublicHeader';
 
@@ -14,10 +14,18 @@ const Notion: React.FC = () => {
         description="Notion is a flexible workspace for notes and databases. SkillFade is a focused tool that calculates skill decay over time. Compare them and learn which fits your learning workflow."
         canonicalUrl="https://skillfade.website/compare/notion"
         ogType="article"
-        structuredData={generateArticleSchema(
-          'SkillFade vs Notion — Skill Decay Tracking vs Notes',
-          'Comparison of SkillFade and Notion for tracking learning. One is a workspace; the other is a freshness algorithm. When each makes sense.'
-        )}
+        structuredData={[
+          generateArticleSchema(
+            'SkillFade vs Notion — Skill Decay Tracking vs Notes',
+            'Comparison of SkillFade and Notion for tracking learning. One is a workspace; the other is a freshness algorithm. When each makes sense.',
+            "2026-05-14"
+          ),
+          generateBreadcrumbSchema([
+            { name: 'Home', url: 'https://skillfade.website/' },
+            { name: 'Comparisons', url: 'https://skillfade.website/comparisons' },
+            { name: 'SkillFade vs Notion', url: 'https://skillfade.website/compare/notion' },
+          ]),
+        ]}
       />
 
       <PublicHeader />

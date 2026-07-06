@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Check, X, Minus } from 'lucide-react';
 import { SEO } from '../components/SEO';
-import { generateArticleSchema } from '../utils/seo';
+import { generateArticleSchema, generateBreadcrumbSchema } from '../utils/seo';
 import PublicFooter from '../components/PublicFooter';
 import PublicHeader from '../components/PublicHeader';
 
@@ -88,13 +88,20 @@ const Comparisons: React.FC = () => {
     <div className="min-h-screen bg-mesh">
       <SEO
         title="SkillFade vs Anki, Notion, Obsidian — Compared"
-        description="How SkillFade compares to flashcard apps (Anki), note-taking tools (Notion, Obsidian), knowledge graphs, and spaced repetition apps. A calm mirror versus gamified coaches and memorization tools."
+        description="How SkillFade compares to Anki, Notion, Obsidian, and spaced repetition apps — a calm mirror for skill decay versus gamified coaches and memorization tools."
         canonicalUrl="https://skillfade.website/comparisons"
         ogType="article"
-        structuredData={generateArticleSchema(
-          'SkillFade vs Anki, Notion, Obsidian — Compared',
-          'Detailed comparison of SkillFade against flashcard apps, note-taking tools, knowledge graphs, and spaced repetition apps.'
-        )}
+        structuredData={[
+          generateArticleSchema(
+            'SkillFade vs Anki, Notion, Obsidian — Compared',
+            'Detailed comparison of SkillFade against flashcard apps, note-taking tools, knowledge graphs, and spaced repetition apps.',
+            "2026-05-14"
+          ),
+          generateBreadcrumbSchema([
+            { name: 'Home', url: 'https://skillfade.website/' },
+            { name: 'Comparisons', url: 'https://skillfade.website/comparisons' },
+          ]),
+        ]}
       />
 
       {/* Header */}
@@ -321,6 +328,12 @@ const Comparisons: React.FC = () => {
                 className="btn-secondary inline-flex items-center gap-2 px-8 py-3"
               >
                 View All Features
+              </Link>
+              <Link
+                to="/pricing"
+                className="btn-secondary inline-flex items-center gap-2 px-8 py-3"
+              >
+                See Plans & Pricing
               </Link>
             </div>
           </div>

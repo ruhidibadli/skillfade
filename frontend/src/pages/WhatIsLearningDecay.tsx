@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Clock, TrendingDown, Brain, RefreshCw } from 'lucide-react';
 import { SEO } from '../components/SEO';
-import { generateArticleSchema } from '../utils/seo';
+import { generateArticleSchema, generateBreadcrumbSchema } from '../utils/seo';
 import PublicFooter from '../components/PublicFooter';
 import PublicHeader from '../components/PublicHeader';
 
@@ -10,17 +10,23 @@ const WhatIsLearningDecay: React.FC = () => {
   const articleSchema = generateArticleSchema(
     "What Is Learning Decay? Understanding the Forgetting Curve for Skills",
     "Learning decay is the gradual loss of knowledge and skills over time without reinforcement. Learn about the forgetting curve, why skills fade, and how to track and prevent skill decay.",
-    "2024-01-01"
+    "2026-05-14"
   );
 
   return (
     <div className="min-h-screen bg-mesh">
       <SEO
-        title="What Is Learning Decay? Understanding the Forgetting Curve"
-        description="Learning decay is the gradual loss of knowledge and skills over time without reinforcement. Learn about the forgetting curve, why skills fade, and how to track and prevent skill decay with SkillFade."
+        title="What Is Learning Decay? The Forgetting Curve"
+        description="Learning decay is the gradual loss of skills over time without reinforcement. Learn about the forgetting curve, why skills fade, and how to prevent it."
         canonicalUrl="https://skillfade.website/what-is-learning-decay"
         ogType="article"
-        structuredData={articleSchema}
+        structuredData={[
+          articleSchema,
+          generateBreadcrumbSchema([
+            { name: 'Home', url: 'https://skillfade.website/' },
+            { name: 'What Is Learning Decay?', url: 'https://skillfade.website/what-is-learning-decay' },
+          ]),
+        ]}
       />
 
       {/* Header */}

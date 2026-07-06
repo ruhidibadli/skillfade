@@ -16,11 +16,7 @@ import {
 import LogoIcon from '../components/LogoIcon';
 import { SEO } from '../components/SEO';
 import PublicFooter from '../components/PublicFooter';
-import {
-  generateOrganizationSchema,
-  generateSoftwareApplicationSchema,
-  generateWebSiteSchema
-} from '../utils/seo';
+import { generateSoftwareApplicationSchema } from '../utils/seo';
 import PublicHeader from '../components/PublicHeader';
 
 // Freshness Indicator Component
@@ -46,17 +42,15 @@ const FreshnessIndicator: React.FC<{ level: 'fresh' | 'aging' | 'decayed'; size?
 };
 
 const Landing: React.FC = () => {
-  const structuredData = [
-    generateOrganizationSchema(),
-    generateSoftwareApplicationSchema(),
-    generateWebSiteSchema()
-  ];
+  // Organization + WebSite live sitewide in index.html; only emit the product schema
+  // here to avoid duplicate entity nodes on every route.
+  const structuredData = [generateSoftwareApplicationSchema()];
 
   return (
     <div className="min-h-screen bg-mesh">
       <SEO
         title="SkillFade — Skill Decay Tracker for Self-Directed Learners"
-        description="Track skill decay, practice gaps, and learning balance. A calm productivity tool for developers, designers, and self-directed learners. No gamification, no streaks — just the truth. Free and open source."
+        description="Track skill decay, practice gaps, and learning balance — a calm tool for developers and self-directed learners. No gamification, no streaks, just the truth."
         canonicalUrl="https://skillfade.website/"
         structuredData={structuredData}
       />
